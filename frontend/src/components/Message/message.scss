@@ -1,0 +1,40 @@
+@import '../../assets/styles/variables';
+
+.message{
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    .messageTop{
+        display: flex;
+        flex-direction: row;
+        .messageOwner{
+            flex: 3;
+        }
+
+        .messageTime{
+            font-size: 12px;
+            flex: 9;
+            align-self: center;
+        }
+        // .messageImg{
+        //     width: 32px;
+        //     height: 32px;
+        //     border-radius: 50%;
+        //     object-fit: cover;
+        // }
+    
+
+    }
+    .messageBottom{
+        
+        // margin-top: 10px;
+        .messageText{
+            // padding: 10px;
+            // border-radius: 20px;
+            // background-color: $main-color-blue;
+            // color: $txt-white;
+            // max-width: 300px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    }
+}

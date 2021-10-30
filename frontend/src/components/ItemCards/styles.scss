@@ -1,0 +1,43 @@
+@import "../../assets/styles/variables";
+
+.item {
+  // flex: 1 0 33%;
+  width: 330px;
+  height: 320px;
+  margin: 5px;
+  // padding: 8px 0;
+
+  .item_description {
+    // display: flex;
+    // flex-direction: row;
+    // justify-content: space-between;
+    position: relative;
+    .item_info {
+      white-space: nowrap;
+      width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+	  font-size: 30px;
+      .card_title {
+        color: $txt-color;
+        font-size: 30px;
+		&:hover{
+			text-decoration: underline;
+		}
+		&:active{
+			color: $color-blue-active;
+		}
+      }
+    }
+    .detail_dropdown {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}
+
+// .board_options {
+// 	margin-left: 10px;
+// 	padding: 10px;
+// }

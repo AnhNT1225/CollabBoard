@@ -1,0 +1,13 @@
+h1 {
+	font-weight: bold;
+	font-size: 48px;
+}
+
+.content_wrap {
+	padding: 50px;
+	// border: 1px solid red;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}

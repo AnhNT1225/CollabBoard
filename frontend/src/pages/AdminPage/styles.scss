@@ -1,0 +1,57 @@
+//--------FOR MAIN LAYOUT -----------
+@import "../../assets/styles/variables";
+
+.layout {
+	color: $txt-color;
+}
+
+.layout__content {
+	padding-left: $sidebar-width;
+	background-color: $second-bg;
+	min-height: 100vh;
+}
+
+.layout__content-main {
+	padding: 30px;
+}
+
+//--------------------
+.recently_created {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  .recently_stats {
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    // padding: 0 20px;
+    position: relative;
+    width: 20vw;
+    height: 30vh;
+    border-radius: 20px;
+    .represent_chart_title {
+      text-align: center;
+    }
+
+    .chart{
+      position: absolute;
+      top: 10;
+      left: 0;
+      width:  40em;  //300px;
+      height:  35em; //250px;
+    }
+  }
+}
+
+.recently_board_chart {
+//   width: 800px;
+//   height: 200px;
+  padding: 0 50px;
+  align-self: center;
+}
+
+
+.header_stats_wrap{
+  display: flex;
+  .pie_chart{
+    flex: 1
+  }
+}

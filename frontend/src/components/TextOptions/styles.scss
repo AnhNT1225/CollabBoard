@@ -1,0 +1,13 @@
+// .text-weight {
+// 	display: flex;
+// 	flex-direction: row;
+// 	justify-content: space-around;
+// }
+.comment-filter {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	#txt_color {
+		width: 50px;
+	}
+}

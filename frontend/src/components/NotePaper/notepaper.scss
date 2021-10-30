@@ -1,0 +1,12 @@
+.note_wrap{
+
+    .text_wrap{
+        width: 100%;
+        height: 200px;
+        resize: none;
+        border: transparent;
+        &:focus{
+            border: transparent;
+        }
+    }
+}

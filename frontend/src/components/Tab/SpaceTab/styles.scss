@@ -1,0 +1,15 @@
+.space_result_wrap{
+    display: flex;
+    flex-direction: row;    
+    // align-items: center;
+    .space_info{
+        flex: 1;
+    }
+    .space_actions{
+        flex: 1;
+        // align-self: center;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+}

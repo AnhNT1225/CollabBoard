@@ -1,0 +1,42 @@
+//Color variables
+$canvas-border-color: rgb(211, 209, 209);
+
+.canvas_wrap {
+	// border: 1px solid red;
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+	height: auto;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid $canvas-border-color;
+
+	// #container {
+	// 	position: absolute;
+	// 	z-index: -1;
+	// 	border: 1px solid $canvas-border-color;
+	// }
+	#menu {
+		display: none;
+		position: absolute;
+		width: 150px;
+		background-color: white;
+		box-shadow: 0 0 5px grey;
+		border-radius: 3px;
+		button {
+			width: 150px;
+			background-color: white;
+			border: none;
+			margin: 0;
+			padding: 5px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			&:hover {
+				background-color: #ffdf00;
+			}
+		}
+	}
+}

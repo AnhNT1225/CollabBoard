@@ -1,0 +1,19 @@
+.sort_icon {
+	position: absolute;
+	top: 8px;
+	left: 110px;
+	font-size: 1rem;
+}
+
+.item_management {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	position: relative;
+
+	.layout_space {
+		position: absolute;
+		top: 0;
+		right: 6rem;
+	}
+}

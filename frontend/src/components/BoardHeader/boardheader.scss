@@ -1,0 +1,35 @@
+.editor_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  // padding: 5px;
+  .page_header {
+    display: flex;
+    align-items: center;
+    .project_name_wrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+	  width: 10vw;
+      .project_name {
+        font-size: 20px;
+        margin-top: 1em;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+  .setting_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .setting_element {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.tool_container {
+  display: flex;
+  flex-direction: row;
+}

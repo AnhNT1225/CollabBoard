@@ -1,0 +1,41 @@
+.dangerous_link{
+    color: #f03636;
+}
+
+.team_result_wrap{
+    display: flex;
+    flex-direction: row;    
+    // align-items: center;
+    .team_info{
+        flex-basis: 80%;
+    }
+    .team_actions{
+        flex-basis: 20%;
+        // align-self: center;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+}
+
+.edit_team_wrapper{
+    width: 100%;
+    height: 100%;
+}
+
+.members_list{
+    .member_row{
+        display: flex;
+    }
+    .member_info{
+        padding: 0 10px;
+        .member_name{
+            font-weight: 600;
+            font-size: medium;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .member_email{
+            font-size: small
+        }
+    }
+}

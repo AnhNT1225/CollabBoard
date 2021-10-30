@@ -1,0 +1,57 @@
+.control_menu {
+	position: absolute;
+	width: fit-content;
+	padding: 10px;
+	height: auto;
+	bottom: 40px;
+	right: 50px;
+	background-color: transparent;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em,
+		rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
+		rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+
+	display: flex;
+	flex-direction: row;
+	.clean_board {
+		margin-right: 20px;
+	}
+}
+
+.zoom_pan {
+	position: absolute;
+	padding: 10px;
+	height: auto;
+	bottom: 20px;
+	left: 20px;
+	display: flex;
+	flex-direction: column;
+	z-index: 1;
+	.zoom_btn {
+		border: 1px solid rgb(236, 228, 228);
+		border-radius: 5px;
+		margin-top: 2px;
+		&:hover {
+			background-color: rgb(201, 198, 190);
+		}
+	}
+}
+
+.chat_pan {
+	position: absolute;
+	width: 50px;
+	height: auto;
+	bottom: 10px;
+	right: 20px;
+
+	.chat_btn {
+		width: 50px;
+		height: 50px;
+		border-color: transparent;
+		border-radius: 50%;
+		background-color: rgb(240, 237, 229);
+		z-index: 0;
+		&:hover {
+			background-color: rgb(238, 235, 217);
+		}
+	}
+}
