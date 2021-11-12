@@ -24,13 +24,19 @@ const API_URL = `${process.env.REACT_APP_SERVER_URL}/api/auth`;
 
 class AuthService {
   login(accountInfo) {
-    return axios.post(API_URL + "/login", accountInfo).then((response) => {
-      if (response.data.accessToken) {
-        localStorage.setItem("token", response.data.accessToken);
-        return response.data;
-      }
-
-    });
+    return axios
+      .post(API_URL + "/login", accountInfo, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        if (response.data.accessToken) {
+          localStorage.setItem("token", response.data.accessToken);
+          return response.data;
+        }
+      });
   }
 
   loginWithGoogle(googleTokenId) {
