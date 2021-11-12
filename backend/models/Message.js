@@ -13,5 +13,11 @@ const messageSchema = new Schema(
 	}
 );
 
+messageSchema.post('save', async(mess, next) => {
+	await mess.populate('senderId');
+	console.log("the populate message: ", mess);
+	return mess;
+	next();
+})
 const Message = mongoose.model("Message", messageSchema);
 module.exports = Message;

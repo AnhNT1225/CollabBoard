@@ -4,22 +4,22 @@ import { useHistory } from "react-router-dom";
 import BoardService from "../../services/boardService";
 import "./styles.scss";
 import JoinRoomModal from "./JoinRoomModal";
-// import { SocketContext } from "../../context/socketContext";
-import crypto from "crypto";
+
+// import crypto from "crypto";
 //media import
 import newCanvas from "../../assets/media/blank_canvas.png";
 import fileToCanvas from "../../assets/media/upload_file.png";
 import enterRoom from "../../assets/media/enter_key.png";
-import { socket } from "../../services/socketServices";
 
-const genRandomCode = () => {
-  const randomCode = crypto.randomBytes(5).toString("hex");
-  console.log("randomCode: ", randomCode);
-  return randomCode;
-};
-const CreateBoardModal = (props) => {
+// const genRandomCode = () => {
+//   const randomCode = crypto.randomBytes(5).toString("hex");
+//   console.log("randomCode: ", randomCode);
+//   return randomCode;
+// };
+const CreateBoardModal = ({socket}) => {
+
   const history = useHistory();
-  // const { socketState, socketDispatch } = useContext(SocketContext);
+
   const [createBoardModal, setCreateBoardModal] = useState(false);
   const [joinRoomModal, setjoinRoomModal] = useState(false);
   const [file, setFile] = useState({ loading: false });
@@ -42,33 +42,16 @@ const CreateBoardModal = (props) => {
   // 	},
   // };
 
-  useEffect(() => {
-    // socket.on("connect", () => {
-    // 	console.log("socket current id: ", socket.id);
-    // 	console.log("Successfully connected from client!");
-    // });
-    const onNotification = (joinData) => {
-      console.log("join data: ", joinData);
-      // history.push()
-      message.success(joinData);
-    };
-    // // socketDispatch({ type: "NOTIFICATION", action: joinData });
-    socket.on("notification", onNotification);
-    // return () => {
-    // 	socket.off("notification", onNotification);
-    // };
-	return () => {
-		socket.off("notification", onNotification)
-	}
-  }, []);
 
   const createBlankBoard = async (e) => {
-    const boardCode = await genRandomCode();
-    await BoardService.createBoard(boardCode)
+    e.preventDefault();
+    // const boardCode = await genRandomCode();
+    console.log("socket create board model: ", socket);
+    await BoardService.createBoard()
       .then(async (response) => {
         console.log("newBoard: ", response.board);
-        console.log("socket is something: ", socket);
-        await socket.emit("create-room", response.board.code);
+        console.log("board COEDNSK RESPONSE: ", response.board.code);
+        await socket?.emit("create-room", response.board.code);
         history.push({ pathname: `/board/${response.board._id}` });
       })
       .catch((error) => {
@@ -178,6 +161,7 @@ const CreateBoardModal = (props) => {
         joinRoomModal={joinRoomModal}
         setjoinRoomModal={setjoinRoomModal}
         setCreateBoardModal={setCreateBoardModal}
+        socket={socket}
       />
     </div>
   );

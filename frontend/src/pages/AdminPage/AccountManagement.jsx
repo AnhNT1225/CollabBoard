@@ -6,6 +6,14 @@ import { UserContext } from "../../context/userContext";
 const AccountManagement = (props) => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const { state, dispatch } = useContext(UserContext);
+  const [groupAge, setGroupAge] = useState({
+    under10: null,
+    between10and15: null,
+    between15and18: null,
+    over18: null,
+    undefined: null,
+  });
+
   useEffect(() => {
     UserService.getAllUser()
       .then((response) => {
@@ -18,17 +26,51 @@ const AccountManagement = (props) => {
       });
   }, []);
 
+  const currentYear = new Date().getFullYear();
+  console.log("current Year: ", currentYear);
+
+  // state.users?.forEach((user) => {
+  //   if (user.DoB) {
+  //     const userAge = currentYear - new Date(user.DoB).getFullYear();
+  //     console.log("user Age: ", userAge);
+  //     if (userAge < 10) {
+  //       setGroupAge((prev) => [...prev.under10, user]);
+  //     } else if (userAge >= 10 && userAge < 15) {
+  //       setGroupAge((prev) => [...prev.between10and15, user]);
+  //     } else if (userAge >= 15 && userAge < 18) {
+  //       setGroupAge((prev) => [...prev.between15and18, user]);
+  //     } else if (userAge >= 18) {
+  //       console.log("user inside: ", user);
+  //       setGroupAge((prev) => [...prev.over18, user]);
+  //     } else {
+  //       setGroupAge((prev) => [...prev.undefined, user]);
+  //     }
+  //   }
+  // });
+
   const handleChange = (pagination, sorter) => {
     console.log("Various parameters", pagination, sorter);
     setSortedInfo(sorter);
   };
 
+  console.log("check array: ", groupAge);
   const ageData = {
-    labels: ["<10", "10-15", "15-18", "18"],
+    labels: [
+      "Under 10 age",
+      "From 10 to 15 age",
+      "From 15 to 18 age",
+      "Over 18 age",
+      "Undefined",
+    ],
     datasets: [
       {
-        // label: '# of Votes',
-        data: [12, 19, 3, 8],
+        data: [
+          12, 7, 9, 5
+          // groupAge.under10?.length,
+          // groupAge.between10and15?.length,
+          // groupAge.between15and18?.length,
+          // groupAge.over18?.length,
+        ],
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
@@ -59,33 +101,6 @@ const AccountManagement = (props) => {
     ],
   };
 
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sidney No. 1 Lake Park",
-    },
-    {
-      key: "4",
-      name: "Jim Red",
-      age: 32,
-      address: "London No. 2 Lake Park",
-    },
-  ];
-
   const columns = [
     {
       title: "Name",
@@ -98,19 +113,44 @@ const AccountManagement = (props) => {
     },
     {
       title: "Age",
-      dataIndex: "age",
-      key: "age",
-      sorter: (a, b) => a.age - b.age,
+      dataIndex: "DoB",
+      key: "DoB",
+      // sorter: (a, b) => a.age - b.age,
+      render: (DoB) => (
+        <span>
+          {DoB ? currentYear - new Date(DoB).getFullYear() : "Not updated"}
+        </span>
+      ),
       // sortOrder: sortedInfo.columnKey === "age" && sortedInfo.order,
       ellipsis: true,
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Email address",
+      dataIndex: "email",
+      key: "email",
 
-      onFilter: (value, record) => record.address.includes(value),
-      sorter: (a, b) => a.address.length - b.address.length,
+      onFilter: (value, record) => record.email.includes(value),
+      sorter: (a, b) => a.email.length - b.email.length,
+      // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
+      ellipsis: true,
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+
+      onFilter: (value, record) => record.gender.includes(value),
+      sorter: (a, b) => a.gender.length - b.gender.length,
+      // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
+      ellipsis: true,
+    },
+    {
+      title: "Position",
+      dataIndex: "position",
+      key: "position",
+
+      onFilter: (value, record) => record.position.includes(value),
+      sorter: (a, b) => a.position.length - b.position.length,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },

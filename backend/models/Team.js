@@ -7,7 +7,7 @@ const teamSchema = new Schema(
 		members: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		boards: [{ type: Schema.Types.ObjectId, ref: "Board" }],
 		spaces: [{ type: Schema.Types.ObjectId, ref: "Space" }],
-		conversationId: [{ type: Schema.Types.ObjectId, ref: "Message" }],
+		// conversationId: [{ type: Schema.Types.ObjectId, ref: "Message" }],
 		createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 	},
 	{

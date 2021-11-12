@@ -12,6 +12,7 @@ const initialState = {
   files: [],
   texts: [],
   appState: [],
+  appHistoryStep: 0,
 };
 const elementReducer = (state, action) => {
   switch (action.type) {
@@ -21,60 +22,70 @@ const elementReducer = (state, action) => {
         ...state,
         rectangles: [...state.rectangles, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_SQUARE":
       return {
         ...state,
         rectangles: [...state.rectangles, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_ROUND":
       return {
         ...state,
         ellipses: [...state.ellipses, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_ELLIPSE":
       return {
         ...state,
         ellipses: [...state.ellipses, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_TRIANGLE":
       return {
         ...state,
         polygons: [...state.polygons, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_RHOMBUS":
       return {
         ...state,
         polygons: [...state.polygons, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_PENTAGON":
       return {
         ...state,
         polygons: [...state.polygons, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_HEXAGON":
       return {
         ...state,
         polygons: [...state.polygons, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_STAR":
       return {
         ...state,
         stars: [...state.stars, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
     case "CREATE_LINE":
       return {
         ...state,
         lines: [...state.lines, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
 
     case "CREATE_NOTE":
@@ -82,6 +93,7 @@ const elementReducer = (state, action) => {
         ...state,
         notes: [...state.notes, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
 
     case "CREATE_TEXT":
@@ -89,6 +101,7 @@ const elementReducer = (state, action) => {
         ...state,
         texts: [...state.texts, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
 
     case "CREATE_FILE":
@@ -96,6 +109,7 @@ const elementReducer = (state, action) => {
         ...state,
         files: [...state.files, action.payload],
         appState: [...state.appState, action.payload],
+        appHistoryStep: state.appHistoryStep + 1,
       };
 
     case "UPDATE_APP_STATE":
@@ -113,13 +127,15 @@ const elementReducer = (state, action) => {
       return {
         ...state,
         appState: state.appState.filter((el) => el.id !== action.payload.id),
+        appHistoryStep: state.appHistoryStep - 1,
       };
       
-    case "SET_APP_STATE":
-      return {
-        ...state,
-        appState: action.payload,
-      };
+    // case "SET_APP_STATE":
+    //   return {
+    //     ...state,
+    //     appState: action.payload,
+    //     appHistoryStep: state.appHistoryStep - 1,
+    //   };
     case "SET_RECTANGLE":
       return {
         ...state,
@@ -172,6 +188,7 @@ const elementReducer = (state, action) => {
         files: [],
         texts: [],
         appState: [],
+        appHistoryStep: 0
       };
       case "REMOVE_RECTANGLE":
         return {

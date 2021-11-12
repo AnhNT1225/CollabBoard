@@ -4,12 +4,14 @@ const app = express();
 // const logger = require("morgan");
 const http = require("http");
 const cors = require("cors");
+const path = require("path");
+const jwt = require("jsonwebtoken");
 // const cookieParser = require("cookie-parser");
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    // origin: "*" || "http://localhost:3000",
-    origin: "*" || "http://localhost:3000",
+    // origin: "http://localhost:3000" || "*",
+    origin: process.env.CLIENT_URL || "*",
     credentials: true,
   },
 });
@@ -18,7 +20,7 @@ const registerBoardHandlers = require("./socketHandler/boardHandler");
 // const bodyParse = require("body-parser");
 
 const route = require("./api");
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "/public")));
 // app.use(express.static(path.join(__dirname, "public")));
 // app.use(bodyParser.urlencoded({extended: true}));
 // app.use(bodyparser.json()); //utilizes the body-parser package
@@ -46,14 +48,6 @@ route(app);
 
 // const boardNamespace = io.of("/users");  //create io namespace which is an instance of socket io ('/')
 //
-// io.use((socket, next) => {
-// 	// console.log("socket request: ", socket.request.socket._events);
-// 	console.log("socket handshake: ", socket.handshake);
-// 	// if(socket.request){
-// 	// 	socket.boardCode = getMatchBoard
-// 	// }
-// 	next();
-// }); //data is room name (board code user send)
 
 //Socket.io ---- send realtime data to server
 
@@ -64,33 +58,41 @@ route(app);
 
 // io.setMaxListeners(0);
 
+io.use(async (socket, next) => {
+  // console.log("socket handshake: ", socket.handshake);
+  try {
+    const token = socket.handshake.auth.token;
+    const payload = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    socket.userId = await payload._id;
+    next();
+  } catch (error) {
+    console.log("error socket: ", error);
+  }
+});
+onlineUsers = [];
+const addNewUser = (userId, socketId) => {
+  !onlineUsers.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return onlineUsers.find((user) => user.userId === userId);
+};
+
 io.on("connection", function (socket) {
-  console.log("New client connected " + socket.id);
+  console.log("New client connected " + socket.userId);
+  socket.on("newUser", (userId) => {
+    addNewUser(userId, socket.id);
+  });
   // console.log("socket room: ", socket.rooms);
   // console.log("al room: ", io.sockets.adapter.rooms);
   socket.on("ping", (count) => {
     console.log(count);
   });
-  // socket.on("createRoom", (roomName) => {
-  // 	socket.join(roomName);
-  // 	//board add into member array
-  // });
-  // socket.on("joinRoom", (boardCode) => {
-  // 	if (socket.rooms.has(boardCode)) {
-  // 		console.log("user joined room: ", boardCode);
-  // 		socket.join(boardCode);
-  // 		console.log("all room: ", socket.rooms);
-  // 		//Trả lại thông báo cho người vào phòng
-  // 		socket.emit("notification", `You have joined the room: ${boardCode}`);
-  // 		//Trả lại thông báo cho tất cả người còn lại trong phòng
-  // 		io.to(boardCode).emit(
-  // 			"notification",
-  // 			`One people has id ${socket.id} has joined our board.`
-  // 		);
-  // 	} else {
-  // 		console.log("There is no room like this key word search");
-  // 	}
-  // });
+
   const joinRoom = (boardCode) => {
     console.log("room code: ", boardCode);
     console.log("code confirm: ", io.sockets.adapter.rooms.has(boardCode));
@@ -135,8 +137,10 @@ io.on("connection", function (socket) {
 
   const leaveRoom = (boardCode) => {
     console.log("code confirm: ", io.sockets.adapter.rooms.has(boardCode));
+    console.log("all room after leave: ", io.sockets.adapter.rooms);
     if (io.sockets.adapter.rooms.has(boardCode)) {
       socket.leave(boardCode);
+      socket.emit("notification", `You have leave the room: ${boardCode}`);
     }
   };
   socket.on("join-room", joinRoom);
@@ -146,20 +150,38 @@ io.on("connection", function (socket) {
     console.log("data drawing: ", data);
     socket.in(data.code).emit("line", data.line);
   });
+
   socket.on("drawShape", (data) => {
     console.log("shapeData: ", data);
     socket.in(data.code).emit("shape", data.shapes);
   });
-  // socket.on("drawText", (textData) => {
-  //   console.log("shapeData: ", textData);
-  //   socket.broadcast.emit("text", textData);
-  // });
-  // socket.on("sendMessageClient", function (data) {
-  //   console.log(data);
-  //   socket.emit("sendMessageServer", { data });
-  // });
+  socket.on("drawText", (data) => {
+    console.log("textData: ", data);
+    socket.in(data.code).emit("text", data.text);
+  });
+
+  socket.on("drawNote", (data) => {
+    console.log("noteData: ", data);
+    socket.in(data.code).emit("note", data.notes);
+  });
+
+  socket.on("drawFile", (data) => {
+    // console.log("fileData: ", data);
+    // data.files.forEach((element) => {
+    //   const buffer = Buffer.from(element.src.split(",")[1], "base64");
+    //   // console.log('buffer type: ', buffer)
+    //   element.src = buffer;
+    // });
+    // console.log("fileData: ", data.files);
+    socket.in(data.code).emit("file", data.files);
+  });
+  socket.on("sendMessageClient", function (data) {
+    console.log(data);
+    socket.in(data.code).emit("receiveMessageServer", { message: data.message });
+  });
   socket.on("disconnect", () => {
-    console.log("Client disconnected!");
+    console.log("Client disconnected!: " + socket.userId);
+    removeUser(socket.id);
   });
 });
 

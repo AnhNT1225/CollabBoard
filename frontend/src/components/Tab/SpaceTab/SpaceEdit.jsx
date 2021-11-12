@@ -13,13 +13,14 @@ const SpaceEdit = (props) => {
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const { teamState, teamDispatch } = useContext(TeamContext);
   // const [space, setSpace] = useState(null);
-  const [form, setForm] = useState({
-    name: spaceState.space?.name,
-    team: {
-      id: spaceState.space.teamId?._id,
-      name: spaceState.space.teamId?.name,
-    },
-  });
+  const [form, setForm] = useState(null);
+  // const [form, setForm] = useState({
+  //   name: spaceState.space?.name,
+  //   team: {
+  //     id: spaceState.space.teamId?._id,
+  //     name: spaceState.space.teamId?.name,
+  //   },
+  // });
   useEffect(() => {
     teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
     TeamService.getJoinedTeam()
@@ -39,6 +40,11 @@ const SpaceEdit = (props) => {
       await SpaceService.getSpaceById(spaceId)
         .then((result) => {
           console.log("result space: ", result);
+          setForm({name: result.data.name,
+              team: {
+                id: result.data.teamId?._id,
+                name: result.data.teamId?.name,
+              },})
           spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
           // setSpace(result.data);
         })
@@ -47,14 +53,14 @@ const SpaceEdit = (props) => {
         });
     };
     getSpaceInfo();
-  }, [spaceDispatch, spaceId]);
+  }, []);
 
   console.log("teamId: ", spaceState.space.teamId?._id);
 
   const saveSpaceEdit = async (e) => {
     e.preventDefault();
     //if space doesn not stored in any team, add space to new team
-    if (!spaceState.space.teamId?._id) {
+    if (!spaceState.space.teamId?._id && form) {
          await SpaceService.updateSpaceInfo(spaceId, form)
         .then((result) => {
           console.log("result of updated space name and TEAM spaces: ", result);
@@ -104,7 +110,7 @@ const SpaceEdit = (props) => {
             name="space_name"
             type="text"
             style={{ width: 250, height: 40, textAlign: "center" }}
-            value={form.name}
+            value={form?.name}
             onChange={(e) =>
               setForm((prev) => ({ ...prev, name: e.target.value }))
             }
@@ -120,13 +126,21 @@ const SpaceEdit = (props) => {
             readOnly
           />
           <label className="edit_space_label">
-            Total boards: {spaceState.space.boards?.length}
+            Total boards: 
           </label>
+          <Input
+            name="space_boards"
+            type="text"
+            style={{ width: 250, height: 40, textAlign: "center" }}
+            value={spaceState.space.boards?.length}
+            readOnly
+          />
+          <Space direction="horizontal">
           <label htmlFor="space_team" className="edit_space_label">
             Team:
           </label>
           <Select
-            defaultValue={!form.team.name ? "No space" : form.team.name}
+            defaultValue={!form?.team.name ? "No space" : form?.team.name}
             style={{ width: 120 }}
             onChange={(value, obj) => {
               console.log("value: ", value, "obj _id: ", obj.name);
@@ -144,7 +158,7 @@ const SpaceEdit = (props) => {
               );
             })}
           </Select>
-
+          </Space>
           <Button htmlType="submit" type="primary" size="middle">
             Save changes
           </Button>

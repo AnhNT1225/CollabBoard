@@ -1,4 +1,7 @@
 const User = require("../models/User");
+const endOfDay= require("date-fns/endOfDay");
+const startOfDay = require("date-fns/startOfDay");
+const bcrypt = require("bcryptjs");
 
 class UserController {
   async findUserByEmail(req, res) {
@@ -10,15 +13,10 @@ class UserController {
           .status(404)
           .json({ success: false, message: "User Not found." });
       }
+      user.password = undefined;
       return res.status(200).json({
         success: true,
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.name,
-          avatar: user.avatar,
-          role: user.role,
-        },
+        user: user,
       });
     } catch (error) {
       console.log("the catch error: ", error);
@@ -35,18 +33,10 @@ class UserController {
           .status(404)
           .json({ success: false, message: "User Not found." });
       }
-
+      user.password = undefined;
       return res.status(200).json({
         success: true,
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.name,
-          avatar: user.avatar,
-          role: user.role,
-          DoB: user.DoB,
-          gender: user.gender,
-        },
+        user: user,
       });
     } catch (error) {
       console.log("the catch error: ", error);
@@ -59,7 +49,7 @@ class UserController {
     console.log("time from client: ", timeFromClient);
     try {
       const filter = {};
-      const user = await User.find(filter);
+      const user = await User.find({role: "user"}).lean();
       if (!user) {
         return res
           .status(404)
@@ -77,7 +67,9 @@ class UserController {
 
   async findNewUsers(req, res) {
     try {
-      const user = await User.find({}).where("createdAt");
+      const user = await User.find({
+        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()) },
+      });
       if (!user) {
         return res
           .status(404)
@@ -107,6 +99,24 @@ class UserController {
         workingPlace: workingPlace,
         position: position,
         avatar: avatar,
+      },
+      { new: true }
+    )
+      .then((user) => {
+        res.status(200).json({
+          success: true,
+          data: user,
+        });
+      })
+      .catch((err) => res.status(400).json("Error: " + err));
+  }
+
+  async updateUserPassword(req, res) {
+    const { password } = req.body;
+    await User.findByIdAndUpdate(
+      { _id: req.user._id },
+      {
+        password: bcrypt.hashSync(password, 10),
       },
       { new: true }
     )

@@ -2,11 +2,12 @@ import React, { useRef } from "react";
 import { Modal, Input, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Logo from "../Logo";
-import { socket } from "../../services/socketServices";
+
 import BoardService from "../../services/boardService";
 import { useHistory } from "react-router-dom";
 const JoinRoomModal = (props) => {
-	const { joinRoomModal, setjoinRoomModal, setCreateBoardModal } = props;
+	const { joinRoomModal, setjoinRoomModal, setCreateBoardModal, socket } = props;
+
 	const history = useHistory();
 	const inputRef = useRef(null);
 	// console.log("test JoinRoomModal : ", joinRoomModal);
@@ -18,17 +19,18 @@ const JoinRoomModal = (props) => {
 	const handleJoinRoom = async (e) => {
 		e.preventDefault();
 		console.log("iasjdsiajdi: ", inputRef.current);
-
+		console.log("join ROMMM SOCKET: ", socket)
 		await BoardService.findBoardByCode(inputRef.current)
 			.then(async (result) => {
 				console.log("result: ", result);
-				await socket.emit("join-room", result.data.code);
+				await socket?.emit("join-room", result.data.code);
 				history.push(`/board/${result.data._id}`);
 			})
 			.catch((error) => {
 				console.log("err: ", error);
 			});
 	};
+	
 	return (
 		<Modal
 			visible={joinRoomModal}

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext, memo } from "react";
 import ControlMenu from "../ControlMenu";
 import Conversation from "../Conversation/Conversation";
 import { withRouter } from "react-router-dom";
+import { message } from "antd";
 import OverlayMenu from "../OverlayMenu/OverlayMenu";
 import { Stage, Layer, Line, Rect, Transformer } from "react-konva";
 import "./Board.scss";
@@ -14,7 +15,6 @@ import Typer from "../NodeModels/text";
 import { ElementContext } from "../../context/elementContext";
 import BoardService from "../../services/boardService";
 import nextId from "react-id-generator";
-import { socket } from "../../services/socketServices";
 import Note from "../NodeModels/label";
 
 const Board = (props) => {
@@ -31,8 +31,9 @@ const Board = (props) => {
     setIsEditText,
     boardState,
     boardDispatch,
+    socket,
   } = props;
-
+  console.log("user from YTF: ", user)
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   // const { boardState, boardDispatch } = useContext(BoardContext);
@@ -88,8 +89,8 @@ const Board = (props) => {
   });
 
   // our history
-  let appHistory = [elementState.appState]; //before params is files
-  let appHistoryStep = 0;
+  // let appHistory = [elementState.appState]; //before params is files
+  // let appHistoryStep = 0;
 
   const updateSelectionRect = () => {
     const node = selectionRectRef.current;
@@ -155,53 +156,86 @@ const Board = (props) => {
   // console.log("currentBoard: ", boardState?.currentBoard);
   console.log("elementState.lines : ", elementState.lines);
   console.log("files: ", elementState.files);
+
+  useEffect(() => {
+    console.log('element State: ', elementState?.rectangles)
+  }, [elementState, socket]);
+
   //----------------------------SOCKET IO client connect to server---------------------------------
   useEffect(() => {
-    // socketState.on("connect", () => {
-    // 	console.log("socket id: ", socketState.id);
-    // 	console.log("Successfully connected from client!");
-    // 	socketState.on("welcome", (welcomeData) => {
-    // 		console.log("welcome: ", welcomeData);
-    // 	});
+    // socket?.on("connect", function () {
+    //   //  'connect' event is received on client on every connection start.
+    //   socket?.emit("create-room", boardState.currentBoard?.code); //  where 'user' is your object containing email.
     // });
+    socket?.emit("create-room", boardState.currentBoard?.code);
+    const onNotification = (joinData) => {
+      console.log("join data: ", joinData);
+      message.success(joinData);
+    };
+
+    socket?.on("notification", onNotification);
+
+    const onDrawingImage = async(fileData) => {
+      // console.log("FILE DATA: ", fileData)
+      // fileData.forEach((el) => {
+      //   let base64ImageString = Buffer.from(el.src, "binary").toString(
+      //     "base64"
+      //   );
+      //   el.src = "data:image/png;base64," + base64ImageString;
+      // });
+      // console.log("file data: ", fileData);
+      await elementDispatch({ type: "SET_FILE", payload: fileData });
+      // elementDispatch({ type: "CREATE_FILE", payload: fileData });
+    };
+
+    socket?.on("file", onDrawingImage);
 
     const onDrawingEvent = (lineData) => {
       console.log("DATA res: ", lineData);
       // setDrawingLines((prev) => [...prev, lineData]);
       elementDispatch({ type: "SET_LINE", payload: lineData });
     };
-    socket.on("line", onDrawingEvent);
+    socket?.on("line", onDrawingEvent);
 
     const onDrawingShapeEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
       // elementDispatch({ type: "SET_LINE", payload: shapeData.lines });
-      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData.rects });
-      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData.elips });
-      elementDispatch({ type: "SET_POLYGONS", payload: shapeData.polys });
-      elementDispatch({ type: "SET_STAR", payload: shapeData.stars });
+      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData?.rects });
+      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData?.elips });
+      elementDispatch({ type: "SET_POLYGONS", payload: shapeData?.polys });
+      elementDispatch({ type: "SET_STAR", payload: shapeData?.stars });
     };
-    socket.on("shape", onDrawingShapeEvent);
+    socket?.on("shape", onDrawingShapeEvent);
+
     const onDrawingTextEvent = (textData) => {
       console.log("text data response: ", textData);
       elementDispatch({ type: "SET_TEXT", payload: textData });
     };
-    socket.on("text", onDrawingTextEvent);
+    socket?.on("text", onDrawingTextEvent);
 
+    const onDrawingNoteEvent = (noteData) => {
+      console.log("note data response: ", noteData);
+      elementDispatch({ type: "SET_NOTE", payload: noteData });
+    };
+    socket?.on("note", onDrawingNoteEvent);
     // // 	# the server is restarted, the client automatically reconnects and sends its buffered events
     // // connect
     // let count = 0;
     // setInterval(() => {
-    // 	socketState.volatile.emit("ping", ++count);
+    // 	socket?.volatile.emit("ping", ++count);
     // }, 1000);
 
     // CLEAN UP THE EFFECT
     return () => {
       // socket.disconnect();
-      socket.off("line", onDrawingEvent);
-      socket.off("shape", onDrawingShapeEvent);
-      socket.off("text", onDrawingTextEvent);
+      socket?.off("line", onDrawingEvent);
+      socket?.off("shape", onDrawingShapeEvent);
+      socket?.off("text", onDrawingTextEvent);
+      socket?.off("file", onDrawingImage);
+      socket?.off("note", onDrawingNoteEvent);
+      socket?.off("notification", onNotification);
     };
-  }, [elementDispatch]);
+  }, [elementDispatch, socket, boardState]);
 
   const handleCursor = (e) => {
     const container = e.currentTarget.getStage().container();
@@ -271,7 +305,12 @@ const Board = (props) => {
 
         elementDispatch({
           type: "CREATE_LINE",
-          payload: { id: nextId('line-'), points: [pos.x, pos.y], drawingProperty },
+          payload: {
+            id: nextId("line-"),
+            points: [pos.x, pos.y],
+            drawingProperty,
+            type: "line"
+          },
         });
 
         break;
@@ -279,6 +318,10 @@ const Board = (props) => {
         //if choose "Pen" tool cannot draggable on board
         console.log("isEditText: ", isEditText);
         if (isEditText) {
+          socket.emit("drawText", {
+            code: boardState.currentBoard.code,
+            text: elementState.texts,
+          });
           return;
         }
         //stop draggble stage when click on Typing component
@@ -293,14 +336,12 @@ const Board = (props) => {
           fill: "black",
           fontStyle: "normal",
           textDecoration: "empty",
-          id: nextId('text-'),
+          id: nextId("text-"),
+          type: 'text'
         };
         elementDispatch({ type: "CREATE_TEXT", payload: textAttr });
         // setTexts((prev) => [...prev, textAttr]);
         setIsEditText(true);
-        // socket.current.emit("drawText", {
-        // 	text: texts,
-        // });
 
         break;
       case "shaping":
@@ -311,7 +352,7 @@ const Board = (props) => {
           selectShape(null);
         }
         //emit the shapeInfo to the socket server
-        socket.emit("drawShape", {
+        socket?.emit("drawShape", {
           code: boardState.currentBoard.code,
           shapes: {
             rects: elementState.rectangles,
@@ -322,6 +363,16 @@ const Board = (props) => {
         });
         break;
       case "noting":
+        socket.emit('drawNote', {
+          code: boardState.currentBoard?.code,
+          notes: elementState.notes
+        })
+        break;
+      case "media_upload":
+        socket.emit("drawFile", {
+          code: boardState.currentBoard?.code,
+          files: elementState?.files,
+        });
         break;
       default:
         break;
@@ -378,7 +429,7 @@ const Board = (props) => {
     switch (menuComponent) {
       case "drawing":
         isDrawing.current = false;
-        socket.emit("drawLine", {
+        socket?.emit("drawLine", {
           code: boardState.currentBoard.code,
           line: elementState.lines,
         });
@@ -413,7 +464,6 @@ const Board = (props) => {
   };
 
   console.log("appState: ", elementState.appState);
-  
 
   //Zooming pan by relative position (by MOUSE Wheel)
   //define scale rate of the stage on zooming
@@ -505,50 +555,74 @@ const Board = (props) => {
       payload: currentElement.attrs,
     });
 
-    if(currentElement.attrs?.points !== null){
-      elementDispatch({type: "REMOVE_LINE", payload: currentElement.attrs})
+    if (currentElement.attrs?.points !== null) {
+      elementDispatch({ type: "REMOVE_LINE", payload: currentElement.attrs });
     }
-    if(currentElement.attrs.id?.includes('rect')){
-      elementDispatch({type: "REMOVE_RECTANGLE", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("rect")) {
+      elementDispatch({
+        type: "REMOVE_RECTANGLE",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('square')){
-      elementDispatch({type: "REMOVE_RECTANGLE", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("square")) {
+      elementDispatch({
+        type: "REMOVE_RECTANGLE",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('ellipse')){
-      elementDispatch({type: "REMOVE_ELLIPSE", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("ellipse")) {
+      elementDispatch({
+        type: "REMOVE_ELLIPSE",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('round')){
-      elementDispatch({type: "REMOVE_ELLIPSE", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("round")) {
+      elementDispatch({
+        type: "REMOVE_ELLIPSE",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('triangle')){
-      elementDispatch({type: "REMOVE_POLYGONS", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("triangle")) {
+      elementDispatch({
+        type: "REMOVE_POLYGONS",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('rhombus')){
-      elementDispatch({type: "REMOVE_POLYGONS", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("rhombus")) {
+      elementDispatch({
+        type: "REMOVE_POLYGONS",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('pentagon')){
-      elementDispatch({type: "REMOVE_POLYGONS", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("pentagon")) {
+      elementDispatch({
+        type: "REMOVE_POLYGONS",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('hexagon')){
-      elementDispatch({type: "REMOVE_POLYGONS", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("hexagon")) {
+      elementDispatch({
+        type: "REMOVE_POLYGONS",
+        payload: currentElement.attrs,
+      });
     }
-    if(currentElement.attrs.id?.includes('star')){
-      elementDispatch({type: "REMOVE_STAR", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("star")) {
+      elementDispatch({ type: "REMOVE_STAR", payload: currentElement.attrs });
     }
 
     // if(currentElement.attrs.id.includes('note')){
     //   elementDispatch({type: "REMOVE_NOTE", payload: currentElement.attrs})
     // }
-    if(currentElement.attrs.id?.includes('text')){
-      elementDispatch({type: "REMOVE_TEXT", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("text")) {
+      elementDispatch({ type: "REMOVE_TEXT", payload: currentElement.attrs });
     }
-    if(currentElement.attrs.id?.includes('file')){
-      elementDispatch({type: "REMOVE_FILE", payload: currentElement.attrs})
+    if (currentElement.attrs.id?.includes("file")) {
+      elementDispatch({ type: "REMOVE_FILE", payload: currentElement.attrs });
     }
   };
 
   const copyElement = (e) => {
-    console.log('copy: ', currentElement.clone())
+    console.log("copy: ", currentElement.clone());
     const copyElement = currentElement.clone().attrs;
 
     // if(currentElement.attrs.hasOwnProperty("lineCap")){
@@ -556,53 +630,53 @@ const Board = (props) => {
     //   elementDispatch({type: "CREATE_LINE", payload: copyElement})
     // }
 
-    if(currentElement.attrs.id?.includes('rect')){
-      copyElement.id = nextId("rect-")
-      elementDispatch({type: "CREATE_RECTANGLE", payload: copyElement})
+    if (currentElement.attrs.id?.includes("rect")) {
+      copyElement.id = nextId("rect-");
+      elementDispatch({ type: "CREATE_RECTANGLE", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('square')){
-      copyElement.id = nextId("square-")
-      elementDispatch({type: "CREATE_SQUARE", payload: copyElement})
+    if (currentElement.attrs.id?.includes("square")) {
+      copyElement.id = nextId("square-");
+      elementDispatch({ type: "CREATE_SQUARE", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('ellipse')){
-      copyElement.id = nextId("ellipse-")
-      elementDispatch({type: "CREATE_ELLIPSE", payload: copyElement})
+    if (currentElement.attrs.id?.includes("ellipse")) {
+      copyElement.id = nextId("ellipse-");
+      elementDispatch({ type: "CREATE_ELLIPSE", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('round')){
-      copyElement.id = nextId("round-")
-      elementDispatch({type: "CREATE_ROUND", payload: copyElement})
+    if (currentElement.attrs.id?.includes("round")) {
+      copyElement.id = nextId("round-");
+      elementDispatch({ type: "CREATE_ROUND", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('triangle')){
-      copyElement.id = nextId("triangle-")
-      elementDispatch({type: "CREATE_TRIANGLE", payload: copyElement})
+    if (currentElement.attrs.id?.includes("triangle")) {
+      copyElement.id = nextId("triangle-");
+      elementDispatch({ type: "CREATE_TRIANGLE", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('rhombus')){
-      copyElement.id = nextId("rhombus-")
-      elementDispatch({type: "CREATE_RHOMBUS", payload: copyElement})
+    if (currentElement.attrs.id?.includes("rhombus")) {
+      copyElement.id = nextId("rhombus-");
+      elementDispatch({ type: "CREATE_RHOMBUS", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('pentagon')){
-      copyElement.id = nextId("pentagon-")
-      elementDispatch({type: "CREATE_PENTAGON", payload: copyElement})
+    if (currentElement.attrs.id?.includes("pentagon")) {
+      copyElement.id = nextId("pentagon-");
+      elementDispatch({ type: "CREATE_PENTAGON", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('hexagon')){
-      copyElement.id = nextId("hexagon-")
-      elementDispatch({type: "CREATE_HEXAGON", payload: copyElement})
+    if (currentElement.attrs.id?.includes("hexagon")) {
+      copyElement.id = nextId("hexagon-");
+      elementDispatch({ type: "CREATE_HEXAGON", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('star')){
-      copyElement.id = nextId("star-")
-      elementDispatch({type: "CREATE_STAR", payload: copyElement})
+    if (currentElement.attrs.id?.includes("star")) {
+      copyElement.id = nextId("star-");
+      elementDispatch({ type: "CREATE_STAR", payload: copyElement });
     }
     // if(currentElement.attrs.id.includes('note')){
     //   copyElement.id = nextId("note-")
     //   elementDispatch({type: "CREATE_NOTE", payload: copyElement})
     // }
-    if(currentElement.attrs.id?.includes('text')){
-      copyElement.id = nextId("text-")
-      elementDispatch({type: "CREATE_TEXT", payload: copyElement})
+    if (currentElement.attrs.id?.includes("text")) {
+      copyElement.id = nextId("text-");
+      elementDispatch({ type: "CREATE_TEXT", payload: copyElement });
     }
-    if(currentElement.attrs.id?.includes('file')){
-      copyElement.id = nextId("file-")
-      elementDispatch({type: "CREATE_FILE", payload: copyElement})
+    if (currentElement.attrs.id?.includes("file")) {
+      copyElement.id = nextId("file-");
+      elementDispatch({ type: "CREATE_FILE", payload: copyElement });
     }
   };
   return (
@@ -849,6 +923,10 @@ const Board = (props) => {
                         type: "SET_TEXT",
                         payload: txts,
                       });
+                      socket.emit("drawText", {
+                        code: boardState.currentBoard.code,
+                        text: txts,
+                      });
                     }}
                   />
                 );
@@ -902,6 +980,7 @@ const Board = (props) => {
             setMenuComponent={setMenuComponent}
             dragUrl={dragUrl}
             setDrawingProperty={setDrawingProperty}
+            socket={socket}
           />
         </div>
         <div id="menu">
@@ -913,15 +992,18 @@ const Board = (props) => {
           </button>
         </div>
         <ControlMenu
-          appHistoryStep={appHistoryStep}
-          appHistory={appHistory}
+          appHistoryStep={elementState.appHistoryStep}
+          appHistory={elementState.appState}
           setIsChatOpen={setIsChatOpen}
+          elementDispatch={elementDispatch}
         />
         {isChatOpen ? (
           <Conversation
             user={user}
             setIsChatOpen={setIsChatOpen}
             boardId={boardId}
+            socket={socket}
+            boardCode={boardState.currentBoard.code}
           />
         ) : null}
         {/* <div className="chat_pan">
@@ -937,4 +1019,4 @@ const Board = (props) => {
   );
 };
 
-export default withRouter(Board);
+export default memo(Board);

@@ -7,7 +7,7 @@ import BoardService from "../../../services/boardService";
 import "./styles.scss";
 // import BoardService from "../../../../services/boardService";
 const AllBoardTab = (props) => {
-  const { searchInput, getJoinedItems, getSpaceLists } = props;
+  const { searchInput, getJoinedItems, getSpaceLists, socket } = props;
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
 
@@ -26,7 +26,7 @@ const AllBoardTab = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-  }, [boardDispatch]);
+  }, []);
 
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
@@ -67,7 +67,7 @@ const AllBoardTab = (props) => {
           .slice(itemNumber.minValue, itemNumber.maxValue)
           .map((board, index) => {
             return (
-              <ItemCards key={index} board={board} spaces={spaceState.spaces} />
+              <ItemCards key={index} board={board} spaces={spaceState.spaces} socket={socket}/>
             );
           })}
       </div>

@@ -1,3 +1,8 @@
+//important fix margin antd form item
+.ant-form-item{
+	margin-bottom: 0;
+}
+
 .login {
 	position: relative;
 	background: repeating-linear-gradient(

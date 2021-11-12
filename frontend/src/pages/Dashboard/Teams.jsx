@@ -31,14 +31,16 @@ function Teams(props) {
 	};
 
 	return (
-		<div className="team_content_wrap">
-			<h1>Team</h1>
+		<div className="space_content_wrap">
+			<div className="content_header">
+			<h1 className="title">Team</h1>
 			<button
-				className="create_team_btn"
+				className="create_btn"
 				onClick={() => setCreateTeamModal(true)}
 			>
-				Add team
+				+ Add team
 			</button>
+			</div>
 			<Modal
 				title="Create new team"
 				// bodyStyle={{ padding: "2rem", height: 300 }}
@@ -69,6 +71,7 @@ function Teams(props) {
 					</Button>
 				</form>
 			</Modal>
+			<br/>
 			<div className="category_card">
 				<AllTeamTab />
 			</div>

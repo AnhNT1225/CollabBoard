@@ -12,7 +12,7 @@ router.get("/owned", permit("user"), spaceController.getOwnedSpaces);
 
 
 //route for update teamId for space
-router.patch("/update/:id", permit("user"), spaceController.setTeamForSpace)
+router.patch("/update/:id", permit("user"), spaceController.updateSpaceInfo)
 
 //route for update teamId for space
 router.patch("/update/team/:id", permit("user"), spaceController.setTeamForSpace)

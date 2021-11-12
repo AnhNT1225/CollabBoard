@@ -21,11 +21,11 @@ import ShapingOptions from "../ShapingOptions/ShapingOptions";
 import ShareContent from "../ShareContent";
 import BoardService from "../../services/boardService";
 import { ElementContext } from "../../context/elementContext";
-import { socket } from "../../services/socketServices";
 import "./boardheader.scss";
 import { useEffect } from "react";
 import ColorPicker from "../ColorPicker/ColorPicker";
 import LineWeight from "../LineWeight/LineWeight";
+import { downloadURI, ToStringBase64 } from "../../lib/process_img";
 const { Paragraph } = Typography;
 const BoardHeader = (props) => {
   const history = useHistory();
@@ -37,7 +37,8 @@ const BoardHeader = (props) => {
     setTextProperty,
     isEditText,
     setIsEditText,
-    boardState, boardDispatch
+    boardState, boardDispatch,
+    socket
   } = props;
   // const { boardState, boardDispatch } = useContext(BoardContext);
   const {elementDispatch} = useContext(ElementContext)
@@ -104,7 +105,8 @@ const BoardHeader = (props) => {
       });
   };
 
-  function handleMenuClick(e) {
+
+  async function handleSettingMenu(e) {
     console.log("click", e);
     const item = e.key;
     switch (item) {
@@ -112,7 +114,12 @@ const BoardHeader = (props) => {
         <h1>Hello2</h1>;
         break;
       case "2":
-        <h1>Hello2</h1>;
+        let base64ImageString = Buffer.from(boardState.currentBoard?.imageURL, "binary").toString(
+          "base64"
+        );
+        // let base64ImageString = await ToStringBase64(boardState.currentBoard?.imageURL)
+        console.log('BASE 64 STRING: ', base64ImageString)
+        downloadURI(`data:image/png;base64,${base64ImageString}`, `${boardState.currentBoard?.name}.png`)
         break;
       case "3":
         <h1>Hello3</h1>;
@@ -124,18 +131,18 @@ const BoardHeader = (props) => {
   //Menu component ant design for DropDown Menu
 
   const menu1 = (
-    <Menu onClick={handleMenuClick}>
+    <Menu onClick={handleSettingMenu}>
       <Menu.Item key="1">View history version</Menu.Item>
       <Menu.Item key="2">Export to image</Menu.Item>
       <Menu.Item key="3">View comment</Menu.Item>
     </Menu>
   );
 
-  const backToDashboard = async () => {
+  const backToDashboard = async (e) => {
+    e.preventDefault();
     elementDispatch({ type: "RESET_STATE" });
     const codeRoom = await boardState.currentBoard?.code;
-    console.log("DO you konw about tht: ", codeRoom);
-    await socket.emit("leave-room", codeRoom);
+    await socket?.emit("leave-room", codeRoom);
     history.goBack(1);
   };
 
@@ -172,7 +179,7 @@ const BoardHeader = (props) => {
           ) : null}
           {menuComponent && menuComponent === "shaping" ? (
             <div className="tool_container">
-              <ShapingOptions />
+              <ShapingOptions boardCode={boardState.currentBoard?.code}/>
             </div>
           ) : null}
           {menuComponent && menuComponent === "typing" ? (

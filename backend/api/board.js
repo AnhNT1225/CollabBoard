@@ -8,6 +8,8 @@ const { permit } = require("../middleware/permissionRole");
 
 //router for get all existed boards in system (admin) --> for manage and statistic
 router.get("/all", permit("admin"), boardController.getAllBoards);
+//router for get new boards that user created on one days
+router.get("/new", permit("admin"),boardController.findNewBoards);
 
 //router for get latest boards that user joined (not owned by user)
 router.get("/lastest", permit("user"),boardController.getLastestBoards);

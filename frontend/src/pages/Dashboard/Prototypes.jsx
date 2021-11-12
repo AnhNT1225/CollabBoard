@@ -13,7 +13,7 @@ import SpaceService from "../../services/spaceService";
 const { TabPane } = Tabs;
 
 const Prototypes = (props) => {
-  const { searchInput } = props;
+  const { searchInput, socket } = props;
   // const [deletedId, setDeletedId] = useState(null)
   const { boardDispatch } = useContext(BoardContext);
   const { spaceDispatch } = useContext(SpaceContext);
@@ -25,7 +25,9 @@ const Prototypes = (props) => {
           await dispatch({type: 'GET_USER', payload: user})
         })
         .catch((error) => {
-          throw new Error(error);
+          if(error){
+            throw new Error(error);
+          }      
         });
           
       }
@@ -82,16 +84,16 @@ const Prototypes = (props) => {
 
   return (
     <div className="board_content_wrap">
-      <CreateBoardModal />
+      <CreateBoardModal socket={socket}/>
       <div className="category_card">
         <Tabs defaultActiveKey="1" onChange={changeTab}>
           <TabPane tab="All" key="1">
             <SortTool />
-            <AllBoardTab searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists}/>
+            <AllBoardTab searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists} socket={socket}/>
           </TabPane>
           <TabPane tab="Created by me" key="2">
             <SortTool />
-            <OwnedBoardTab searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists}/>
+            <OwnedBoardTab searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists} socket={socket}/>
           </TabPane>
         </Tabs>
       </div>

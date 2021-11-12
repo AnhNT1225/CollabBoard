@@ -5,7 +5,8 @@ import TopNav from "../../components/NavBar/DashboardNavbar";
 import UserRoutes from "../../pages/Dashboard/UserRoutes";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import UserService from "../../services/userService";
-const UserDashboard = () => {
+const UserDashboard = (props) => {
+  const {socket} = props;
   const [searchInput, setSearchInput] = useState("");
   let { path } = useRouteMatch();
   const { dispatch } = useContext(UserContext);
@@ -47,7 +48,7 @@ const UserDashboard = () => {
       <div className="layout__content">
         <TopNav setSearchInput={setSearchInput} />
         <div className="layout__content-main">
-          <UserRoutes path={path} searchInput={searchInput} />
+          <UserRoutes path={path} searchInput={searchInput} socket={socket}/>
         </div>
       </div>
     </div>

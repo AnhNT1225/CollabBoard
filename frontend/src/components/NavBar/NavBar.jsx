@@ -7,7 +7,7 @@ import { ACTIONS, UserContext } from "../../context/userContext";
 import { Dropdown, Col, Row, Button, Menu } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 
-const NavBar = (props) => {
+const NavBar = ({socket}) => {
 	const history = useHistory();
 	const { state, dispatch } = useContext(UserContext);
 	const logout = () => {
@@ -32,7 +32,7 @@ const NavBar = (props) => {
 					<Logo />
 				</Col>
 				<Col span={3}>
-					<SearchRoom />
+					<SearchRoom socket={socket}/>
 				</Col>
 				<Col span={12}>
 					<nav className="navbar navbar-expand-lg navbar-light ">

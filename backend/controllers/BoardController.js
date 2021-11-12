@@ -1,5 +1,7 @@
 const Board = require("../models/Board");
-
+const endOfDay = require("date-fns/endOfDay");
+const startOfDay = require("date-fns/startOfDay");
+const { genRandomCode } = require("../utils/genRandomCodeString");
 const BLANK_BOARD =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAADICAQAAADmHyRtAAABVUlEQVR42u3SMQEAAAgDINc/9Izg4QsZSDvwEomQCImQCCRCIiRCIpAIiZAIiUAiJEIiJAKJkAiJkAgkQiIkQiKQCImQCIlAIiRCIiQCiZAIiZAIJEIiJEIikAiJkAiJQCIkQiIkAomQCImQCCRCIiRCIpAIiZAIiUAiJEIiJAKJkAiJkAgkQiIkQiKQCImQCIlAIiRCIiQCiZAIiZAIJEIiJEIikAiJkAiJQCIkQiIkAomQCImQCCRCIiRCIpAIiZAIiUAiJEIiJAKJkAiJkAgkQiIkQiKQCImQCIlAIiRCIiSSCImQCIlAIiRCIiQCiZAIiZAIJEIiJEIikAiJkAiJQCIkQiIkAomQCImQCCRCIiRCIpAIiZAIiUAiJEIiJAKJkAiJkAgkQiIkQiKQCImQCIlAIiRCIiQCiZAIiZAIJEIiJEIikAiJkAiJQCIkQiIkgtsCPzePSLVEgrkAAAAASUVORK5CYII=";
 class BoardController {
@@ -30,10 +32,34 @@ class BoardController {
       });
   }
 
+  //get new boards that user created once day
+  async findNewBoards(req, res) {
+    try {
+      const board = await Board.find({
+        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()) },
+      });
+      if (!board) {
+        return res
+          .status(404)
+          .json({ success: false, message: "New boards not found." });
+      }
+      console.log("board: ", board);
+      return res.status(200).json({
+        success: true,
+        data: board,
+      });
+    } catch (error) {
+      console.log("the catch error: ", error);
+      return res.status(500).json({ success: false, message: "Bad request!" });
+    }
+  }
+
   //get lastest boards that user accessed
   async getLastestBoards(req, res) {
     // Querry for getting 4 latest documents
-    await Board.find({ contributors: req.user._id }).sort({ _id: -1 }).limit(4)
+    await Board.find({ contributors: req.user._id })
+      .sort({ _id: -1 })
+      .limit(4)
       // .populate("createdBy")
       // .populate("spaceId")
       .then((boards) => {
@@ -104,11 +130,7 @@ class BoardController {
   }
   //update board by id
   async updateBoardCanvas(req, res) {
-    const {
-      board_storage,
-      board_src,
-      board_media,
-    } = req.body;
+    const { board_storage, board_src, board_media } = req.body;
     console.log("hehehe: ", JSON.parse(board_media));
     let mediaArr = JSON.parse(board_media);
     let newArr = [];
@@ -138,6 +160,7 @@ class BoardController {
         lines: JSON.parse(board_storage.lines),
         texts: JSON.parse(board_storage.texts),
       },
+      updatedAt: new Date(Date.now()).toISOString(),
       media: newArr,
     };
     // }
@@ -149,15 +172,6 @@ class BoardController {
       .populate("createdBy")
       .populate("spaceId")
       .then(async (board) => {
-        // // console.log("test update: ", board);
-        // board.storage.rectangles = board_storage.rectangles;
-        // board.storage.polygons = board_storage.polygons;
-        // board.storage.ellipses = board_storage.ellipses;
-        // board.storage.stars = board_storage.stars;
-        // board.storage.lines = board_storage.lines;
-        // board.markModified("storage");
-        // await board.save();
-
         return res.status(200).json({
           success: true,
           message: "Update boards successful",
@@ -178,7 +192,7 @@ class BoardController {
     console.log("boardID If: ", boardId, "boardName: ", board_name);
     await Board.findByIdAndUpdate(
       { _id: boardId },
-      { name: board_name },
+      { name: board_name, updatedAt: new Date(Date.now()).toISOString() },
       {
         new: true,
       }
@@ -256,8 +270,10 @@ class BoardController {
   // 	const {}
   // }
 
-  createBoard(req, res) {
-    const { boardCode } = req.body;
+  async createBoard(req, res) {
+    // const { boardCode } = req.body;
+    const boardCode = await genRandomCode();
+    const { boardName } = req.body;
     const bindata = Buffer.from(BLANK_BOARD.split(",")[1], "base64");
 
     const board = new Board({
@@ -265,6 +281,9 @@ class BoardController {
       code: boardCode,
       imageURL: bindata,
     });
+    if (boardName) {
+      board.name = boardName;
+    }
     board.contributors.addToSet(req.user);
     // board.storage = { elements: null, medias: null };
     // board.markModified("storage");
@@ -355,6 +374,7 @@ class BoardController {
       { spaceId: spaceId },
       { new: true }
     )
+      .populate("spaceId")
       .then((board) => {
         return res.status(200).json({
           success: true,

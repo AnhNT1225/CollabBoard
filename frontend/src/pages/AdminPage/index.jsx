@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useRouteMatch } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import TopNav from "../../components/NavBar/DashboardNavbar";
+import TopNav from "../../components/NavBar/AdminNavBar";
 import AdminRoutes from "../../pages/AdminPage/AdminRoutes";
 import UserService from '../../services/userService';
 import {UserContext, ACTIONS} from '../../context/userContext';
@@ -10,11 +10,13 @@ const AdminPage = () => {
   const [searchInput, setSearchInput] = useState("");
   let { path, url } = useRouteMatch();
   const { dispatch } = useContext(UserContext);
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
     UserService.getCurrentUser()
       .then((response) => {
         dispatch({ type: ACTIONS.GET_USER, payload: response });
+        setUser(response)
       })
       .catch((error) => {
         console.log("error: ", error);
@@ -43,9 +45,10 @@ const AdminPage = () => {
       icon: "fas fa-users-cog",
     },
   ];
+
   return (
     <>
-      <Sidebar sidebarItem={adminItem} />
+      <Sidebar sidebarItem={adminItem} admin={user}/>
       <div className="layout__content">
         <TopNav setSearchInput={setSearchInput} />
         <div className="layout__content-main">

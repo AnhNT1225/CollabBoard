@@ -8,10 +8,10 @@ import workImg from "../../assets/images/creative_ideas.png";
 import sketchImg from "../../assets/images/limnu1.PNG";
 import collabImg from "../../assets/images/limnu2.PNG";
 import brainStorm from "../../assets/images/limnu3.PNG";
-const HomePage = () => {
+const HomePage = ({socket}) => {
 	return (
 		<div className="home">
-			<NavBar />
+			<NavBar socket={socket}/>
 			<div className="content_wrap">
 				<div className="content_1">
 					<div className="introduction">

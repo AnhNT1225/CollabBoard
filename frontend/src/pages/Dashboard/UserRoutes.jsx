@@ -12,17 +12,17 @@ import SpaceResult from '../../components/Tab/SpaceTab/SpaceResult';
 
 
 const UserRoutes = (props) => {
-	// console.log("props path: ", props);
+	console.log("props path: ", props);
 	return (
 		<Switch>
 			<Route exact path={`${props.path}`}>
-				<RecentWorkspace searchInput={props.searchInput} />
+				<RecentWorkspace searchInput={props.searchInput} socket={props.socket}/>
 			</Route>
 			<Route exact path={`${props.path}/prototypes`}>
-				<Propotypes searchInput={props.searchInput} />
+				<Propotypes searchInput={props.searchInput} socket={props.socket}/>
 			</Route>
 			<Route exact path={`${props.path}/spaces`}>
-				<Spaces searchInput={props.searchInput} />
+				<Spaces searchInput={props.searchInput}/>
 			</Route>
 			<Route exact path={`${props.path}/teams`}>
 				<Teams />

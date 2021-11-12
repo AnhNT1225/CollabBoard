@@ -5,7 +5,9 @@ const messageController = require('../controllers/MessageController')
 
 router.post("/:boardId", messageController.addNewMessage);
 
-//get
+//router delete message
+router.delete('/:boardId', messageController.deleteMessages)
+//get all messages by boardId
 
 router.get("/:boardId", messageController.getMessages);
 

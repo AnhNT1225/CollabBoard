@@ -2,8 +2,8 @@ import axios from "axios";
 // import GoogleLogin from "react-google-login";
 // import authHeader from "./auth-header";
 // const BASE_URL = "http://localhost:5000";
-
-const API_URL = "http://localhost:5000/api/auth";
+// const API_URL = "http://localhost:5000/api/board";
+const API_URL = `${process.env.REACT_APP_SERVER_URL}/api/auth`;
 // axios.interceptors.request.use(
 // 	(config) => {
 // 		const token = localStorage.getItem("user");

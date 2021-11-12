@@ -17,7 +17,7 @@ import {
 import { ElementContext } from "../../context/elementContext";
 import nextId from "react-id-generator";
 import "./styles.scss";
-function ShapingOptions(props) {
+const ShapingOptions =() => {
 	// const { setShapingProperty } = props;
 	const { elementDispatch } = useContext(ElementContext);
 	const handleShapeTypes = (e) => {
@@ -34,9 +34,9 @@ function ShapingOptions(props) {
 					stroke: "black",
 					name: "rect",
 					id: nextId("rect-"),
+					type: 'rect'
 				};
 				elementDispatch({ type: "CREATE_RECTANGLE", payload: rectData });
-				
 				break;
 			case "square":
 				// setShapingProperty(shapeName);
@@ -47,6 +47,7 @@ function ShapingOptions(props) {
 					height: 100,
 					fill: "red",
 					id: nextId("square-"),
+					type: 'rect'
 				};
 				elementDispatch({ type: "CREATE_SQUARE", payload: squareData });
 				
@@ -61,6 +62,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 2,
 					id: nextId("round-"),
+					type: 'ellipse'
 				};
 				elementDispatch({ type: "CREATE_ROUND", payload: roundData });
 
@@ -76,6 +78,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 2,
 					id: nextId("ellipse-"),
+					type: 'ellipse'
 				};
 				elementDispatch({ type: "CREATE_ELLIPSE", payload: ellipseData });
 
@@ -90,6 +93,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 1,
 					id: nextId("triangle-"),
+					type: 'polygons' 
 				};
 				elementDispatch({ type: "CREATE_TRIANGLE", payload: triangleData });
 
@@ -103,6 +107,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 1,
 					id: nextId("rhombus-"),
+					type: 'polygons'
 				};
 				elementDispatch({ type: "CREATE_RHOMBUS", payload: rhombusData });
 
@@ -116,6 +121,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 1,
 					id: nextId("pentagon-"),
+					type: 'polygons'
 				};
 				elementDispatch({ type: "CREATE_PENTAGON", payload: pentagonData });
 
@@ -129,6 +135,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 1,
 					id: nextId("hexagon-"),
+					type: 'polygons'
 				};
 				elementDispatch({ type: "CREATE_HEXAGON", payload: hexagonData });
 
@@ -144,6 +151,7 @@ function ShapingOptions(props) {
 					stroke: "black",
 					strokeWidth: 4,
 					id: nextId("star-"),
+					type: 'star'
 				};
 				elementDispatch({ type: "CREATE_STAR", payload: starData });
 

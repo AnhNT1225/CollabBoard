@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./style.scss";
+import {withRouter} from 'react-router-dom'
 import Board from "../../components/Board/Board";
 import BoardService from "../../services/boardService";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import { BoardContext } from "../../context/boardContext";
 import UserService from "../../services/userService";
 import BoardHeader from "../../components/BoardHeader/BoardHeader";
-const Editor = (props) => {
+const Editor = ({match, socket}) => {
 	const { state, dispatch } = useContext(UserContext);
 	const {  boardState, boardDispatch } = useContext(BoardContext);
-	const boardId = props.match.params.id;
-	
+	const boardId = match.params.id;
+	console.log('boardId: ', boardId);
+	console.log('editor socket: ', socket)
 
 	useEffect(() => {
 		boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
@@ -68,6 +70,7 @@ const Editor = (props) => {
 				setIsEditText={setIsEditText}
 				boardState={boardState}
 				boardDispatch={boardDispatch}
+				socket={socket}
 				/>
 			<Board
 				menuComponent={menuComponent}
@@ -81,9 +84,10 @@ const Editor = (props) => {
 				setIsEditText={setIsEditText}
 				boardState={boardState}
 				boardDispatch={boardDispatch}
+				socket={socket}
 			/>
 		</div>
 	);
 };
 
-export default Editor;
+export default withRouter(Editor) ;

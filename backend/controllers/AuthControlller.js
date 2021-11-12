@@ -20,6 +20,7 @@ class AuthController {
 			name: name,
 			email: email,
 			password: bcrypt.hashSync(password, 10),
+			gender: "Undefined"
 		});
 		user
 			.save()

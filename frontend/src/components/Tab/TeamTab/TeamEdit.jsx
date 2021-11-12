@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Input, Button, Space, Tag, Checkbox } from "antd";
-import { LeftOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import TeamService from "../../../services/teamService";
 import { TeamContext } from "../../../context/teamContext";
 import { Link } from "react-router-dom";
 const TeamEdit = (props) => {
   const teamId = props.match.params.teamId;
-  const { teamDispatch } = useContext(TeamContext);
-  const [team, setTeam] = useState(null);
+  const { teamState, teamDispatch } = useContext(TeamContext);
   const [isCheck, setIsCheck] = useState(false);
-  const [updateName, setUpdateName] = useState(team?.name);
-
+  const [updateName, setUpdateName] = useState(null);
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const emailRef = useRef(null);
   useEffect(() => {
     const getTeamInfo = async () => {
       await TeamService.getTeamById(teamId)
         .then((result) => {
-          setTeam(result.data);
+          console.log("result team : ", result);
+          setUpdateName(result.data.name);
+          teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
         })
         .catch((err) => {
           throw new Error(err);
@@ -28,25 +30,50 @@ const TeamEdit = (props) => {
     e.preventDefault();
     await TeamService.editTeamName(teamId, updateName)
       .then((result) => {
-        console.log("result: ", result);
-        teamDispatch({ type: "UPDATE_TEAM_NAME", payload: result.data });
+        console.log("result edit team name: ", result);
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((err) => {
         console.log("error: ", err);
       });
-    await setUpdateName(null);
   };
 
-  function onChange(e) {
+  function onChange(checkedValues) {
+    console.log(`checkedValues: `, checkedValues);
+    setSelectedMemberId(checkedValues);
+  }
+  const changeCheckedItem = (e) => {
     console.log(`checked = ${e.target.checked}`);
     setIsCheck(e.target.checked);
-  }
+  };
+  const removeMember = async () => {
+    await TeamService.removeMemberFromTeam(teamId, selectedMemberId)
+      .then((result) => {
+        console.log("result: ", result);
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
+      })
+      .catch((err) => {
+        console.log("error: ", err);
+      });
+  };
 
+  const inviteMember = async() => {
+    await TeamService.addMemberToTeam(teamId, emailRef.current)
+      .then((result) => {
+        console.log("add member to team result: ", result);
+        teamDispatch({type: "FETCH_TEAM_SUCCESS", payload: result.data});
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+        throw new Error("The space haven't add to the team.");
+      });
+    emailRef.current = null;
+  };
   return (
     <div>
-      <Link to="/dashboard/teams" >
-      <i class="fas fa-chevron-left"></i>
-        <span >Back to Dashboard</span>
+      <Link to="/dashboard/teams">
+        <i class="fas fa-chevron-left"></i>
+        <span>Back to Dashboard</span>
       </Link>
       <h2>Edit Team</h2>
       <form className="edit_team_wrapper" onSubmit={saveEdit}>
@@ -68,12 +95,12 @@ const TeamEdit = (props) => {
             name="team_host"
             type="text"
             style={{ width: 250, height: 40, textAlign: "center" }}
-            value={team?.createdBy.name}
+            value={teamState.team.createdBy?.name}
             onChange={(e) => setUpdateName(e.target.value)}
-            disabled
+            readOnly
           />
           <label className="edit_team_label">
-            Total members: {team?.members.length}
+            Total members: {teamState.team.members?.length}
           </label>
           <div style={{ display: "flex" }}>
             <Input
@@ -81,9 +108,11 @@ const TeamEdit = (props) => {
               type="email"
               placeholder="Enter email you want to add"
               style={{ width: 250 }}
-              onChange={(e) => setUpdateName(e.target.value)}
+              onChange={(e) => {
+                emailRef.current = e.target.value;
+              }}
             />
-            <Button>Invite</Button>
+            <Button onClick={inviteMember}>Invite</Button>
           </div>
 
           <table class="table table-hover">
@@ -94,33 +123,49 @@ const TeamEdit = (props) => {
                 <th scope="col">Email</th>
                 <th scope="col">Roles</th>
                 {isCheck ? <th scope="col">Action</th> : null}
-                
               </tr>
             </thead>
             <tbody>
-              {team?.members.map((mem) => {
+              {teamState.team.members?.map((mem) => {
                 return (
                   <tr key={mem._id}>
                     {/* <th scope="row">1</th> */}
                     <td>
-                      <Checkbox onChange={onChange} />
+                      <Checkbox.Group
+                        style={{ width: "100%" }}
+                        onChange={onChange}
+                      >
+                        <Checkbox
+                          value={mem._id}
+                          onChange={changeCheckedItem}
+                        />
+                      </Checkbox.Group>
                     </td>
                     <td>{mem.name}</td>
                     <td>{mem.email}</td>
                     <td>
-                      {team?.createdBy._id === mem._id ? (
+                      {teamState.team.createdBy?._id === mem._id ? (
                         <Tag color="blue">Owner</Tag>
                       ) : (
                         <Tag color="magenta">Member</Tag>
                       )}
                     </td>
-                    <td>{isCheck ? <Link to={"#"}><DeleteOutlined /></Link> : null}</td>
+                    <td>
+                      {isCheck ? (
+                        <Button
+                          className="dangerous_link"
+                          type="link"
+                          icon={<DeleteOutlined />}
+                          onClick={removeMember}
+                        />
+                      ) : null}
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-          <Button htmlType="submit" type="primary" size="middle">
+          <Button htmlType="submit" type="primary" size="large" shape="round">
             Save changes
           </Button>
         </Space>

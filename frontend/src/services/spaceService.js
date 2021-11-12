@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "../lib/auth";
-const API_URL = "http://localhost:5000/api/space";
-
+// const API_URL = "http://localhost:5000/api/space";
+const API_URL = `${process.env.REACT_APP_SERVER_URL}/api/space`;
 class SpaceService {
   createSpace(spaceName) {
     return axios
@@ -47,14 +47,11 @@ class SpaceService {
   		});
   }
 
-  addBoardToSpace(spaceId, dataInput) {
+  addBoardToSpace(spaceId, boardId) {
     console.log("space id: ", spaceId);
-    const spaceData = {
-      spaceName: dataInput.spaceName,
-      boardId: dataInput.boardId,
-    };
+
     return axios
-      .patch(API_URL + `/update/boards/${spaceId}`, spaceData, {
+      .patch(API_URL + `/update/boards/${spaceId}`, {boardId: boardId}, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
       .then((response) => {
@@ -128,6 +125,7 @@ class SpaceService {
   }
 
   updateSpaceInfo(spaceId, form){
+    console.log("teamInfo: ", form)
     return axios
     .patch(
       API_URL + `/update/${spaceId}`,

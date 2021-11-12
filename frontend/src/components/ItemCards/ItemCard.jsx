@@ -5,11 +5,11 @@ import { MoreOutlined } from "@ant-design/icons";
 import ItemOptions from "./ItemOptions";
 import "./styles.scss";
 import SpaceService from "../../services/spaceService";
-import { socket } from "../../services/socketServices";
+
 import BoardService from "../../services/boardService";
 import {BoardContext} from '../../context/boardContext'
 const { Option } = Select;
-const ItemCards = ({ board, index, spaces }) => {
+const ItemCards = ({ board, index, spaces, socket }) => {
 	const history = useHistory();
 	const [spaceSelectionModal, setSpaceSelectionModal] = useState(false);
 	const {boardDispatch} = useContext(BoardContext)
@@ -27,10 +27,10 @@ const ItemCards = ({ board, index, spaces }) => {
 	const submitStorePositiion = async (e) => {
 		try {
 			e.preventDefault();
-			const inputData = {
-				name: spaceVal.current,
-				boardId: board._id,
-			};
+			// const inputData = {
+			// 	name: spaceVal.current,
+			// 	boardId: board._id,
+			// };
 			await BoardService.setSpaceForBoard(board._id, spaceId.current)
 			.then((result) => {
 				console.log("result 1: ", result);
@@ -40,7 +40,7 @@ const ItemCards = ({ board, index, spaces }) => {
 				console.log("error: ", error);
 				throw new Error("The board haven't add to the space.");
 			});
-			await SpaceService.addBoardToSpace(spaceId.current, inputData)
+			await SpaceService.addBoardToSpace(spaceId.current, board._id)
 				.then((result) => {
 					console.log("result 2: ", result);
 				})
@@ -55,22 +55,13 @@ const ItemCards = ({ board, index, spaces }) => {
 		}
 	};
 
-	// useEffect(() => {
-	// 	// socketRef.current.on("connect", () => {
-	// 	// 	console.log("socket current id: ", socketRef.current.id);
-	// 	// 	console.log("Successfully connected from client!");
-	// 	// });
-	// 	// socket.on("connect", () => {
-	// 	// 	console.log("MEOWOWOOWOWOWOWOW: ", socket.id);
-	// 	// 	console.log(socket.connected);
-	// 	// });
-	// }, [socket]);
-
-	const handleJoinRoom = () => {
+	const handleJoinRoom = (e) => {
+		e.preventDefault();
 		// socketDispatch({ type: "JOIN_ROOM", payload: board.code });
-		socket.emit("create-room", board.code);
+		socket?.emit("create-room", board.code);
 		history.push(`/board/${board._id}`);
 	};
+
 	let base64ImageString = Buffer.from(board.imageURL, "binary").toString(
 		"base64"
 	);
@@ -102,8 +93,8 @@ const ItemCards = ({ board, index, spaces }) => {
 					<Row>
 						<Col span={12}>
 							{
-							board && board?.spaceId?._id ? 
-							<Link to={`/dashboard/spaces/${board?.spaceId?._id}`} >{board?.spaceId.name}</Link> 
+							board.spaceId?._id ? 
+							<Link to={`/dashboard/spaces/${board.spaceId?._id}`} >{board.spaceId?.name}</Link> 
 							: (
 								<>
 									<button

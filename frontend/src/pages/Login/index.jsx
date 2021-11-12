@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
-import { Input, Button, Divider, message } from "antd";
+import React, {  useContext } from "react";
+import { Link, withRouter, useHistory } from "react-router-dom";
+import { Input, Button, Divider, message, Form } from "antd";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
@@ -13,32 +13,28 @@ import Logo from "../../components/Logo";
 import GoogleLogin from "react-google-login";
 import { refreshTokenSetup } from "../../utils/refreshToken";
 import AuthService from "../../services/authService";
-import AdminPage from "../../pages/AdminPage/index";
 import { ACTIONS, UserContext } from "../../context/userContext";
+
 import "./styles.scss";
 const Login = (props) => {
   const { dispatch } = useContext(UserContext);
   const history = useHistory();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const handleLogin = (e) => {
-    e.preventDefault();
+
+  //use for checking validate form
+  const handleLogin = (data) => {
     // setIsLoading(true);
-    const data = {
-      email: email,
-      password: password,
-    };
     AuthService.login(data)
       .then((data) => {
         dispatch({ type: ACTIONS.LOGIN, payload: data });
         // console.log("data.user: ", data.user.role);
-        localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('role', data.user.role);
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("role", data.user.role);
         message.success(`Login successfully`, 1);
         if (data.user.role === "admin") {
-          history.push("/admin");
+          props.history.push("/admin");
         } else {
-          history.push("/dashboard");
+          props.history.push("/dashboard");
+          props.setupSocket();
         }
       })
       .catch((error) => {
@@ -115,24 +111,51 @@ const Login = (props) => {
             icon={<CloseOutlined style={{ fontSize: 20 }} />}
           />
         </Link>
-        <form className="login_form" onSubmit={handleLogin}>
+        <Form className="login_form" onFinish={handleLogin} scrollToFirstError autoComplete="off">
+          {/* <form className="login_form"   onSubmit={handleLogin}> */}
           <Logo />
           <label className="input_label" htmlFor="email">
             Email
           </label>
-          <Input
+          <Form.Item
             name="email"
-            className="login_input"
-            size="middle"
-            placeholder="abc@xyz.com"
-            prefix={<UserOutlined />}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            allowClear
-          />
+            rules={[
+              {
+                type: 'email',
+                message: 'The input is not valid E-mail!',
+              },
+              {
+                required: true,
+                message: 'Please input your E-mail!',
+              },
+              {whitespace: true},
+
+            ]}
+            hasFeedback
+          >
+            <Input
+              className="login_input"
+              size="middle"
+              type="text"
+              placeholder="abc@xyz.com"
+              prefix={<UserOutlined />}
+              // allowClear
+            />
+          </Form.Item>
           <label className="input_label" htmlFor="password">
             Password
           </label>
+          <Form.Item
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+              {min: 8}
+            ]}
+            hasFeedback
+          >  
           <Input.Password
             className="login_input"
             name="password"
@@ -142,9 +165,8 @@ const Login = (props) => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
-            onChange={(e) => setPassword(e.target.value)}
-            required
           />
+          </Form.Item>
           <div className="forgot_section">
             <Link className="redirect_link" to={"/reset-password"}>
               Forgot password?
@@ -179,10 +201,11 @@ const Login = (props) => {
               </Link>
             </p>
           </div>
-        </form>
+          {/* </form> */}
+        </Form>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default withRouter(Login);

@@ -8,6 +8,8 @@ router.post("/create", permit("user"), teamController.createTeam);
 
 //router for get all Team
 router.get("/all", permit("admin"), teamController.getAllTeams);
+//router for get all Team
+router.get("/new", permit("admin"), teamController.findNewTeams);
 //router for get top team
 router.get("/top5", permit("admin"), teamController.getMaxBoardsTeams);
 
@@ -31,6 +33,8 @@ router.patch("/update/boards/:id", permit("user"), teamController.addBoardToTeam
 router.patch("/update/spaces/:id", permit("user"), teamController.addSpaceToTeam);
 //router for remove selected space to team
 router.patch("/remove/spaces/:id", permit("user"), teamController.removeSpaceFromTeam);
+//router for remove selected members to team
+router.patch("/remove/members/:id", permit("user"), teamController.removeMemberFromTeam);
 
 //router for update Team spaces by id
 router.patch("/update/members/:id", permit("user"), teamController.addMemberToTeam);

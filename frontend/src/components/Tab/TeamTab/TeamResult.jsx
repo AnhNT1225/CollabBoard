@@ -17,25 +17,27 @@ import ItemCards from "../../ItemCards/ItemCard";
 import { BoardContext } from "../../../context/boardContext";
 import BoardService from "../../../services/boardService";
 import { SpaceContext } from "../../../context/spaceContext";
-import {TeamContext} from '../../../context/teamContext'
+import { TeamContext } from "../../../context/teamContext";
 import SpaceService from "../../../services/spaceService";
 const { TabPane } = Tabs;
 const { Option } = Select;
 const TeamResult = (props) => {
   const teamId = props.match.params.teamId;
-  const [team, setTeam] = useState(null);
-  const { boardState, boardDispatch } = useContext(BoardContext);
-  const { spaceState, spaceDispatch } = useContext(SpaceContext);
-  const {teamContext, teamDispatch} = useContext(TeamContext)
-  const [boardSelectionModal, setBoardSelectionModal] = useState(false);
-  const [spaceSelectionModal, setSpaceSelectionModal] = useState(false);
+  // const [team, setTeam] = useState(null);
+  const { boardDispatch } = useContext(BoardContext);
+  const { spaceDispatch } = useContext(SpaceContext);
+  const { teamState, teamDispatch } = useContext(TeamContext);
+  // const [boardSelectionModal, setBoardSelectionModal] = useState(false);
+  const [createSpaceModal, setCreateSpaceModal] = useState(false);
+  const [createBoardModal, setCreateBoardModal] = useState(false);
 
   const emailRef = useRef(null);
-  const boardId = useRef(null);
-  const spaceId = useRef(null);
-  const time = new Date(team?.createdAt).toLocaleDateString("en-EN", {
+  const [boardName, setBoardName] = useState('');
+  const [spaceName, setSpaceName] = useState('');
+
+  const time = new Date(teamState?.team.createdAt).toLocaleDateString("en-EN", {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
   });
   const [tab, setTab] = useState(null);
@@ -43,19 +45,20 @@ const TeamResult = (props) => {
     console.log(key);
     setTab(key);
   }
+
   useEffect(() => {
     const getTeamInfo = async () => {
       await TeamService.getTeamById(teamId)
         .then((result) => {
           console.log("result team : ", result);
-          setTeam(result.data);
+          teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
         })
         .catch((err) => {
           throw new Error(err);
         });
     };
     getTeamInfo();
-  }, [teamId]);
+  }, []);
 
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
@@ -111,88 +114,104 @@ const TeamResult = (props) => {
   //       console.log("error: ", error);
   //     });
   // }
-  // const createNewSpace = async (e) => {
-  //   e.preventDefault();
-  //   await SpaceService.createSpace(spaceName)
-  //     .then((result) => {
-  //       console.log("result: ", result);
-  //       spaceDispatch({ type: "CREATE_SPACE", payload: result.space });
-  //       message.success(result.message);
-  //     })
-  //     .catch((error) => {
-  //       console.log("error: ", error);
-  //     });
-  //   await setSpaceName(null);
-  //   setCreateSpaceModal(false);
-  // };
+  const changeSpaceName = async (e) => {
+    const name = e.target.value;
+    console.log("space name: ", name);
+    setSpaceName(name);
+  };
+
+  const changeBoardName = async (e) => {
+    const name = e.target.value;
+    console.log("space name: ", name);
+    setBoardName(name);
+  };
+  const createNewSpace = async (e) => {
+    e.preventDefault();
+    await SpaceService.createSpace(spaceName)
+      .then((result) => {
+        console.log("result: ", result);
+        spaceDispatch({ type: "CREATE_SPACE", payload: result.space });
+        message.success(result.message);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+      setCreateSpaceModal(false);
+    await TeamService.addSpaceToTeam(teamId, spaceName)
+      .then((result) => {
+        console.log("add space to team result: ", result);
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+        if(error){
+          throw new Error("The space haven't add to the team.");
+        }
+      });
+    setSpaceName('');
+  };
+
+  const createNewBoard = async (e) => {
+    e.preventDefault();
+    await BoardService.createBoard(boardName)
+      .then((result) => {
+        console.log("result: ", result);
+        boardDispatch({ type: "CREATE_BOARD", payload: result.board });
+        message.success(result.message);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+      setCreateBoardModal(false);
+    await TeamService.addBoardToTeam(teamId, boardName)
+      .then((result) => {
+        console.log("add board to team result: ", result);
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+        if(error){
+          throw new Error("The board haven't add to the team.");
+        }
+      });
+    setBoardName('');
+  };
 
   const inviteMember = async (e) => {
     e.preventDefault();
     await TeamService.addMemberToTeam(teamId, emailRef.current)
       .then((result) => {
         console.log("add member to team result: ", result);
-        teamDispatch({type: "FETCH_TEAM_SUCCESS", payload: result.data});
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((error) => {
         console.log("error: ", error);
-        throw new Error("The space haven't add to the team.");
+        if (error) {
+          throw new Error("Failed to add new member to the team.");
+        }
       });
   };
   //----------------------------------------------------------------
-  const changeSpaceSelection = async (value, e) => {
-    console.log("e: ", e);
-    console.log("value: ", value);
-    spaceId.current = await e.key;
-  };
 
-  const changeBoardSelection = async (value, e) => {
-    console.log("e: ", e);
-    console.log("value: ", value);
-    boardId.current = await e.key;
-  };
+  const viewChat = () => {};
 
-  const submitSpace = async (e) => {
-    try {
-      e.preventDefault();
-      await SpaceService.setTeamForSpace(spaceId.current, teamId)
-        .then((result) => {
-          console.log("set teamId to Space result: ", result);
-        })
-        .catch((error) => {
-          console.log("error: ", error);
-          throw new Error("The teamId haven't set to the space.");
-        });
-
-      await TeamService.addSpaceToTeam(teamId, spaceId.current)
-        .then((result) => {
-          console.log("add space to Team spaces[] result: ", result);
-        })
-        .catch((error) => {
-          console.log("error: ", error);
-          throw new Error("The space haven't add to the team.");
-        });
-      setSpaceSelectionModal(false);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
-
-  const submitBoard = async (e) => {
-    try {
-      e.preventDefault();
-      await TeamService.addBoardToTeam(teamId, boardId.current)
-        .then((result) => {
-          console.log("add board to team result: ", result);
-        })
-        .catch((error) => {
-          console.log("error: ", error);
-          throw new Error("The board haven't add to the team.");
-        });
-      setBoardSelectionModal(false);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
+  // const submitBoard = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     await TeamService.addBoardToTeam(teamId, boardId.current)
+  //       .then((result) => {
+  //         console.log("add board to team result: ", result);
+  //         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
+  //       })
+  //       .catch((error) => {
+  //         console.log("error: ", error);
+  //         throw new Error("The board haven't add to the team.");
+  //       });
+  //       setCreateBoardModal(false);
+  //   } catch (error) {
+  //     console.log("error: ", error);
+  //   }
+  // };
 
   //-------------------------------Return-----------------------------------------
   return (
@@ -214,15 +233,15 @@ const TeamResult = (props) => {
           </Breadcrumb.Item>
         </Link>
         <Breadcrumb.Item>
-          <b>{team?.name}</b>
+          <b>{teamState.team?.name}</b>
         </Breadcrumb.Item>
       </Breadcrumb>
       <div className="team_result_wrap">
         <div className="team_info">
-          <h1>Team : {team?.name}</h1>
-          <span>Total Member: {team?.members.length}</span>
+          <h1>Team : {teamState.team?.name}</h1>
+          <span>Total Member: {teamState.team.members?.length}</span>
           <p>Created At: {time}</p>
-          <b>Host: {team?.createdBy.name}</b>
+          <b>Host: {teamState.team.createdBy?.name}</b>
         </div>
 
         {tab === "1" ? (
@@ -234,107 +253,81 @@ const TeamResult = (props) => {
             {/* <Button onClick={createNewBoard}>Add new board</Button> */}
             <Button
               onClick={(e) => {
-                setBoardSelectionModal(true);
+                setCreateBoardModal(true);
               }}
             >
-              Add existed board
+              + Create board
             </Button>
             <Modal
-              title="Choose board"
+              title="Create new board"
+              // bodyStyle={{ padding: "2rem", height: 300 }}
               style={{ textAlign: "center" }}
               centered
-              visible={boardSelectionModal}
-              onOk={() => setBoardSelectionModal(false)}
-              onCancel={() => setBoardSelectionModal(false)}
-              zIndex={1000}
+              visible={createBoardModal}
+              onOk={() => setCreateBoardModal(false)}
+              onCancel={() => setCreateBoardModal(false)}
               footer={null}
               keyboard
             >
-              <form onSubmit={submitBoard}>
-                <label>Current Board: </label>{" "}
-                <Select
-                  showSearch
-                  style={{ width: 200 }}
-                  placeholder="Select a board"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                  filterSort={(optionA, optionB) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
-                  }
-                  onChange={changeBoardSelection}
+              <form className="room_code_wrapper" onSubmit={createNewBoard}>
+                <label className="room_code_label">New board name</label>
+                <br />
+                <Input
+                  style={{ width: 250, height: 40, textAlign: "center" }}
+                  value={boardName}
+                  onChange={changeBoardName}
+                />
+                <br />
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  size="large"
+                  style={{ width: 100, borderRadius: 5, fontWeight: "bold" }}
                 >
-                  {boardState?.boards.map((board) => (
-                    <Option key={board._id} value={board.name} name={board._id}>
-                      {board.name}
-                    </Option>
-                  ))}
-                </Select>
-                <br />
-                <br />
-                <Button type="primary" htmlType="submit">
-                  Insert
+                  Create
                 </Button>
               </form>
             </Modal>
           </div>
         ) : tab === "3" ? (
           <div className="team_actions">
-            <Button onClick={() => setSpaceSelectionModal(true)}>
-              Add existed space
+            <Button onClick={() => setCreateSpaceModal(true)}>
+              + Create space
             </Button>
             <Modal
-              title="Choose Space"
+              title="Create new space"
               // bodyStyle={{ padding: "2rem", height: 300 }}
               style={{ textAlign: "center" }}
               centered
-              visible={spaceSelectionModal}
-              onOk={() => setSpaceSelectionModal(false)}
-              onCancel={() => setSpaceSelectionModal(false)}
+              visible={createSpaceModal}
+              onOk={() => setCreateSpaceModal(false)}
+              onCancel={() => setCreateSpaceModal(false)}
               footer={null}
               keyboard
             >
-              <form onSubmit={submitSpace}>
-                <label>Current Space: </label>{" "}
-                <Select
-                  showSearch
-                  style={{ width: 200 }}
-                  placeholder="Select a board"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                  filterSort={(optionA, optionB) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
-                  }
-                  onChange={changeSpaceSelection}
+              <form className="room_code_wrapper" onSubmit={createNewSpace}>
+                <label className="room_code_label">Space name</label>
+                <br />
+                <Input
+                  style={{ width: 250, height: 40, textAlign: "center" }}
+                  value={spaceName}
+                  onChange={changeSpaceName}
+                />
+                <br />
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  size="large"
+                  style={{ width: 100, borderRadius: 5, fontWeight: "bold" }}
                 >
-                  {spaceState?.spaces.map((space) => (
-                    <Option key={space._id} value={space.name} name={space._id}>
-                      {space.name}
-                    </Option>
-                  ))}
-                </Select>
-                <br />
-                <br />
-                <Button type="primary" htmlType="submit">
-                  Insert
+                  Create
                 </Button>
               </form>
             </Modal>
           </div>
         ) : (
           <div className="team_actions">
-            <Button>View chat history</Button>
+            <Button onClick={viewChat}>View chat history</Button>
           </div>
         )}
       </div>
@@ -353,7 +346,7 @@ const TeamResult = (props) => {
             </form>
             <table class="table table-hover">
               <tbody>
-                {team?.members.map((mem) => {
+                {teamState.team.members?.map((mem) => {
                   return (
                     <tr key={mem._id}>
                       <td>
@@ -366,12 +359,12 @@ const TeamResult = (props) => {
                             onClick={(e) => e.preventDefault()}
                           >
                             <span className="avatar_digit">
-                              {mem.name.charAt(0)}
+                              {mem.name?.charAt(0)}
                             </span>
                           </Avatar>
                           <div className="member_info">
                             <span className="member_name">{mem.name} </span>
-                            {team?.createdBy.name === mem.name ? (
+                            {teamState.team.createdBy?.name === mem.name ? (
                               <Tag color="blue">Owner</Tag>
                             ) : (
                               <Tag color="green">Member</Tag>
@@ -391,13 +384,13 @@ const TeamResult = (props) => {
         </TabPane>
         <TabPane tab="Boards" key="2">
           <div className="item_wrap">
-            {team?.boards.map((board, index) => {
+            {teamState.team.boards?.map((board, index) => {
               return <ItemCards key={index} board={board} />;
             })}
           </div>
         </TabPane>
         <TabPane tab="Spaces" key="3">
-          <table class="table">
+          <table className="table">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -408,13 +401,13 @@ const TeamResult = (props) => {
               </tr>
             </thead>
             <tbody>
-              {team?.spaces.map((space, index) => {
+              {teamState.team.spaces?.map((space, index) => {
                 return (
                   <tr key={space._id}>
-                    <th scope="row">{index}</th>
+                    <th scope="row">{index + 1}</th>
                     <td>{space.name}</td>
-                    <td>{space.boards.length}</td>
-                    <td>{space.createdBy.name}</td>
+                    <td>{space.boards?.length}</td>
+                    <td>{space.createdBy?.name}</td>
                     <td>
                       {new Date(space.updatedAt).toLocaleTimeString("en-EN", {
                         hour: "2-digit",

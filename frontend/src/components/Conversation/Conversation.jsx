@@ -1,31 +1,31 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, Tooltip } from "antd";
 import { CloseOutlined, SendOutlined } from "@ant-design/icons";
-import { socket } from "../../services/socketServices";
 import MessageService from "../../services/messageService";
 import "./conversation.scss";
 import Message from "../Message/Message";
 const Conversation = (props) => {
-  const { setIsChatOpen, user, boardId } = props;
+  const { setIsChatOpen, user, boardId, socket, boardCode } = props;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const scrollRef = useRef();
-
+  console.log("boardCode: ", boardCode);
   useEffect(() => {
-    socket.on("getMessage", (data) => {
+    socket?.on("receiveMessageServer", (data) => {
       setArrivalMessage({
-        senderId: data.senderId,
-        message: data.message,
-        createdAt: Date.now(),
+        senderId: data.message.senderId,
+        message: data.message.message,
+        createdAt: new Date(Date.now()).toISOString(),
       });
     });
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const getMessages = async () => {
       await MessageService.getMessage(boardId)
         .then((response) => {
+          console.log("GET MESS: ", response);
           setMessages(response.data);
         })
         .catch((error) => {
@@ -40,17 +40,21 @@ const Conversation = (props) => {
   }, [arrivalMessage]);
 
   const sendMessage = async (e) => {
-    e.preventDefault();
-
     await MessageService.addNewMessage(boardId, newMessage)
       .then(async (response) => {
         console.log("response message: ", response);
         const message = {
-          senderId: response.senderId,
-          message: response.message,
+          senderId: {
+            _id: response.data.senderId._id,
+            name: response.data.senderId.name,
+          },
+          message: response.data.message,
         };
-        await socket.emit("sendMessage", message);
-        setMessages([...messages, response]);
+        await socket?.emit("sendMessageClient", {
+          code: boardCode,
+          message: message,
+        });
+        setMessages([...messages, response.data]);
         setNewMessage("");
       })
       .catch((error) => {
@@ -77,11 +81,11 @@ const Conversation = (props) => {
         </Tooltip>
       </div>
       <div className="chatbox_wrap">
-        {messages.map((m) => {
+        {messages?.map((m) => {
           console.log("all message in boards: ", m);
           return (
             <div ref={scrollRef}>
-              <Message key={m._id} message={m} user={user} />
+              <Message key={m._id} message={m} />
             </div>
           );
         })}

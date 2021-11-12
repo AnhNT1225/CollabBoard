@@ -80,7 +80,7 @@ const BoardManagement = () => {
       // onFilter: (value, record) => record.createdAt.includes(value),
       render: (createdAt) => <span>{new Date(createdAt).toLocaleDateString("en-EN", {
         day: "numeric",
-        month: "short",
+        month: "long",
         year: "numeric",
       })}</span>,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,

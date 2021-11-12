@@ -5,8 +5,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import "./style.scss";
 import BoardService from "../../services/boardService";
 // import { BoardContext } from "../../context/boardContext";
-import { socket } from "../../services/socketServices";
-const SearchRoom = () => {
+
+const SearchRoom = ({socket}) => {
 	const history = useHistory();
 	const [code, setCode] = useState(null);
 
@@ -22,10 +22,10 @@ const SearchRoom = () => {
 		// 	console.log("Successfully connected from client!");
 		// });
 
-		socket.on("notification", onNotification);
+		socket?.on("notification", onNotification);
 
 		return () => {
-			socket.off("notification", onNotification);
+			socket?.off("notification", onNotification);
 		};
 	}, [socket]);
 	const location = useLocation().search;
@@ -62,7 +62,7 @@ const SearchRoom = () => {
 		await BoardService.findBoardByCode(code)
 			.then(async (result) => {
 				console.log("result: ", result);
-				await socket.emit("join-room", result.data.code);
+				await socket?.emit("join-room", result.data.code);
 				history.push(`/board/${result.data._id}`);
 			})
 			.catch((error) => {

@@ -1,4 +1,4 @@
-const { mongoose } = require("../models");
+const { mongoose, board } = require("../models");
 
 const Space = require("../models/Space");
 const Board = require("../models/Board");
@@ -38,7 +38,7 @@ class SpaceController {
   async getJoinedSpaces(req, res) {
     await Space.find({ members: req.user._id })
       .populate("createdBy", "_id name")
-      .populate('spaces')
+      .populate("spaces")
       .then((result) => {
         if (!result)
           return res.status(404).json({
@@ -63,37 +63,37 @@ class SpaceController {
 
   //get the owned space that user created
   async getOwnedSpaces(req, res) {
-  	await Space.find({ createdBy: req.user._id })
-  		.populate("createdBy", "_id name")
-  		.then((result) => {
-  			if (!result)
-  				return res.status(404).json({
-  					success: false,
-  					message: "Spaces not found",
-  				});
-  			return res.status(200).json({
-  				success: true,
-  				data: result,
-  			});
-  		})
-  		.catch((error) => {
-  			console.log("the catch error: ", error);
-  			return res
-  				.status(400)
-  				.json({ success: false, message: "Bad request!" });
-  		});
+    await Space.find({ createdBy: req.user._id })
+      .populate("createdBy", "_id name")
+      .then((result) => {
+        if (!result)
+          return res.status(404).json({
+            success: false,
+            message: "Spaces not found",
+          });
+        return res.status(200).json({
+          success: true,
+          data: result,
+        });
+      })
+      .catch((error) => {
+        console.log("the catch error: ", error);
+        return res
+          .status(400)
+          .json({ success: false, message: "Bad request!" });
+      });
   }
 
   async addBoardToSpace(req, res) {
     const spaceId = req.params.id;
     console.log("spaceId: ", spaceId);
-    const { spaceName, boardId } = req.body;
+    const { boardId } = req.body;
     await Space.findByIdAndUpdate(
       { _id: spaceId },
       { $addToSet: { boards: boardId } },
       { new: true }
     )
-      .populate("boards")
+      .populate({ path: "boards", populate: "spaceId" })
       .then((space) => {
         // space.populated("boards").boardId.spaceId = spaceId;
 
@@ -116,6 +116,11 @@ class SpaceController {
     const spaceId = req.params.id;
     console.log("spaceId: ", spaceId);
     const { boardId } = req.body;
+    await Board.findByIdAndUpdate(
+      { _id: boardId },
+      { spaceId: null },
+      { new: true }
+    );
     await Space.findByIdAndUpdate(
       { _id: spaceId },
       { $pull: { boards: boardId } },
@@ -163,7 +168,7 @@ class SpaceController {
     // console.log("test space Id: ", spaceId);
 
     await Space.findById(spaceId)
-      .populate("boards")
+      .populate({ path: "boards", populate: "spaceId" })
       .populate("createdBy")
       .populate("teamId")
       .then((space) => {
@@ -190,12 +195,8 @@ class SpaceController {
   //add teamId for Space
   async setTeamForSpace(req, res) {
     const spaceId = req.params.id;
-    const { teamId} = req.body;
-    Space.findByIdAndUpdate(
-      { _id: spaceId },
-      { teamId: teamId},
-      { new: true }
-    )
+    const { teamId } = req.body;
+    Space.findByIdAndUpdate({ _id: spaceId }, { teamId: teamId }, { new: true })
       .then((space) => {
         return res.status(200).json({
           success: true,
@@ -214,21 +215,31 @@ class SpaceController {
   //UPDATE SPACE INFO (USE FOR SPACE EDIT PAGE)
   async updateSpaceInfo(req, res) {
     const spaceId = req.params.id;
-	console.log("teamId new: ", form.team.id)
-    const { form } = req.body;
-    //Find the team has name === new modified name, add spaceId to that team
-    const team = await Team.findIdAndUpdate(
-      { _id: form.team.id },
-      { $addToSet: { spaces: spaceId } },
-	  {new: true}
-    ).lean();
-	console.log('teamId new also : ', team._id)
+
+    const { name, team } = req.body;
+    console.log("form: ", name, team.id);
+    let newUpdate;
+    if (team && team.id !== undefined && name) {
+      //Find the team has name === new modified name, add spaceId to that team
+      await Team.findByIdAndUpdate(
+        { _id: team.id },
+        { $addToSet: { spaces: spaceId } },
+        { new: true }
+      ).lean();
+      newUpdate = {
+        name: name,
+        teamId: team.id,
+      };
+    }
+    if (name) {
+      newUpdate = {
+        name: name,
+      };
+    }
+
+    console.log("teamId input: ", team.id);
     //Find the space by Id and update name and teamId
-    Space.findByIdAndUpdate(
-      { _id: spaceId },
-      { name: form.name, teamId: team._id},
-      { new: true }
-    )
+    await Space.findByIdAndUpdate({ _id: spaceId }, newUpdate, { new: true })
       .then((space) => {
         return res.status(200).json({
           success: true,

@@ -4,23 +4,23 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { UserProvider } from "./context/userContext";
-import { SocketProvider } from "./context/socketContext";
 import { ContextProviderComposer } from "./context/ContextProviderComposer";
 import { BoardProvider } from "./context/boardContext";
 import { ElementProvider } from "./context/elementContext";
 import { SpaceProvider } from "./context/spaceContext";
 import { TeamProvider } from './context/teamContext';
+import { MessageProvider } from './context/messageContext';
 
 ReactDOM.render(
   <React.StrictMode>
     <ContextProviderComposer
 			contextProviders={[
 				<UserProvider key={0} />,
-				<SocketProvider key={1} />,
-				<BoardProvider key={2} />,
-				<SpaceProvider key={3} />,
-				<ElementProvider key={4} />,
-				<TeamProvider key={5}/>
+				<BoardProvider key={1} />,
+				<SpaceProvider key={2} />,
+				<ElementProvider key={3} />,
+				<TeamProvider key={4}/>,
+				<MessageProvider key={5} />
 			]}
 		>
 			<App />

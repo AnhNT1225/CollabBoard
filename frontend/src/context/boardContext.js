@@ -6,7 +6,8 @@ const initialState = {
   isFetch: false,
   hasError: false,
   currentBoard: {},
-  foundBoards: []
+  foundBoards: [],
+  newBoards: [],
 };
 
 const boardReducer = (state, action) => {
@@ -30,7 +31,7 @@ const boardReducer = (state, action) => {
         ...state,
         isFetch: false,
         boards: action.payload,
-        foundBoards: action.payload
+        foundBoards: action.payload,
       };
     case "FETCH_DATA_FAILURE":
       return {
@@ -38,11 +39,19 @@ const boardReducer = (state, action) => {
         hasError: true,
         isFetch: false,
       };
+    case "CREATE_BOARD":
+      return {
+        ...state,
+        boards: [...state.boards, action.payload],
+        foundBoards: [...state.boards, action.payload]
+      };
     case "REMOVE_BOARD":
       return {
         ...state,
         boards: state.boards.filter((board) => board._id !== action.payload),
-        foundBoards: state.boards.filter((board) => board._id !== action.payload)
+        foundBoards: state.boards.filter(
+          (board) => board._id !== action.payload
+        ),
       };
     case "SET_CURRENT_BOARD":
       console.log("action payload: ", action.payload);
@@ -69,15 +78,23 @@ const boardReducer = (state, action) => {
     case "SEARCH_BOARD":
       console.log("search payload: ", action.payload);
       if (action.payload === "") {
-        console.log("ok empty is true")
+        console.log("ok empty is true");
         return {
           ...state,
-          foundBoards: state.boards
+          foundBoards: state.boards,
         };
       }
       return {
         ...state,
-        foundBoards: state.boards.filter(board => board.name.toLowerCase().includes(action.payload.toLowerCase()))
+        foundBoards: state.boards.filter((board) =>
+          board.name.toLowerCase().includes(action.payload.toLowerCase())
+        ),
+      };
+
+    case "SET_NEW_BOARD":
+      return {
+        ...state,
+        newBoards: action.payload,
       };
     default:
       return state;

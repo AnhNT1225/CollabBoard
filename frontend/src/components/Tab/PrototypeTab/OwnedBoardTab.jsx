@@ -1,42 +1,83 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Empty, Pagination } from "antd";
 import ItemCards from "../../ItemCards/ItemCard";
 import { BoardContext } from "../../../context/boardContext";
 import {SpaceContext} from '../../../context/spaceContext';
+import BoardService from "../../../services/boardService";
 const OwnedBoardTab = (props) => {
-  const { searchInput, getOwnedItems, getSpaceLists } = props;
+  const { searchInput, getOwnedItems, getSpaceLists, socket } = props;
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
+  const [itemNumber, setItemNumber] = useState({ minValue: 0, maxValue: 4 });
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
-    getOwnedItems();
+    BoardService.getOwnedBoard()
+      .then((response) => {
+        boardDispatch({
+          type: "FETCH_BOARDS_SUCCESS",
+          payload: response.data,
+        });
+        // setBoards(response.data);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+    
   }, []);
 
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
     getSpaceLists();
   }, []);
-  let foundBoards;
-  if (searchInput) {
-    foundBoards = boardState.boards.filter((board) => {
-      return board.name.toLowerCase().includes(searchInput.toLowerCase());
-    });
-  }
+  // let foundBoards;
+  // if (searchInput) {
+  //   foundBoards = boardState.boards.filter((board) => {
+  //     return board.name.toLowerCase().includes(searchInput.toLowerCase());
+  //   });
+  // }
+  useEffect(() => {
+    boardDispatch({ type: "SEARCH_BOARD", payload: searchInput });
+  }, [searchInput, boardDispatch]);
+
+  const onChangePage = (pageNumber, pageSize) => {
+    console.log("Page: ", pageNumber);
+    console.log("pageSize: ", pageSize);
+    if (pageNumber <= 1) {
+      setItemNumber({
+        minValue: 0,
+        maxValue: 4,
+      });
+    } else {
+      setItemNumber({
+        minValue: itemNumber.maxValue,
+        maxValue: itemNumber.maxValue + pageSize,
+      });
+    }
+  };
   return (
     <>
       <div className="item_wrap">
-        {boardState.boards && searchInput === "" ? (
-          boardState.boards.map((board, index) => {
-            return <ItemCards key={index} board={board} spaces={spaceState.spaces}/>;
-          })
-        ) : boardState.boards && searchInput.length > 0 ? (
-          /* foundBoards */
-          foundBoards.map((board, index) => {
-            return <ItemCards key={index} board={board} spaces={spaceState.spaces}/>;
-          })
-        ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
+        {
+          boardState?.foundBoards
+            .slice(itemNumber.minValue, itemNumber.maxValue)
+            .map((board, index) => {
+              return (
+                <ItemCards key={index} board={board} spaces={spaceState.spaces} socket={socket}/>
+              );
+            })
+        // boardState.boards && searchInput === "" ? (
+        //   boardState.boards.map((board, index) => {
+        //     return <ItemCards key={index} board={board} spaces={spaceState.spaces} socket={socket}/>;
+        //   })
+        // ) : boardState.boards && searchInput.length > 0 ? (
+        //   /* foundBoards */
+        //   foundBoards.map((board, index) => {
+        //     return <ItemCards key={index} board={board} spaces={spaceState.spaces} socket={socket}/>;
+        //   })
+        // ) : (
+        //   <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        // )
+        }
       </div>
       <br />
 
@@ -44,9 +85,12 @@ const OwnedBoardTab = (props) => {
         <Pagination
           total={boardState.boards.length}
           defaultCurrent={1}
-          showSizeChanger
-          showQuickJumper
+          defaultPageSize={4}
+          // showSizeChanger
+          // showQuickJumper
           showTotal={(total) => `Total ${total} items`}
+          responsive={true}
+          onChange={onChangePage}
         />
       </div>
     </>

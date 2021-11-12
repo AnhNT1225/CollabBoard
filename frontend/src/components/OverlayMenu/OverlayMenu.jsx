@@ -16,7 +16,7 @@ import "./overlaymenu.scss";
 import NotePaper from "../NotePaper/NotePaper";
 
 const OverlayMenu = (props) => {
-  const { setMenuComponent, dragUrl, setDrawingProperty } = props;
+  const { setMenuComponent, dragUrl, setDrawingProperty, socket } = props;
   const [selectedFile, setSelectedFile] = useState([]);
   const [preview, setPreview] = useState();
   const [isUploadModal, setIsUploadModal] = useState(false);
@@ -66,6 +66,8 @@ const OverlayMenu = (props) => {
   const createNewNote = (e) => {
     e.preventDefault();
     const newNote = {
+      type: 'note',
+      id: nextId('note-'),
       label: {
         x: 350,
         y: 250,
@@ -80,7 +82,6 @@ const OverlayMenu = (props) => {
         size: 18,
         padding: 5,
         fill: "black",
-        id: nextId('note-'),
       },
     };
 
@@ -133,11 +134,13 @@ const OverlayMenu = (props) => {
     const reader = new FileReader();
     reader.onload = () => {
       const imageObj = {
+        type: 'file',
         id: nextId('file-'),
         src: reader.result,
       };
       // setFiles((prev) => [...prev, imageObj]);
       elementDispatch({ type: "CREATE_FILE", payload: imageObj });
+
     };
     reader.readAsDataURL(e.target.files[0]);
     // I've kept this example simple by using the first image instead of multiple

@@ -10,6 +10,7 @@ const initialState = {
   token: null,
   isAdmin: false,
   users: [],
+  newUsers: [],
 };
 export const UserContext = createContext();
 
@@ -51,6 +52,11 @@ const authReducer = (state, action) => {
       return {
         ...state,
         users: action.payload,
+      };
+    case "SET_NEW_USER":
+      return {
+        ...state,
+        newUsers: action.payload,
       };
     default:
       return state;

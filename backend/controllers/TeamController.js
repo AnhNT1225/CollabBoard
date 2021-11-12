@@ -1,6 +1,7 @@
-const { mongoose } = require("../models");
+const endOfDay = require("date-fns/endOfDay");
+const startOfDay = require("date-fns/startOfDay");
 const Space = require("../models/Space");
-
+const Board = require("../models/Board")
 const Team = require("../models/Team");
 const User = require("../models/User");
 // const Space = require('../models/Space');
@@ -39,7 +40,6 @@ class TeamController {
   async getAllTeams(req, res) {
     await Team.find({})
       .populate("members")
-      .populate("conversationId")
       .populate("createdBy")
       .then((teams) => {
         if (!teams)
@@ -62,11 +62,31 @@ class TeamController {
       });
   }
 
+  async findNewTeams(req, res) {
+    try {
+      const team = await Team.find({
+        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()) },
+      });
+      if (!team) {
+        return res
+          .status(404)
+          .json({ success: false, message: "New teams not found." });
+      }
+      console.log("team: ", team);
+      return res.status(200).json({
+        success: true,
+        data: team,
+      });
+    } catch (error) {
+      console.log("the catch error: ", error);
+      return res.status(500).json({ success: false, message: "Bad request!" });
+    }
+  }
+
   // GET TEAMS HAS LARGEST BOARDS (FOR ADMIN)
   async getMaxBoardsTeams(req, res) {
     await Team.find({}).sort("-boards").limit(5)
       .populate("members")
-      .populate("conversationId")
       .populate("createdBy")
       .then((teams) => {
         if (!teams)
@@ -91,9 +111,8 @@ class TeamController {
 
   // GET ALL JOINED TEAM
   async getJoinedTeams(req, res) {
-    await Team.find({ members: mongoose.Types.ObjectId(req.user._id) })
+    await Team.find({ members: req.user._id })
       .populate("members")
-      .populate("conversationId")
       .populate("boards")
       .populate("spaces")
       .then((result) => {
@@ -121,10 +140,11 @@ class TeamController {
     const teamId = req.params.id;
     const { team_name } = req.body;
     console.log("teamID If: ", teamId, "teamName: ", team_name);
-    await Team.findByIdAndUpdate({ _id: teamId }, { name: team_name })
+    await Team.findByIdAndUpdate({ _id: teamId }, { name: team_name }, {new:true})
       .lean()
+      .populate('members')
+      .populate('createdBy')
       .then((team) => {
-        console.log("New team updated name: ", team);
         return res.status(200).json({
           success: true,
           message: "Update team name successful",
@@ -194,11 +214,16 @@ class TeamController {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
 
-    const { boardId } = req.body;
-    console.log("boardId: ", boardId);
+    const { boardName } = req.body;
+    console.log("boardName: ", boardName);
+    const foundBoard = await Board.findOne({ createdBy: req.user._id, name: boardName}).lean();
+    console.log("BOARD ID: ", foundBoard._id);
+
+    // const { boardId } = req.body;
+    // console.log("boardId: ", boardId);
     await Team.findByIdAndUpdate(
       { _id: teamId },
-      { $addToSet: { boards: boardId } },
+      { $addToSet: { boards: foundBoard._id } },
       { new: true }
     )
       .populate("boards")
@@ -223,11 +248,14 @@ class TeamController {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
 
-    const { spaceId } = req.body;
-    console.log("spaceId: ", spaceId);
+    const { spaceName } = req.body;
+    console.log("spaceName: ", spaceName);
+    const foundSpace = await Space.findOne({ createdBy: req.user._id, name: spaceName}).lean();
+    console.log("SPACE ID: ", foundSpace._id);
+
     await Team.findByIdAndUpdate(
       { _id: teamId },
-      { $addToSet: { spaces: spaceId } },
+      { $addToSet: { spaces: foundSpace._id } },
       { new: true }
     )
       .populate("spaces")
@@ -236,7 +264,7 @@ class TeamController {
 
         return res.status(200).json({
           success: true,
-          message: "Update teams successful",
+          message: "Update spaces in team successful",
           data: team,
         });
       })
@@ -262,6 +290,7 @@ class TeamController {
       { new: true }
     )
       .populate("members")
+      .populate("createdBy")
       .then((team) => {
         // team.populated("spaces").memberEmail.teamId = teamId;
 
@@ -283,6 +312,7 @@ class TeamController {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
     const { spaceId } = req.body;
+    
     await Team.findByIdAndUpdate(
       { _id: teamId },
       { $pull: { spaces: spaceId } },
@@ -302,6 +332,35 @@ class TeamController {
           .status(500)
           .json({ success: false, message: "Bad request!" });
       });
+  }
+
+  removeMemberFromTeam(req, res){
+    const teamId = req.params.id;
+    console.log("teamId: ", teamId);
+    const { selectedMemberId } = req.body;
+    console.log("selectedMemberId: ", selectedMemberId)
+    selectedMemberId.forEach(async(memId) => {
+      await Team.findByIdAndUpdate(
+        { _id: teamId },
+        { $pull: { members: memId } },
+        { new: true }
+      )
+        .populate("members")
+        .populate("createdBy")
+        .then((team) => {
+          return res.status(200).json({
+            success: true,
+            message: "Remove the member from teams successful",
+            data: team,
+          });
+        })
+        .catch((error) => {
+          console.log("the catch error: ", error);
+          return res
+            .status(500)
+            .json({ success: false, message: "Bad request!" });
+        });
+    });
   }
 }
 

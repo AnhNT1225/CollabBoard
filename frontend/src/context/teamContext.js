@@ -6,6 +6,7 @@ const initialState = {
   isFetch: false,
   hasError: false,
   team: {},
+  newTeams: []
 };
 
 const teamReducer = (state, action) => {
@@ -51,11 +52,18 @@ const teamReducer = (state, action) => {
           (team) => team._id === action.payload._id
         ).name = action.payload.name),
       };
-    // case "UPDATE_BOARD":
-    // 	return {
 
-    // 	}
-
+      //remove team member from current team
+    case "REMOVE_TEAM_MEMBER":
+      return {
+        ...state,
+        team: state.team.members.filter((member) => member._id !== action.payload),
+      };
+    case "SET_NEW_TEAM":
+      return {
+        ...state,
+        newTeams: action.payload
+      }
     default:
       return state;
   }

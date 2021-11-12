@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "../lib/auth";
-const API_URL = "http://localhost:5000/api/team";
-
+// const API_URL = "http://localhost:5000/api/team";
+const API_URL = `${process.env.REACT_APP_SERVER_URL}/api/team`;
 class TeamService {
   createTeam(teamName) {
     return axios
@@ -18,6 +18,19 @@ class TeamService {
       .catch((error) => {
         console.log("error: ", error);
       });
+  }
+
+  getNewTeams(){
+    return axios
+    .get(API_URL + "/new", {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log("err: ", error);
+    });
   }
 
   getAllTeams() {
@@ -49,24 +62,6 @@ class TeamService {
   getJoinedTeam() {
     return axios
       .get(API_URL + "/joined", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        console.log("err: ", error);
-      });
-  }
-
-  addBoardToSpace(spaceId, dataInput) {
-    console.log("space id: ", spaceId);
-    const spaceData = {
-      spaceName: dataInput.spaceName,
-      boardId: dataInput.boardId,
-    };
-    return axios
-      .patch(API_URL + `/update/${spaceId}`, spaceData, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
       .then((response) => {
@@ -120,11 +115,11 @@ class TeamService {
       });
   }
 
-  addBoardToTeam(teamId, boardId) {
+  addBoardToTeam(teamId, boardName) {
     return axios
       .patch(
         API_URL + `/update/boards/${teamId}`,
-        { boardId: boardId },
+        { boardName: boardName },
         {
           headers: { Authorization: `Bearer ${getToken()}` },
         }
@@ -137,13 +132,13 @@ class TeamService {
       });
   }
 
-  addSpaceToTeam(teamId, spaceId) {
+  addSpaceToTeam(teamId, spaceName) {
     console.log("team id: ", teamId);
-    console.log("bbbbb id: ", spaceId);
+    console.log("spaceName: ", spaceName);
     return axios
       .patch(
         API_URL + `/update/spaces/${teamId}`,
-        { spaceId: spaceId },
+        { spaceName: spaceName },
         {
           headers: { Authorization: `Bearer ${getToken()}` },
         }
@@ -174,7 +169,7 @@ class TeamService {
         console.log("err: ", error);
       });
   }
-
+  //-----------------------------REMOVE SPACE FROM TEAM ----------------------------
   removeSpaceFromTeam(spaceId, teamId) {
     console.log("space id: ", spaceId);
 
@@ -182,6 +177,26 @@ class TeamService {
       .patch(
         API_URL + `/remove/spaces/${teamId}`,
         { spaceId: spaceId },
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log("err: ", error);
+      });
+  }
+
+ //-----------------------------REMOVE MEMBER FROM TEAM ----------------------------
+  removeMemberFromTeam(teamId, selectedMemberId){
+    console.log("selectedMemberId: ", selectedMemberId);
+
+    return axios
+      .patch(
+        API_URL + `/remove/members/${teamId}`,
+        { selectedMemberId: selectedMemberId },
         {
           headers: { Authorization: `Bearer ${getToken()}` },
         }

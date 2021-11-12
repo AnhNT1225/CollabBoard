@@ -1,14 +1,17 @@
 import axios from "axios";
 import { getToken } from "../lib/auth";
-const API_URL = "http://localhost:5000/api/board";
+
+// const API_URL = "http://localhost:5000/api/board";
+const API_URL = `${process.env.REACT_APP_SERVER_URL}/api/board`;
 
 
 class BoardService {
-	createBoard(boardCode) {
+	//create board without name
+	createBoard(boardName) {
 		return axios
 			.post(
 				API_URL + "/create",
-				{ boardCode: boardCode },
+				{ boardName: boardName },
 				{
 					headers: { Authorization: `Bearer ${getToken()}` },
 				}
@@ -20,6 +23,7 @@ class BoardService {
 				console.log("err: ", error);
 			});
 	}
+
 	///FOR ADMIN GET ALL BOARD IN SYSTEM
 	getAllBoard() {
 		return axios
@@ -34,6 +38,19 @@ class BoardService {
 			});
 	}
 
+	getNewBoards(){
+		return axios
+		.get(API_URL + "/new", {
+			headers: { Authorization: `Bearer ${getToken()}` },
+		})
+		.then((response) => {
+			return response.data;
+		})
+		.catch((error) => {
+			console.log("err: ", error);
+		});
+	}
+	
 	//FOR USER
 	getJoinedBoard() {
 		return axios
