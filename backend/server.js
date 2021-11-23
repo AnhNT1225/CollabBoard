@@ -10,8 +10,8 @@ const jwt = require("jsonwebtoken");
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    // origin: "http://localhost:3000" || "*",
-    origin: process.env.CLIENT_URL || "*",
+    origin: "http://localhost:3000" || "*",
+    // origin: process.env.CLIENT_URL || "*",
     credentials: true,
   },
 });

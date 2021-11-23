@@ -33,7 +33,7 @@ const Board = (props) => {
     boardDispatch,
     socket,
   } = props;
-  console.log("user from YTF: ", user)
+  console.log("user from YTF: ", user);
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   // const { boardState, boardDispatch } = useContext(BoardContext);

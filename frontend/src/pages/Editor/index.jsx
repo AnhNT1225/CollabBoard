@@ -7,13 +7,13 @@ import { UserContext, ACTIONS } from "../../context/userContext";
 import { BoardContext } from "../../context/boardContext";
 import UserService from "../../services/userService";
 import BoardHeader from "../../components/BoardHeader/BoardHeader";
-const Editor = ({match, socket}) => {
+const Editor = ({match, socket, location}) => {
 	const { state, dispatch } = useContext(UserContext);
 	const {  boardState, boardDispatch } = useContext(BoardContext);
 	const boardId = match.params.id;
 	console.log('boardId: ', boardId);
 	console.log('editor socket: ', socket)
-
+	console.log('state props history: ', location.state)
 	useEffect(() => {
 		boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
 		BoardService.getBoard(boardId)

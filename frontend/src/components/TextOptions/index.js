@@ -17,7 +17,7 @@ function TextOptions(props) {
 
   const getFont = () =>
     fetch(
-      `https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyDmsHMz7ufFxXwkgn8HDmUpWcpPEZpgwBI`
+      `https://www.googleapis.com/webfonts/v1/webfonts?key=${process.env.REACT_APP_FONT_API_KEY}`
     )
       .then((response) => response.json())
 

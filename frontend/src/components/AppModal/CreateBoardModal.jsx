@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import BoardService from "../../services/boardService";
 import "./styles.scss";
 import JoinRoomModal from "./JoinRoomModal";
+import {ElementContext} from '../../context/elementContext';
 
 // import crypto from "crypto";
 //media import
@@ -23,6 +24,7 @@ const CreateBoardModal = ({socket}) => {
   const [createBoardModal, setCreateBoardModal] = useState(false);
   const [joinRoomModal, setjoinRoomModal] = useState(false);
   const [file, setFile] = useState({ loading: false });
+  const {elementState, elementDispatch} = useContext(ElementContext)
   // const propsTypes = {
   // 	name: "file",
   // 	// action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
@@ -65,7 +67,7 @@ const CreateBoardModal = ({socket}) => {
         console.log("newBoard: ", response.board);
         history.push({
           pathname: `/board/${response.board._id}`,
-          state: file,
+          state: file?.imageUrl,
         });
       })
       .catch((error) => {

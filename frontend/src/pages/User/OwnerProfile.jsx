@@ -70,18 +70,41 @@ const OwnerProfile = () => {
             <span>Working place: {state.user?.workingPlace}</span>
             <span>Position: {state.user?.position}</span>
           </Space>
-		  <button className="edit_info_btn" onClick={() => history.push('/user/profiles/edit')}>
-          <i className="far fa-edit"></i>
-		  </button>
+          <button
+            className="edit_info_btn"
+            onClick={() => history.push("/user/profiles/edit")}
+          >
+            <i className="far fa-edit"></i>
+          </button>
         </div>
       </div>
-      <div className="user_management_wrap">
-        <Tabs defaultActiveKey="tab 1" onChange={changeTab}>
+      {/* <div className="user_management_wrap"> */}
+        {/* <Tabs defaultActiveKey="tab 1" onChange={changeTab}>
           <TabPane tab="Current board" key="tab 1" />
           <TabPane tab="Spaces" key="tab 2" />
           <TabPane tab="Teams" key="tab 3" />
-        </Tabs>
-      </div>
+        </Tabs> */}
+        <div className="user_stats_container">
+          <div className="user_all_stats">
+            <p className="stats_title">Current board</p>
+            <div className='stats_show'>
+              <b className="stats_title">{state?.newUsers.length}</b>
+            </div>
+          </div>
+          <div className="user_all_stats">
+            <p className="stats_title">Spaces</p>
+            <div className='stats_show'>
+              <b className="stats_title">{state?.newUsers.length}</b>
+            </div>
+          </div>
+          <div className="user_all_stats">
+            <p className="stats_title">Teams</p>
+            <div className='stats_show'>
+              <b className="stats_title">{state?.newUsers.length}</b>
+            </div>
+          </div>
+        </div>
+      {/* </div> */}
     </>
   );
 };
