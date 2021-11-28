@@ -85,6 +85,7 @@ const Editor = ({match, socket, location}) => {
 				boardState={boardState}
 				boardDispatch={boardDispatch}
 				socket={socket}
+				match={match}
 			/>
 		</div>
 	);

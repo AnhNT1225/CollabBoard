@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useContext, memo } from "react";
 import ControlMenu from "../ControlMenu";
 import Conversation from "../Conversation/Conversation";
+import { useParams } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import { message } from "antd";
 import OverlayMenu from "../OverlayMenu/OverlayMenu";
@@ -34,29 +35,10 @@ const Board = (props) => {
     socket,
   } = props;
   console.log("user from YTF: ", user);
+
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   // const { boardState, boardDispatch } = useContext(BoardContext);
-
-  // useEffect(() => {
-  //   boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
-  //   BoardService.getBoard(boardId)
-  //     .then(async(response) => {
-  //       console.log("response at board: ", response.data);
-  //       // response.id = boardId;
-  //       // setCurrentBoard(response);
-  //       await boardDispatch({
-  //         type: "FETCH_CURRENT_BOARD_SUCCESS",
-  //         payload: response.data,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.log("err: ", error);
-  //     });
-  //   return () => {
-  //     boardDispatch({ type: "FETCH_DATA_FAILURE" });
-  //   };
-  // }, []);
   //----------------------------------
   const stageRef = useRef();
   const layerRef = useRef();
@@ -65,12 +47,10 @@ const Board = (props) => {
 
   const isDrawing = useRef(false);
 
-  const [selectedId, selectShape] = useState(null);
-
   // console.log("text property: ", textProperty);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  const [isButton, setIsButton] = useState(true)
   // console.log("state push by history: ", location.state);
   const dragUrl = useRef();
   const [nodesArray, setNodes] = useState([]);
@@ -87,11 +67,50 @@ const Board = (props) => {
     x2: 0,
     y2: 0,
   });
-
+  const [selectedId, selectShape] = useState(null);
+  const [count, setCount] = useState(null);
   // our history
   // let appHistory = [elementState.appState]; //before params is files
   // let appHistoryStep = 0;
 
+  // useEffect(() => {
+  //   const uri = stageRef.current.toDataURL();
+  //   const boardCanvasData = {
+  //     board_src: uri,
+  //     board_storage: {
+  //       rectangles: JSON.stringify(elementState.rectangles),
+  //       polygons: JSON.stringify(elementState.polygons),
+  //       ellipses: JSON.stringify(elementState.ellipses),
+  //       stars: JSON.stringify(elementState.stars),
+  //       texts: JSON.stringify(elementState.texts),
+  //       notes: JSON.stringify(elementState.notes),
+  //       lines: JSON.stringify(elementState.lines),
+  //     },
+  //     board_media: JSON.stringify(elementState.files),
+  //   };
+
+  //   // saveStateToHistory
+  //   BoardService.updateBoardCanvas(boardId, boardCanvasData)
+  //     .then(async (response) => {
+  //       console.log("Board updated info: ", response.data);
+  //       // elementDispatch({ type: "RESET_STATE" });
+  //     })
+  //     .catch((error) => {
+  //       console.log("err: ", error);
+  //     });
+  // }, [elementState]);
+
+  // let {id} = useParams();
+  // useEffect(() => {
+  //   // console.log('BOARDID: ', id)
+  //     BoardService.getBoard(boardId).then((response) => {
+  //       console.log("DATA RETURN GET BOARD: ", response);
+  //       boardDispatch({
+  //         type: "SET_CURRENT_BOARD",
+  //         payload: response.data,
+  //       });
+  //     });
+  // }, []);
   const updateSelectionRect = () => {
     const node = selectionRectRef.current;
     node.setAttrs({
@@ -153,12 +172,12 @@ const Board = (props) => {
       elementDispatch({ type: "SET_FILE", payload: files });
     }
   }, [boardState, elementDispatch]);
-  // console.log("currentBoard: ", boardState?.currentBoard);
+
   console.log("elementState.lines : ", elementState.lines);
   console.log("files: ", elementState.files);
 
   useEffect(() => {
-    console.log('element State: ', elementState?.rectangles)
+    console.log("element State: ", elementState?.rectangles);
   }, [elementState, socket]);
 
   //----------------------------SOCKET IO client connect to server---------------------------------
@@ -175,17 +194,8 @@ const Board = (props) => {
 
     socket?.on("notification", onNotification);
 
-    const onDrawingImage = async(fileData) => {
-      // console.log("FILE DATA: ", fileData)
-      // fileData.forEach((el) => {
-      //   let base64ImageString = Buffer.from(el.src, "binary").toString(
-      //     "base64"
-      //   );
-      //   el.src = "data:image/png;base64," + base64ImageString;
-      // });
-      // console.log("file data: ", fileData);
+    const onDrawingImage = async (fileData) => {
       await elementDispatch({ type: "SET_FILE", payload: fileData });
-      // elementDispatch({ type: "CREATE_FILE", payload: fileData });
     };
 
     socket?.on("file", onDrawingImage);
@@ -218,6 +228,32 @@ const Board = (props) => {
       elementDispatch({ type: "SET_NOTE", payload: noteData });
     };
     socket?.on("note", onDrawingNoteEvent);
+    //---------------Socket on delete event -------------------
+    socket?.on("handleLineDelete", (lineData) => {
+      console.log('THE LINE DATA: ', lineData)
+      elementDispatch({ type: "REMOVE_LINE", payload: lineData });
+    });
+    socket?.on("handleTextDelete", (textData) => {
+      elementDispatch({ type: "REMOVE_TEXT", payload: textData });
+    });
+    socket?.on("handleFileDelete", (fileData) => {
+      elementDispatch({ type: "REMOVE_FILE", payload: fileData });
+    });
+
+    socket?.on("handleShapeDelete", (shapeData) => {
+      if (shapeData.type === "rect") {
+        elementDispatch({ type: "REMOVE_RECTANGLE", payload: shapeData });
+      }
+      if (shapeData.type === "ellipse") {
+        elementDispatch({ type: "REMOVE_ELLIPSE", payload: shapeData });
+      }
+      if (shapeData.type === "polygons") {
+        elementDispatch({ type: "REMOVE_POLYGONS", payload: shapeData });
+      }
+      if (shapeData.type === "star") {
+        elementDispatch({ type: "REMOVE_STAR", payload: shapeData });
+      }
+    });
     // // 	# the server is restarted, the client automatically reconnects and sends its buffered events
     // // connect
     // let count = 0;
@@ -309,13 +345,12 @@ const Board = (props) => {
             id: nextId("line-"),
             points: [pos.x, pos.y],
             drawingProperty,
-            type: "line"
+            type: "line",
           },
         });
 
         break;
       case "typing":
-        //if choose "Pen" tool cannot draggable on board
         console.log("isEditText: ", isEditText);
         if (isEditText) {
           socket.emit("drawText", {
@@ -337,7 +372,7 @@ const Board = (props) => {
           fontStyle: "normal",
           textDecoration: "empty",
           id: nextId("text-"),
-          type: 'text'
+          type: "text",
         };
         elementDispatch({ type: "CREATE_TEXT", payload: textAttr });
         // setTexts((prev) => [...prev, textAttr]);
@@ -363,10 +398,10 @@ const Board = (props) => {
         });
         break;
       case "noting":
-        socket.emit('drawNote', {
+        socket.emit("drawNote", {
           code: boardState.currentBoard?.code,
-          notes: elementState.notes
-        })
+          notes: elementState.notes,
+        });
         break;
       case "media_upload":
         socket.emit("drawFile", {
@@ -417,7 +452,8 @@ const Board = (props) => {
           payload: elementState.lines.concat(),
         });
         break;
-
+      case "shaping":
+        break;
       default:
         break;
     }
@@ -557,11 +593,19 @@ const Board = (props) => {
 
     if (currentElement.attrs?.points !== null) {
       elementDispatch({ type: "REMOVE_LINE", payload: currentElement.attrs });
+      socket?.emit("deleteLine", {
+        code: boardState.currentBoard.code,
+        line: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("rect")) {
       elementDispatch({
         type: "REMOVE_RECTANGLE",
         payload: currentElement.attrs,
+      });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
       });
     }
     if (currentElement.attrs.id?.includes("square")) {
@@ -569,11 +613,19 @@ const Board = (props) => {
         type: "REMOVE_RECTANGLE",
         payload: currentElement.attrs,
       });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("ellipse")) {
       elementDispatch({
         type: "REMOVE_ELLIPSE",
         payload: currentElement.attrs,
+      });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
       });
     }
     if (currentElement.attrs.id?.includes("round")) {
@@ -581,11 +633,19 @@ const Board = (props) => {
         type: "REMOVE_ELLIPSE",
         payload: currentElement.attrs,
       });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("triangle")) {
       elementDispatch({
         type: "REMOVE_POLYGONS",
         payload: currentElement.attrs,
+      });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
       });
     }
     if (currentElement.attrs.id?.includes("rhombus")) {
@@ -593,11 +653,19 @@ const Board = (props) => {
         type: "REMOVE_POLYGONS",
         payload: currentElement.attrs,
       });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("pentagon")) {
       elementDispatch({
         type: "REMOVE_POLYGONS",
         payload: currentElement.attrs,
+      });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
       });
     }
     if (currentElement.attrs.id?.includes("hexagon")) {
@@ -605,9 +673,17 @@ const Board = (props) => {
         type: "REMOVE_POLYGONS",
         payload: currentElement.attrs,
       });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("star")) {
       elementDispatch({ type: "REMOVE_STAR", payload: currentElement.attrs });
+      socket?.emit("deleteShape", {
+        code: boardState.currentBoard.code,
+        shape: currentElement.attrs,
+      });
     }
 
     // if(currentElement.attrs.id.includes('note')){
@@ -615,9 +691,17 @@ const Board = (props) => {
     // }
     if (currentElement.attrs.id?.includes("text")) {
       elementDispatch({ type: "REMOVE_TEXT", payload: currentElement.attrs });
+      socket?.emit("deleteText", {
+        code: boardState.currentBoard.code,
+        text: currentElement.attrs,
+      });
     }
     if (currentElement.attrs.id?.includes("file")) {
       elementDispatch({ type: "REMOVE_FILE", payload: currentElement.attrs });
+      socket?.emit("deleteFile", {
+        code: boardState.currentBoard.code,
+        file: currentElement.attrs,
+      });
     }
   };
 
@@ -995,12 +1079,15 @@ const Board = (props) => {
           appHistoryStep={elementState.appHistoryStep}
           appHistory={elementState.appState}
           setIsChatOpen={setIsChatOpen}
+          isButton={isButton}
+          setIsButton={setIsButton}
           elementDispatch={elementDispatch}
         />
         {isChatOpen ? (
           <Conversation
             user={user}
             setIsChatOpen={setIsChatOpen}
+            setIsButton={setIsButton}
             boardId={boardId}
             socket={socket}
             boardCode={boardState.currentBoard.code}

@@ -1,17 +1,17 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import Logo from "../Logo";
 import SidebarItem from "./SideBarItem";
-import { Dropdown, Menu, Button } from "antd";
-import {UpOutlined } from '@ant-design/icons'
+import { Dropdown, Menu, Button, Divider } from "antd";
 import { Link } from "react-router-dom";
 import { UserContext, ACTIONS } from "../../context/userContext";
+import TeamQuickAccess from "../TeamQuickAccess/TeamQuickAccess";
 const SideBar = (props) => {
   const { admin } = props;
-const {dispatch} = useContext(UserContext)
-//   const history = useHistory();
+  const { dispatch } = useContext(UserContext);
+  //   const history = useHistory();
   const logout = () => {
-	dispatch({ type: ACTIONS.LOGOUT });
-	props.history.replace("/");
+    dispatch({ type: ACTIONS.LOGOUT });
+    props.history.replace("/");
   };
   const menu = (
     <Menu className="dropdown_menu">
@@ -43,12 +43,23 @@ const {dispatch} = useContext(UserContext)
       {admin ? (
         <div className="admin_frame">
           <Dropdown overlay={menu} trigger={["click"]}>
-		  <Button shape="round" style={{width: "100%"}} onClick={(e) => e.preventDefault()}>
-              <p>Welcome, {admin?.name} <i className="fas fa-angle-up"></i></p>
+            <Button
+              shape="round"
+              style={{ width: "100%" }}
+              onClick={(e) => e.preventDefault()}
+            >
+              <p>
+                Welcome, {admin?.name} <i className="fas fa-angle-up"></i>
+              </p>
             </Button>
           </Dropdown>
         </div>
-      ) : null}
+      ) : (
+        <div className="user_frame">
+          <Divider />
+          <TeamQuickAccess/>
+        </div>
+      )}
     </div>
   );
 };

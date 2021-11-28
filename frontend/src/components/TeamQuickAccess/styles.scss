@@ -1,0 +1,26 @@
+.team_quick_access{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    .access_title{
+        font-size: 20px;
+    }
+}
+.team_item_container{
+    display: flex;
+    flex-direction: column;
+    .team_item{
+        list-style-type: none;
+        padding: 10px 40px;
+        // margin-left: 10px;
+        border-color: transparent;
+        border-radius: 20px;
+        &:hover{
+            background: rgb(241, 240, 239);
+        }
+    }
+}
+.ant-modal-content {
+    overflow: auto;
+    border-radius: 20px
+}

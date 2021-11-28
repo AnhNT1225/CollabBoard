@@ -1,7 +1,7 @@
 const endOfDay = require("date-fns/endOfDay");
 const startOfDay = require("date-fns/startOfDay");
 const Space = require("../models/Space");
-const Board = require("../models/Board")
+const Board = require("../models/Board");
 const Team = require("../models/Team");
 const User = require("../models/User");
 // const Space = require('../models/Space');
@@ -85,7 +85,9 @@ class TeamController {
 
   // GET TEAMS HAS LARGEST BOARDS (FOR ADMIN)
   async getMaxBoardsTeams(req, res) {
-    await Team.find({}).sort("-boards").limit(5)
+    await Team.find({})
+      .sort("-boards")
+      .limit(5)
       .populate("members")
       .populate("createdBy")
       .then((teams) => {
@@ -140,10 +142,14 @@ class TeamController {
     const teamId = req.params.id;
     const { team_name } = req.body;
     console.log("teamID If: ", teamId, "teamName: ", team_name);
-    await Team.findByIdAndUpdate({ _id: teamId }, { name: team_name }, {new:true})
+    await Team.findByIdAndUpdate(
+      { _id: teamId },
+      { name: team_name },
+      { new: true }
+    )
       .lean()
-      .populate('members')
-      .populate('createdBy')
+      .populate("members")
+      .populate("createdBy")
       .then((team) => {
         return res.status(200).json({
           success: true,
@@ -216,7 +222,10 @@ class TeamController {
 
     const { boardName } = req.body;
     console.log("boardName: ", boardName);
-    const foundBoard = await Board.findOne({ createdBy: req.user._id, name: boardName}).lean();
+    const foundBoard = await Board.findOne({
+      createdBy: req.user._id,
+      name: boardName,
+    }).lean();
     console.log("BOARD ID: ", foundBoard._id);
 
     // const { boardId } = req.body;
@@ -250,7 +259,10 @@ class TeamController {
 
     const { spaceName } = req.body;
     console.log("spaceName: ", spaceName);
-    const foundSpace = await Space.findOne({ createdBy: req.user._id, name: spaceName}).lean();
+    const foundSpace = await Space.findOne({
+      createdBy: req.user._id,
+      name: spaceName,
+    }).lean();
     console.log("SPACE ID: ", foundSpace._id);
 
     await Team.findByIdAndUpdate(
@@ -258,6 +270,7 @@ class TeamController {
       { $addToSet: { spaces: foundSpace._id } },
       { new: true }
     )
+      .lean()
       .populate("spaces")
       .then((team) => {
         // team.populated("spaces").spaceId.teamId = teamId;
@@ -286,7 +299,7 @@ class TeamController {
     console.log("USER ID: ", user._id);
     await Team.findByIdAndUpdate(
       { _id: teamId },
-      { $addToSet: { members: user._id, } },
+      { $addToSet: { members: user._id } },
       { new: true }
     )
       .populate("members")
@@ -312,7 +325,7 @@ class TeamController {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
     const { spaceId } = req.body;
-    
+
     await Team.findByIdAndUpdate(
       { _id: teamId },
       { $pull: { spaces: spaceId } },
@@ -334,12 +347,12 @@ class TeamController {
       });
   }
 
-  removeMemberFromTeam(req, res){
+  removeMemberFromTeam(req, res) {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
     const { selectedMemberId } = req.body;
-    console.log("selectedMemberId: ", selectedMemberId)
-    selectedMemberId.forEach(async(memId) => {
+    console.log("selectedMemberId: ", selectedMemberId);
+    selectedMemberId.forEach(async (memId) => {
       await Team.findByIdAndUpdate(
         { _id: teamId },
         { $pull: { members: memId } },

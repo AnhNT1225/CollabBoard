@@ -92,43 +92,23 @@ const OverlayMenu = (props) => {
     // setNotes()
   };
 
-  // const onSelectFile = (e) => {
-  // 	e.preventDefault();
-  // 	let files;
-  // 	if (e.dataTransfer) {
-  // 		files = e.dataTransfer.files;
-  // 	} else if (e.target) {
-  // 		files = e.target.files;
-  // 	}
-  // 	const reader = new FileReader();
-  // 	reader.onload = () => {
-  // 		setFiles((prev) => ({ ...prev, file: reader.result }));
-  // 	};
-  // 	reader.readAsDataURL(files[0]);
-  // 	console.log("selectedFile", e.dataTransfer);
-  // };
-  // create a preview as a side effect, whenever selected file is changed
-
+  
   useEffect(() => {
     if (!selectedFile) {
       setPreview(undefined);
       return;
     }
-
     const objectUrl = selectedFile.map((file) => URL.createObjectURL(file));
-    // console.log("obj: ", objectUrl);
     setPreview(objectUrl);
-
     // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
-  console.log("preview: ", preview);
+
   const onSelectFile = (e) => {
     if (!e.target.files || e.target.files.length === 0) {
       setSelectedFile(undefined);
       return;
     }
-
     const fileArray = Array.from(e.target.files);
     setSelectedFile(fileArray);
     const reader = new FileReader();
@@ -138,14 +118,11 @@ const OverlayMenu = (props) => {
         id: nextId('file-'),
         src: reader.result,
       };
-      // setFiles((prev) => [...prev, imageObj]);
       elementDispatch({ type: "CREATE_FILE", payload: imageObj });
-
     };
     reader.readAsDataURL(e.target.files[0]);
-    // I've kept this example simple by using the first image instead of multiple
-    // setSelectedFile(e.target.files[0]);
   };
+
   return (
     <div className="overlay">
       <div className="tool_item">
@@ -163,6 +140,7 @@ const OverlayMenu = (props) => {
           <EraserIcon
             className="svg_icon"
             onClick={() => {
+              setMenuComponent("drawing");
               setDrawingProperty((prev) => ({
                 ...prev,
                 brushColor: "#ffffff",
@@ -196,7 +174,6 @@ const OverlayMenu = (props) => {
         >
           <form className="file-select-frm">
             <input
-              multiple={true}
               className="custom-file-input"
               type="file"
               accept="image/*"

@@ -9,7 +9,7 @@ const userSchema = new Schema(
     avatar: { type: String, default: null },
     boards: [{ type: Schema.Types.ObjectId, ref: "Board" }],
     DoB: { type: Date, default: null },
-    gender: { type: String, enum: ["Male", "Female", "Undefined"], default: "null" },
+    gender: { type: String, enum: ["Male", "Female", "Undefined"], default: "Undefined" },
     position: {type: String, default: null},
     workingPlace: {type: String, default: null},
     resetLink: { type: String, default: "" },

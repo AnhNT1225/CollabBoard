@@ -101,8 +101,10 @@ io.on("connection", function (socket) {
       console.log("user joined room: ", boardCode);
       console.log("all room in Join: ", io.of("/").adapter.rooms);
       //Trả lại thông báo cho người vào phòng
+
       socket.emit("notification", `You have joined the room: ${boardCode}`);
       //Trả lại thông báo cho tất cả người còn lại trong phòng
+
       io.to(boardCode).emit(
         "notification",
         `One people has id ${socket.id} has joined our board.`
@@ -130,9 +132,11 @@ io.on("connection", function (socket) {
 
   const createRoom = (boardCode) => {
     console.log("THIS IS ROOM CODE: ", boardCode);
+    if (boardCode !== null) {
     socket.join(boardCode);
     console.log("all room in create: ", io.sockets.adapter.rooms);
     socket.emit("notification", `You have joined the room: ${boardCode}`);
+    }
   };
 
   const leaveRoom = (boardCode) => {
@@ -166,18 +170,28 @@ io.on("connection", function (socket) {
   });
 
   socket.on("drawFile", (data) => {
-    // console.log("fileData: ", data);
-    // data.files.forEach((element) => {
-    //   const buffer = Buffer.from(element.src.split(",")[1], "base64");
-    //   // console.log('buffer type: ', buffer)
-    //   element.src = buffer;
-    // });
-    // console.log("fileData: ", data.files);
     socket.in(data.code).emit("file", data.files);
   });
+
+  //------------------SOCKET HANDLE DELETE---------------
+  socket.on("deleteLine", (data) => {
+    socket.in(data.code).emit("handleLineDelete", data.line);
+  });
+  socket.on("deleteShape", (data) => {
+    socket.in(data.code).emit("handleShapeDelete", data.shape);
+  });
+  socket.on("deleteText", (data) => {
+    socket.in(data.code).emit("handleTextDelete", data.text);
+  });
+  socket.on("deleteFile", (data) => {
+    socket.in(data.code).emit("handleFileDelete", data.file);
+  });
+  //--------------SOCKET HANDLE MESSAGE----------------
   socket.on("sendMessageClient", function (data) {
     console.log(data);
-    socket.in(data.code).emit("receiveMessageServer", { message: data.message });
+    socket
+      .in(data.code)
+      .emit("receiveMessageServer", { message: data.message });
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected!: " + socket.userId);

@@ -13,7 +13,7 @@ const Message = (props) => {
     <div className="message">
       <div className="messageTop">
         {message.senderId?._id === userId ? (
-          <b className="messageOwner"> You </b>
+          <div className="messageOwner"><b>You</b>  </div>
         ) : (
           <b className="messageOwner"> {message.senderId?.name} </b>
         )}

@@ -81,7 +81,7 @@ const UserEdit = () => {
             <label>Gender:</label>
             <Select
               style={{ width: 200 }}
-              defaultValue="Undefined"
+              value={newUser?.gender}
               onChange={changeGender}
             >
               <Option value="Male">Male</Option>

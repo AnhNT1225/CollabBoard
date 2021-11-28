@@ -5,7 +5,7 @@ import MessageService from "../../services/messageService";
 import "./conversation.scss";
 import Message from "../Message/Message";
 const Conversation = (props) => {
-  const { setIsChatOpen, user, boardId, socket, boardCode } = props;
+  const { setIsChatOpen, user, boardId, socket, boardCode, setIsButton } = props;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -66,6 +66,10 @@ const Conversation = (props) => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const handleClose = () => {
+    setIsChatOpen(false);
+    setIsButton(true);
+  }
   return (
     <div className="chat_box">
       <div className="chatbox_title_wrap">
@@ -76,7 +80,7 @@ const Conversation = (props) => {
             type="text"
             shape="circle"
             icon={<CloseOutlined style={{ fontSize: 20 }} />}
-            onClick={() => setIsChatOpen(false)}
+            onClick={handleClose}
           />
         </Tooltip>
       </div>
@@ -99,6 +103,7 @@ const Conversation = (props) => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
+        <div className="send_wrap">
         <Button
           className="send_btn"
           htmlType="button"
@@ -115,6 +120,7 @@ const Conversation = (props) => {
           }
           onClick={sendMessage}
         />
+        </div>
       </div>
     </div>
   );

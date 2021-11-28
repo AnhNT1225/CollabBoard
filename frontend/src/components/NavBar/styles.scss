@@ -2,7 +2,7 @@ $color-nav: rgb(138, 114, 114);
 $color-nav-hover: rgb(24, 167, 233);
 
 .navbar {
-	min-width: 100%;
+	// min-width: 100%;
 	position: -webkit-sticky;
 	position: sticky;
 	top: 0;
@@ -10,7 +10,7 @@ $color-nav-hover: rgb(24, 167, 233);
 	background: #e9e8e0;
 	z-index: 1;
 	display: flex;
-	flex-direction: row;
+	// flex-direction: row;
 	justify-content: center;
 	// align-self: center;
 	ul {
@@ -21,6 +21,7 @@ $color-nav-hover: rgb(24, 167, 233);
 
 	li {
 		width: 100px;
+		margin-top: 10px;
 		align-self: center;
 		text-align: center;
 		margin-right: 10px;

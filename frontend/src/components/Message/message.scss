@@ -8,12 +8,12 @@
         display: flex;
         flex-direction: row;
         .messageOwner{
-            flex: 3;
+            flex: 1;
         }
 
         .messageTime{
             font-size: 12px;
-            flex: 9;
+            flex: 2;
             align-self: center;
         }
         // .messageImg{

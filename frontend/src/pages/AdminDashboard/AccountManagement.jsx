@@ -29,24 +29,24 @@ const AccountManagement = (props) => {
   const currentYear = new Date().getFullYear();
   console.log("current Year: ", currentYear);
 
-  // state.users?.forEach((user) => {
-  //   if (user.DoB) {
-  //     const userAge = currentYear - new Date(user.DoB).getFullYear();
-  //     console.log("user Age: ", userAge);
-  //     if (userAge < 10) {
-  //       setGroupAge((prev) => [...prev.under10, user]);
-  //     } else if (userAge >= 10 && userAge < 15) {
-  //       setGroupAge((prev) => [...prev.between10and15, user]);
-  //     } else if (userAge >= 15 && userAge < 18) {
-  //       setGroupAge((prev) => [...prev.between15and18, user]);
-  //     } else if (userAge >= 18) {
-  //       console.log("user inside: ", user);
-  //       setGroupAge((prev) => [...prev.over18, user]);
-  //     } else {
-  //       setGroupAge((prev) => [...prev.undefined, user]);
-  //     }
-  //   }
-  // });
+  state.users?.forEach((user) => {
+    if (user?.DoB) {
+      const userAge = currentYear - new Date(user.DoB).getFullYear();
+      console.log("user Age: ", userAge);
+      if (userAge < 10) {
+        setGroupAge((prev) => [...prev.under10, user]);
+      } else if (userAge >= 10 && userAge < 15) {
+        setGroupAge((prev) => [...prev.between10and15, user]);
+      } else if (userAge >= 15 && userAge < 18) {
+        setGroupAge((prev) => [...prev.between15and18, user]);
+      } else if (userAge >= 18) {
+        console.log("user inside: ", user);
+        setGroupAge((prev) => [...prev.over18, user]);
+      } else {
+        setGroupAge((prev) => [...prev.undefined, user]);
+      }
+    }
+  });
 
   const handleChange = (pagination, sorter) => {
     console.log("Various parameters", pagination, sorter);

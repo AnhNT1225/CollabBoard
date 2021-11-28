@@ -213,7 +213,8 @@ const elementReducer = (state, action) => {
       case "REMOVE_LINE":
         return {
           ...state,
-          lines: state.lines.filter((el) => el.points !== action.payload.points),
+          //array comparing
+          lines: state.lines.filter((el) => JSON.stringify(el.points) !== JSON.stringify(action.payload.points)),
         };
       case "REMOVE_FILE":
         return {

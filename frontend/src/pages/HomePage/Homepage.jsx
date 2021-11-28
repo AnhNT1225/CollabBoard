@@ -1,5 +1,7 @@
-import React from "react";
+import React, {useEffect, useContext} from "react";
 import { Button } from "antd";
+import { UserContext, ACTIONS } from "../../context/userContext";
+import UserService from '../../services/userService';
 import "./style.scss";
 import Footer from "../../components/PageFooter";
 import NavBar from "../../components/NavBar/NavBar";
@@ -9,6 +11,17 @@ import sketchImg from "../../assets/images/limnu1.PNG";
 import collabImg from "../../assets/images/limnu2.PNG";
 import brainStorm from "../../assets/images/limnu3.PNG";
 const HomePage = ({socket}) => {
+	const { dispatch } = useContext(UserContext);
+	useEffect(() => {
+		UserService.getCurrentUser()
+			.then((response) => {
+				dispatch({ type: ACTIONS.GET_USER, payload: response });
+				// console.log("user response data: ", response.data);
+			})
+			.catch((error) => {
+				console.log("error: ", error);
+			});
+	}, []);
 	return (
 		<div className="home">
 			<NavBar socket={socket}/>

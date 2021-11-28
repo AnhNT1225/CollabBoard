@@ -46,42 +46,6 @@ const Login = (props) => {
       });
   };
 
-  //Google Login functions
-  // const onSuccess = (res) => {
-  // 	console.log("[Login success] currentUser: ", res.profileObj);
-  // 	// refreshTokenSetup(res);
-
-  // 	// AuthService.getCurrentUser()
-  // 	// .then((data) => {
-  // 	// 	console.log("user: ", data);
-  // 	// 	message.success(`Login successfully`);
-  // 	// 	history.replace("/dashboard");
-  // 	// })
-  // 	// .catch((error) => {
-  // 	// 	console.log("error: ", error);
-  // 	// 	// setIsLoading(false);
-  // 	// 	message.error(
-  // 	// 		`Your account is wrong or not existed! Please login again.`
-  // 	// 	);
-  // 	// });
-
-  // 	// message.success(`Login successfully`);
-  // 	// history.replace("/dashboard");
-  // };
-  // const onFailure = (res) => {
-  // 	console.log("[Login fail] res: ", res);
-  // 	message.error(`Your account is wrong or not existed! Please login again.`);
-  // };
-  // const { signIn } = useGoogleLogin({
-  // 	onSuccess,
-  // 	onFailure,
-  // 	clientId,
-  // 	isSignedIn: false,
-  // 	accessType: "offline",
-  // 	// responseType: 'code',
-  // 	// prompt: 'consent',
-  // });
-
   const handleGoogleLogin = async (googleData) => {
     console.log("google data: ", googleData);
     try {
@@ -90,9 +54,16 @@ const Login = (props) => {
         console.log("Google data: ", token);
         await AuthService.loginWithGoogle(token).then((data) => {
           console.log("login data GOOGLE: ", data);
-          if (data) {
-            message.success(`Login successfully`, 1);
-            history.push("/dashboard");
+          dispatch({ type: ACTIONS.LOGIN, payload: data });
+          // console.log("data.user: ", data.user.role);
+          localStorage.setItem("userId", data.user.id);
+          localStorage.setItem("role", data.user.role);
+          message.success(`Login successfully`, 1);
+          if (data.user.role === "admin") {
+            props.history.push("/admin");
+          } else {
+            props.history.push("/dashboard");
+            props.setupSocket();
           }
         });
       }
@@ -122,14 +93,14 @@ const Login = (props) => {
             rules={[
               {
                 type: 'email',
-                message: 'The input is not valid E-mail!',
+                message: 'The input is not valid email!',
               },
               {
                 required: true,
-                message: 'Please input your E-mail!',
+                message: 'Please input your email!',
               },
               {whitespace: true},
-
+              {max: 50, message: 'The maximum charecters of email is 50 charecters!'}
             ]}
             hasFeedback
           >

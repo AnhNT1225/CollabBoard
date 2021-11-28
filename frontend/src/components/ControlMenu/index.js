@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Button } from "antd";
 import {
 	UndoOutlined,
@@ -10,7 +10,8 @@ import {
 import "./styles.scss";
 
 function ControlMenu(props) {
-	let { setIsChatOpen, appHistoryStep, appHistory, elementDispatch } = props;
+	let { setIsChatOpen, appHistoryStep, appHistory, elementDispatch, setIsButton, isButton } = props;
+	
 	console.log('APP STATE: ',appHistory);
 	console.log('APP STEP: ',appHistoryStep);
 
@@ -64,7 +65,11 @@ function ControlMenu(props) {
 		}
 
 	}
-
+	
+	const handleClick = () => {
+		setIsChatOpen(true);
+		setIsButton(false);
+	}
 	return (
 		<>
 			<div className="zoom_pan">
@@ -84,12 +89,13 @@ function ControlMenu(props) {
 				/>
 			</div>
 			<div className="chat_pan">
-				<Button
+				{isButton ? <Button
 					className="chat_btn"
 					size="large"
 					icon={<MessageOutlined style={{ fontSize: 25 }} />}
-					onClick={() => setIsChatOpen(true)}
-				/>
+					onClick={handleClick}
+				/> : null}
+				
 			</div> 
 		</>
 	);

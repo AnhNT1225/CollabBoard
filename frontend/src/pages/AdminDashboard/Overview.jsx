@@ -176,7 +176,7 @@ const Overview = () => {
         </div>
         <div className="recently_stats">
           <p className="represent_chart_title">
-            New board: <b>{boardState?.boards.length}</b>
+            New board today: <b>{boardState?.newBoards.length}</b>
           </p>
           <div>
           <Doughnut
@@ -190,7 +190,7 @@ const Overview = () => {
         </div>
         <div className="recently_stats">
           <p className="represent_chart_title">
-            New team: <b>{teamState?.newTeams.length}</b>
+            New team today: <b>{teamState?.newTeams.length}</b>
           </p>
           <div>
           <Doughnut
@@ -204,7 +204,7 @@ const Overview = () => {
       <div className="recently_board_chart">
         <div>
             <h5>Top 5 teams own the most boards</h5>
-            <table class="table">
+            <table className="table">
               <thead>
                 <tr>
                   <th scope="col">#</th>

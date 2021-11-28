@@ -58,7 +58,7 @@ const TeamResult = (props) => {
         });
     };
     getTeamInfo();
-  }, []);
+  }, [teamId]);
 
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });

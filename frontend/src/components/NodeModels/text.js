@@ -10,22 +10,10 @@ const Typer = ({
 }) => {
 	const textRef = React.useRef();
 
-	// const trRef = React.useRef();
-
-	// React.useEffect(() => {
-	// 	if (isSelected) {
-	// 		// we need to attach transformer manually
-	// 		trRef.current.nodes([textRef.current]);
-	// 		trRef.current.getLayer().batchDraw();
-	// 		setIsEditText(true);
-	// 	}
-	// }, [isSelected]);
-
 	return (
 		<React.Fragment>
 			<Text
 				onClick={onSelect}
-				onTap={onSelect}
 				ref={textRef}
 				{...textProps}
 				name="shapes"
@@ -52,7 +40,7 @@ const Typer = ({
 
 					let textPosition = textRef.current.absolutePosition();
 					console.log("textPosition: ", textPosition);
-					// then lets find position of stage container on the page:
+					// find position of stage container on the page:
 					let stageBox = e.target
 						.getStage()
 						.container()
@@ -71,8 +59,6 @@ const Typer = ({
 							fonts.forEach(function (font) {
 								console.log(font + "loaded");
 								// Map the result of the Promise back to our existing data,
-								// to get the other properties we need.
-								// console.log(exampleFontData[font.family].color);
 							});
 						})
 						.catch(function (err) {
@@ -82,11 +68,7 @@ const Typer = ({
 					let textarea = document.createElement("textarea");
 					document.body.appendChild(textarea);
 					// apply many styles to match text on canvas as close as possible
-					// remember that text rendering on canvas and on the textarea can be different
-					// and sometimes it is hard to make it 100% the same. But we will try...
-					console.log("text style: ", textStyle);
 					textarea.value = textRef.current.text();
-					// textarea.select();
 					textarea.placeholder = "Type here";
 					textarea.style.position = "absolute";
 					textarea.style.top = areaPosition.y + "px";
@@ -141,10 +123,6 @@ const Typer = ({
 						textarea.parentNode.removeChild(textarea);
 						window.removeEventListener("click", handleOutsideClick);
 						textRef.current.show();
-						// boardDispatch({
-						// 	type: "ADD_NEW_DRAWING",
-						// 	payload: textRef.current.attrs,
-						// });
 						onChange({
 							...textProps,
 							text: textRef.current.text(),
@@ -153,9 +131,6 @@ const Typer = ({
 							textDecoration: textRef.current.textDecoration(),
 							fill: textRef.current.fill(),
 						});
-						console.log("textRef: ", textRef.current.attrs);
-						// trRef.current.show();
-						// trRef.current.forceUpdate();
 					}
 					function setTextareaWidth(newWidth) {
 						if (!newWidth) {
@@ -182,9 +157,12 @@ const Typer = ({
 
 					textarea.addEventListener("keydown", function (e) {
 						// setIsEditText(true);
-						// hide on enter
-						// but don't hide on shift + enter
-						// let key = e.key || e.keyCode;
+						let scale = textRef.current.getAbsoluteScale().x;
+						setTextareaWidth(textRef.current.width() * scale);
+						textarea.style.height = "auto";
+						textarea.style.height =
+							textarea.scrollHeight + textRef.current.fontSize() + "px";
+						// using shift + enter to down the line
 						if (e.keyCode === 13 && !e.shiftKey) {
 							textRef.current.text(textarea.value);
 							removeTextarea();
@@ -193,14 +171,6 @@ const Typer = ({
 						if (e.keyCode === 27) {
 							removeTextarea();
 						}
-					});
-					textarea.addEventListener("keydown", function (e) {
-						// setIsEditText(true);
-						let scale = textRef.current.getAbsoluteScale().x;
-						setTextareaWidth(textRef.current.width() * scale);
-						textarea.style.height = "auto";
-						textarea.style.height =
-							textarea.scrollHeight + textRef.current.fontSize() + "px";
 					});
 
 					function handleOutsideClick(e) {
@@ -214,17 +184,6 @@ const Typer = ({
 					});
 				}}
 			/>
-			{/* {isSelected && (
-				<Transformer
-					ref={trRef}
-					boundBoxFunc={(oldBox, newBox) => {
-						// // set minimum width of text
-						newBox.width = Math.max(30, newBox.width);
-						return newBox;
-					}}
-					enabledAnchors={["middle-left", "middle-right"]}
-				/>
-			)} */}
 		</React.Fragment>
 	);
 };

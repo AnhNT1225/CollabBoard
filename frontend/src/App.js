@@ -8,14 +8,14 @@ import {
   Redirect,
 } from "react-router-dom";
 import { io } from "socket.io-client";
-import HomePage from "./pages/HomePage/index.jsx";
-import Register from "./pages/Register/index";
-import Editor from "./pages/Editor/index";
-import Login from "./pages/Login/index";
+import HomePage from "./pages/HomePage/Homepage";
+import Register from "./pages/Register/Register";
+import Editor from "./pages/Editor/Editor";
+import Login from "./pages/Login/Login";
 // import NotFound from "./pages/PageNotFound";
 import UserProfile from "./pages/User/UserProfile";
 import OwnerProfile from "./pages/User/OwnerProfile";
-import AdminPage from "./pages/AdminPage/index";
+import AdminPage from "./pages/AdminDashboard/AdminDashboard";
 
 import AboutUs from "./pages/About us/index";
 import Spinner from "./components/Loading/Spinner";
