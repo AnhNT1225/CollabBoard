@@ -25,7 +25,7 @@ const Board = (props) => {
     setDrawingProperty,
     textProperty,
     setMenuComponent,
-    // location,
+    location,
     boardId,
     user,
     isEditText,
@@ -35,7 +35,7 @@ const Board = (props) => {
     socket,
   } = props;
   console.log("user from YTF: ", user);
-
+  console.log('location: ', location)
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   // const { boardState, boardDispatch } = useContext(BoardContext);

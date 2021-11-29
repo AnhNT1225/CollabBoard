@@ -98,7 +98,7 @@ const UserEdit = () => {
             <label>DoB:</label>
 
             <DatePicker
-              value={moment(newUser?.DoB)}
+              value={newUser?.DoB}
               onChange={(date, dateString) => {
                 console.log("date: ", date, "dateString: ", dateString);
                 setNewUser({ ...newUser, DoB: date });

@@ -132,7 +132,7 @@ const SpaceResult = (props) => {
             }}
           >
             <i class="fas fa-pen"></i>
-            <span> Add Existed Board</span>
+            <span> Add new board</span>
           </Button>
           <Modal
             title="Choose board"
@@ -146,6 +146,7 @@ const SpaceResult = (props) => {
             keyboard
           >
             <form onSubmit={submitBoard}>
+              
               <label>Current Board: </label>{" "}
               <Select
                 showSearch

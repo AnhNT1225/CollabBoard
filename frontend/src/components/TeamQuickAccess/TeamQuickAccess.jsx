@@ -5,12 +5,15 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, message, Input, Modal, Space } from "antd";
 import { useHistory, Link } from "react-router-dom";
 import "./styles.scss";
+import { getUserRole } from "../../lib/auth";
 const TeamQuickAccess = () => {
   const { teamState, teamDispatch } = useContext(TeamContext);
   const [createTeamModal, setCreateTeamModal] = useState(false);
   const [teamName, setTeamName] = useState(null);
   const history= useHistory()
   useEffect(() => {
+    const userRole = getUserRole();
+    if(userRole === "user"){
     teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
     TeamService.getJoinedTeam()
       .then((result) => {
@@ -21,6 +24,10 @@ const TeamQuickAccess = () => {
       .catch((err) => {
         throw new Error(err);
       });
+    }
+    else{
+      return null
+    }
   }, []);
 
   const changeTeamName = (e) => {

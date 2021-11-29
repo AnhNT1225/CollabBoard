@@ -19,7 +19,7 @@ const UserProfile = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-  }, []);
+  }, [userId]);
   
 
   return (

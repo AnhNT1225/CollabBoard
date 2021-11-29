@@ -369,6 +369,7 @@ class BoardController {
   async setSpaceForBoard(req, res) {
     const boardId = req.params.id;
     const { spaceId } = req.body;
+    console.log("PSAPCE: ", spaceId );
     Board.findByIdAndUpdate(
       { _id: boardId },
       { spaceId: spaceId },

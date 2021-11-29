@@ -68,7 +68,7 @@ class UserController {
   async findNewUsers(req, res) {
     try {
       const user = await User.find({
-        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()) },
+        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()), role:'user' },
       });
       if (!user) {
         return res

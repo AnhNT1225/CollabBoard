@@ -109,22 +109,6 @@ io.on("connection", function (socket) {
         "notification",
         `One people has id ${socket.id} has joined our board.`
       );
-      // socket.on("drawLine", (data) => {
-      //   console.log("data drawing: ", data);
-      //   io.to("b9a96a021a").broadcast.emit("line", data);
-      // });
-      // socket.on("drawShape", (shapeData) => {
-      //   console.log("shapeData: ", shapeData);
-      //   socket.to(boardCode).emit("shape", shapeData);
-      // });
-      // socket.on("drawText", (textData) => {
-      //   console.log("shapeData: ", textData);
-      //   socket.to(boardCode).emit("text", textData);
-      // });
-      // socket.on("sendMessageClient", (data) => {
-      //   console.log(data);
-      //   io.to(boardCode).emit("sendMessageServer", { data });
-      // });
     } else {
       console.log("There is no room like this key word search");
     }

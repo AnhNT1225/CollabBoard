@@ -15,7 +15,6 @@ const boardSchema = new Schema(
     imageURL: {
       type: Buffer,
     },
-    // store: { type: String, default: null },
     media: [
       {
         id: { type: String },

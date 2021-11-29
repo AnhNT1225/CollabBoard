@@ -35,11 +35,8 @@ const HomePage = ({socket}) => {
 								</h2>
 								<h1>Create your own design ideas</h1>
 								<p>
-									Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-									Atque aspernatur reiciendis accusantium voluptatum, dolorem
-									aperiam distinctio neque reprehenderit natus fugit, quo illum.
-									Tempora voluptatibus ea dolorem, explicabo aspernatur eos
-									similique?
+								The idea of an online whiteboard is to provide teams with a whiteboard on which they can work digital, from everywhere when they are online.
+								Online whiteboards can be used for the same purpose as a real whiteboard, but without the limitations of a real whiteboard. The latter is limited by space, the number of things which you can add (have you ever tried to put a video on a real whiteboard?) and is only available to the people which are in the same room
 								</p>
 								<h2>Collab Board -- Where to start new ideas!</h2>
 							</span>

@@ -6,7 +6,6 @@ import { UserContext, ACTIONS } from "../../context/userContext";
 import { getUserId } from "../../lib/auth";
 import UserService from "../../services/userService";
 // import AllBoardTab from "../../components/Tab/PrototypeTab/AllBoardTab";
-const { TabPane } = Tabs;
 
 const OwnerProfile = () => {
   const userId = getUserId();
@@ -27,16 +26,6 @@ const OwnerProfile = () => {
     history.goBack(1);
   };
 
-  const changeTab = (tab) => {
-    console.log("key ", tab);
-    switch (tab) {
-      case "tab 1":
-        // return <AllBoardTab />;
-        break;
-      default:
-        break;
-    }
-  };
 
   return (
     <>
@@ -70,12 +59,6 @@ const OwnerProfile = () => {
             <span>Working place: {state.user?.workingPlace}</span>
             <span>Position: {state.user?.position}</span>
           </Space>
-          <button
-            className="edit_info_btn"
-            onClick={() => history.push("/user/profiles/edit")}
-          >
-            <i className="far fa-edit"></i>
-          </button>
         </div>
       </div>
       {/* <div className="user_management_wrap"> */}
@@ -92,13 +75,13 @@ const OwnerProfile = () => {
             </div>
           </div>
           <div className="user_all_stats">
-            <p className="stats_title">Spaces</p>
+            <p className="stats_title">Current Spaces</p>
             <div className='stats_show'>
               <b className="stats_title">{state?.newUsers.length}</b>
             </div>
           </div>
           <div className="user_all_stats">
-            <p className="stats_title">Teams</p>
+            <p className="stats_title">Current Teams</p>
             <div className='stats_show'>
               <b className="stats_title">{state?.newUsers.length}</b>
             </div>

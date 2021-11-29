@@ -14,14 +14,15 @@ const NavBar = ({socket}) => {
 		dispatch({ type: ACTIONS.LOGOUT });
 		history.replace("/");
 	};
+	console.log('test navbar user: ', state.user)
 	const menu = (
 		<Menu className="dropdown_menu">
 			<Menu.Item key="0" className="dropdown_item">
-				<Link to={"/user"}>Manage account</Link>
+				<Link to={`/user/profiles`}><i className="fas fa-user-edit"></i>View profile</Link>
 			</Menu.Item>
 			{/* <Menu.Divider /> */}
 			<Menu.Item key="1" className="dropdown_item" onClick={logout}>
-				<i class="fas fa-sign-out-alt">Sign out</i>
+				<i className="fas fa-sign-out-alt"></i>Sign out
 			</Menu.Item>
 		</Menu>
 	);

@@ -2,16 +2,16 @@ import React, { useContext } from "react";
 import Logo from "../Logo";
 import SidebarItem from "./SideBarItem";
 import { Dropdown, Menu, Button, Divider } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useHistory} from "react-router-dom";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import TeamQuickAccess from "../TeamQuickAccess/TeamQuickAccess";
 const SideBar = (props) => {
   const { admin } = props;
   const { dispatch } = useContext(UserContext);
-  //   const history = useHistory();
+    const history = useHistory();
   const logout = () => {
     dispatch({ type: ACTIONS.LOGOUT });
-    props.history.replace("/");
+    history.replace("/");
   };
   const menu = (
     <Menu className="dropdown_menu">

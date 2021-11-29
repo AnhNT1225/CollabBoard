@@ -9,6 +9,7 @@ import {
   Avatar,
   message,
   Input,
+  Form,
 } from "antd";
 import { Link } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
@@ -30,10 +31,9 @@ const TeamResult = (props) => {
   // const [boardSelectionModal, setBoardSelectionModal] = useState(false);
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const [createBoardModal, setCreateBoardModal] = useState(false);
-
   const emailRef = useRef(null);
-  const [boardName, setBoardName] = useState('');
-  const [spaceName, setSpaceName] = useState('');
+  const [boardName, setBoardName] = useState("");
+  const [spaceName, setSpaceName] = useState("");
 
   const time = new Date(teamState?.team.createdAt).toLocaleDateString("en-EN", {
     day: "numeric",
@@ -114,20 +114,9 @@ const TeamResult = (props) => {
   //       console.log("error: ", error);
   //     });
   // }
-  const changeSpaceName = async (e) => {
-    const name = e.target.value;
-    console.log("space name: ", name);
-    setSpaceName(name);
-  };
 
-  const changeBoardName = async (e) => {
-    const name = e.target.value;
-    console.log("space name: ", name);
-    setBoardName(name);
-  };
-  const createNewSpace = async (e) => {
-    e.preventDefault();
-    await SpaceService.createSpace(spaceName)
+  const createNewSpace = async (form) => {
+    await SpaceService.createSpace(form.spaceName)
       .then((result) => {
         console.log("result: ", result);
         spaceDispatch({ type: "CREATE_SPACE", payload: result.space });
@@ -136,24 +125,23 @@ const TeamResult = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-      setCreateSpaceModal(false);
-    await TeamService.addSpaceToTeam(teamId, spaceName)
+    setCreateSpaceModal(false);
+    await TeamService.addSpaceToTeam(teamId, form.spaceName)
       .then((result) => {
         console.log("add space to team result: ", result);
         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((error) => {
         console.log("error: ", error);
-        if(error){
+        if (error) {
           throw new Error("The space haven't add to the team.");
         }
       });
-    setSpaceName('');
+    // setSpaceName("");
   };
 
-  const createNewBoard = async (e) => {
-    e.preventDefault();
-    await BoardService.createBoard(boardName)
+  const createNewBoard = async (form) => {
+    await BoardService.createBoard(form.boardName)
       .then((result) => {
         console.log("result: ", result);
         boardDispatch({ type: "CREATE_BOARD", payload: result.board });
@@ -162,19 +150,18 @@ const TeamResult = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-      setCreateBoardModal(false);
-    await TeamService.addBoardToTeam(teamId, boardName)
+    setCreateBoardModal(false);
+    await TeamService.addBoardToTeam(teamId, form.boardName)
       .then((result) => {
         console.log("add board to team result: ", result);
         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((error) => {
         console.log("error: ", error);
-        if(error){
+        if (error) {
           throw new Error("The board haven't add to the team.");
         }
       });
-    setBoardName('');
   };
 
   const inviteMember = async (e) => {
@@ -239,14 +226,18 @@ const TeamResult = (props) => {
       <div className="team_result_wrap">
         <div className="team_info">
           <h1>Team : {teamState.team?.name}</h1>
-          <span>Total Member: {teamState.team.members?.length}</span>
+          <span>Total Members: {teamState.team.members?.length}</span>
           <p>Created At: {time}</p>
           <b>Host: {teamState.team.createdBy?.name}</b>
         </div>
 
         {tab === "1" ? (
           <div className="team_actions">
-            <Button>View chat history</Button>
+            <Button>
+              {" "}
+              <i class="far fa-trash-alt"></i>
+              <span> Delete</span>
+            </Button>
           </div>
         ) : tab === "2" ? (
           <div className="team_actions">
@@ -268,15 +259,34 @@ const TeamResult = (props) => {
               onCancel={() => setCreateBoardModal(false)}
               footer={null}
               keyboard
+              destroyOnClose={true}
             >
-              <form className="room_code_wrapper" onSubmit={createNewBoard}>
+              <Form
+                className="room_code_wrapper"
+                onFinish={createNewBoard}
+                scrollToFirstError
+                autoComplete="off"
+              >
                 <label className="room_code_label">New board name</label>
                 <br />
-                <Input
-                  style={{ width: 250, height: 40, textAlign: "center" }}
-                  value={boardName}
-                  onChange={changeBoardName}
-                />
+                <Form.Item
+                  name="boardName"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your board name!",
+                    },
+                    { whitespace: true,  message: "Please enter some characters!"},
+                  ]}
+                  hasFeedback
+                >
+                  <Input
+                    style={{ width: 250, height: 40, textAlign: "center" }}
+                    value={boardName}
+                    name='boardName'
+                    // onChange={changeBoardName}
+                  />
+                </Form.Item>
                 <br />
                 <Button
                   htmlType="submit"
@@ -286,7 +296,7 @@ const TeamResult = (props) => {
                 >
                   Create
                 </Button>
-              </form>
+              </Form>
             </Modal>
           </div>
         ) : tab === "3" ? (
@@ -304,15 +314,34 @@ const TeamResult = (props) => {
               onCancel={() => setCreateSpaceModal(false)}
               footer={null}
               keyboard
+              destroyOnClose={true}
             >
-              <form className="room_code_wrapper" onSubmit={createNewSpace}>
+              <Form
+                className="room_code_wrapper"
+                onFinish={createNewSpace}
+                scrollToFirstError
+                autoComplete="off"
+              >
                 <label className="room_code_label">Space name</label>
                 <br />
+                <Form.Item
+                  name="spaceName"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your space name!",
+                    },
+                    { whitespace: true,  message: "Please enter some characters!"},
+                  ]}
+                  hasFeedback
+                >
                 <Input
                   style={{ width: 250, height: 40, textAlign: "center" }}
                   value={spaceName}
-                  onChange={changeSpaceName}
+                  // onChange={changeSpaceName}
+                  name='spaceName'
                 />
+                </Form.Item>
                 <br />
                 <Button
                   htmlType="submit"
@@ -322,12 +351,16 @@ const TeamResult = (props) => {
                 >
                   Create
                 </Button>
-              </form>
+                </Form>
             </Modal>
           </div>
         ) : (
           <div className="team_actions">
-            <Button onClick={viewChat}>View chat history</Button>
+            <Button onClick={viewChat}>
+              {" "}
+              <i class="far fa-trash-alt"></i>
+              <span> Delete</span>
+            </Button>
           </div>
         )}
       </div>

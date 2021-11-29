@@ -53,7 +53,7 @@ const SpaceEdit = (props) => {
         });
     };
     getSpaceInfo();
-  }, []);
+  }, [spaceDispatch, spaceId]);
 
   console.log("teamId: ", spaceState.space.teamId?._id);
 

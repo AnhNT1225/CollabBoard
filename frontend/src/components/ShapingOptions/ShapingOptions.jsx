@@ -22,10 +22,8 @@ const ShapingOptions =() => {
 	const { elementDispatch } = useContext(ElementContext);
 	const handleShapeTypes = (e) => {
 		const shapeName = e.currentTarget.name;
-		// console.log("shape: ", shapeName);
 		switch (shapeName) {
 			case "rectangle":
-				// setShapingProperty(shapeName);
 				let rectData = {
 					x: 200,
 					y: 200,
@@ -39,13 +37,12 @@ const ShapingOptions =() => {
 				elementDispatch({ type: "CREATE_RECTANGLE", payload: rectData });
 				break;
 			case "square":
-				// setShapingProperty(shapeName);
 				let squareData = {
 					x: 50,
 					y: 50,
 					width: 100,
 					height: 100,
-					fill: "red",
+					stroke: "black",
 					id: nextId("square-"),
 					type: 'rect'
 				};
@@ -53,7 +50,6 @@ const ShapingOptions =() => {
 				
 				break;
 			case "round":
-				// setShapingProperty(shapeName);
 				let roundData = {
 					x: 250,
 					y: 250,
@@ -68,13 +64,11 @@ const ShapingOptions =() => {
 
 				break;
 			case "ellipse":
-				// setShapingProperty(shapeName);
 				let ellipseData = {
 					x: 250,
 					y: 250,
 					radiusX: 100,
 					radiusY: 50,
-					fill: "yellow",
 					stroke: "black",
 					strokeWidth: 2,
 					id: nextId("ellipse-"),
@@ -84,7 +78,6 @@ const ShapingOptions =() => {
 
 				break;
 			case "triangle":
-				// setShapingProperty(shapeName);
 				let triangleData = {
 					x: 250,
 					y: 250,
@@ -147,7 +140,6 @@ const ShapingOptions =() => {
 					numPoints: 5,
 					innerRadius: 40,
 					outerRadius: 70,
-					fill: "yellow",
 					stroke: "black",
 					strokeWidth: 4,
 					id: nextId("star-"),

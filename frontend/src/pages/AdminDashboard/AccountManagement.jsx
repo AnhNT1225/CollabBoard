@@ -3,15 +3,16 @@ import { Table } from "antd";
 import { Pie } from "react-chartjs-2";
 import UserService from "../../services/userService";
 import { UserContext } from "../../context/userContext";
+
 const AccountManagement = (props) => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const { state, dispatch } = useContext(UserContext);
   const [groupAge, setGroupAge] = useState({
-    under10: null,
-    between10and15: null,
-    between15and18: null,
-    over18: null,
-    undefined: null,
+    under10: [],
+    between10and15: [],
+    between15and18: [],
+    over18: [],
+    undefined: [],
   });
 
   useEffect(() => {
@@ -24,29 +25,56 @@ const AccountManagement = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
+      loopUser();
   }, []);
+
 
   const currentYear = new Date().getFullYear();
   console.log("current Year: ", currentYear);
 
-  state.users?.forEach((user) => {
-    if (user?.DoB) {
-      const userAge = currentYear - new Date(user.DoB).getFullYear();
+  const loopUser = () => {
+    // console.log("HUNG NGUYEn")
+    for (const user of state?.users) {
+      console.log("user: ", user);
+      const userAge =
+        currentYear - new Date(user?.DoB).getFullYear();
       console.log("user Age: ", userAge);
-      if (userAge < 10) {
-        setGroupAge((prev) => [...prev.under10, user]);
+      if(user?.DoB !== null){
+        setGroupAge({undefined: user});
+      }
+      else if (userAge < 10) {
+        setGroupAge({under10: user} );
       } else if (userAge >= 10 && userAge < 15) {
-        setGroupAge((prev) => [...prev.between10and15, user]);
+        setGroupAge({between10and15: user} );
       } else if (userAge >= 15 && userAge < 18) {
-        setGroupAge((prev) => [...prev.between15and18, user]);
+        setGroupAge({between15and18: user} );
       } else if (userAge >= 18) {
-        console.log("user inside: ", user);
-        setGroupAge((prev) => [...prev.over18, user]);
-      } else {
-        setGroupAge((prev) => [...prev.undefined, user]);
+        setGroupAge({over18: user} );
+        
       }
     }
-  });
+  };
+  // for (const user in state.users) {
+  //   console.log("user: ", user);
+  //   console.log(`${user}: ${state.users[user]}`);
+  //   const userAge = currentYear - new Date(state.users[user].DoB).getFullYear();
+  //   console.log("user Age: ", userAge);
+  //   if (userAge < 10) {
+  //     let arr1 = [];
+  //     arr1.push(state.users[user]);
+  //     setGroupAge((prev) => ({ ...prev.under10, arr1 }));
+  //   } else if (userAge >= 10 && userAge < 15) {
+  //     setGroupAge((prev) => [...prev.between10and15, user]);
+  //   } else if (userAge >= 15 && userAge < 18) {
+  //     setGroupAge((prev) => [...prev.between15and18, user]);
+  //   } else if (userAge >= 18) {
+  //     let arr2 = [];
+  //     arr2.push(state.users[user]);
+  //     setGroupAge((prev) => ({ ...prev.over18, arr2 }));
+  //   } else {
+  //     setGroupAge((prev) => [...prev.undefined, user]);
+  //   }
+  // }
 
   const handleChange = (pagination, sorter) => {
     console.log("Various parameters", pagination, sorter);
@@ -65,7 +93,7 @@ const AccountManagement = (props) => {
     datasets: [
       {
         data: [
-          12, 7, 9, 5
+          12, 7, 9, 5,
           // groupAge.under10?.length,
           // groupAge.between10and15?.length,
           // groupAge.between15and18?.length,
@@ -105,7 +133,6 @@ const AccountManagement = (props) => {
     {
       title: "Name",
       dataIndex: "name",
-      key: "name",
       onFilter: (value, record) => record.name.includes(value),
       sorter: (a, b) => a.name.length - b.name.length,
       // sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
@@ -114,7 +141,6 @@ const AccountManagement = (props) => {
     {
       title: "Age",
       dataIndex: "DoB",
-      key: "DoB",
       // sorter: (a, b) => a.age - b.age,
       render: (DoB) => (
         <span>
@@ -127,7 +153,6 @@ const AccountManagement = (props) => {
     {
       title: "Email address",
       dataIndex: "email",
-      key: "email",
 
       onFilter: (value, record) => record.email.includes(value),
       sorter: (a, b) => a.email.length - b.email.length,
@@ -137,7 +162,6 @@ const AccountManagement = (props) => {
     {
       title: "Gender",
       dataIndex: "gender",
-      key: "gender",
 
       onFilter: (value, record) => record.gender.includes(value),
       sorter: (a, b) => a.gender.length - b.gender.length,
@@ -147,7 +171,6 @@ const AccountManagement = (props) => {
     {
       title: "Position",
       dataIndex: "position",
-      key: "position",
 
       onFilter: (value, record) => record.position.includes(value),
       sorter: (a, b) => a.position.length - b.position.length,
@@ -183,6 +206,7 @@ const AccountManagement = (props) => {
         rowSelection={{
           type: "checkbox",
         }}
+        rowKey={state.user?._id}
         columns={columns}
         dataSource={state?.users}
         onChange={handleChange}

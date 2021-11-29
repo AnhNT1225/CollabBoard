@@ -11,11 +11,6 @@ class SpaceController {
       name: spaceName,
       createdBy: req.user,
     });
-    // space.members.addToSet(req.user);
-    // space: space,
-    // contributors: contributors,
-
-    //This populates the user id with actual author information!
     space
       .save()
       .then((data) => {

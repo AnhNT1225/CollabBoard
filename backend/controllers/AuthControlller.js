@@ -102,19 +102,14 @@ class AuthController {
       // res.send({ user });
       if (email_verified) {
 		  console.log("EMAIL HERE: ", email)
-        User.findOne({ email: 'nguyentuananhctk22@gmail.com' }).exec((err, user) => {
-          console.log("user: ", user);
-          console.log('err:', err)
+        User.findOne({ email: email }).exec((err, user) => {
           if (err) {
-            console.log('if 1')
           	return res.status(400).json({
           		success: false,
           		error: "Something went wrong...",
           	});
           } else {
-            console.log('if 2')
           	if (user) {
-              console.log('sign in now')
           		const token = jwt.sign(
           			{ _id: user._id },
           			process.env.ACCESS_TOKEN_SECRET,
@@ -122,7 +117,6 @@ class AuthController {
           				expiresIn: 86400, // 24 hours
           			}
           		);
-          		console.log('user: ', user)
           		const { _id, name, email, avatar } = user;
           		res.json({ token, user: { _id, name, email, avatar } });
           	} else {
@@ -133,17 +127,15 @@ class AuthController {
           			email: email,
           			password: bcrypt.hashSync(email, 10),
           			avatar: profilePic,
+                role:'user'
           		});
-              console.log('new usr: ', newUser)
           		newUser.save((err, data) => {
           			if (err) {
-                  console.log('is err: ', err)
           				return res.status(400).json({
           					success: false,
           					error: "Something went wrong...",
           				});
           			}
-                console.log('not err')
           			const token = jwt.sign(
           				{ _id: data._id },
           				process.env.ACCESS_TOKEN_SECRET,

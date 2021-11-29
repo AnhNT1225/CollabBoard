@@ -92,17 +92,23 @@ const BoardHeader = (props) => {
   }, [boardState]);
 
   const updateName = async (e) => {
-    console.log("e: ", e);
-    const newBoardName = await e;
-    setText(e);
-    await BoardService.updateBoardName(boardId, newBoardName)
-      .then(async(response) => {
-        console.log("Board updated name info: ", response.data);
-        await boardDispatch({ type: "SET_CURRENT_BOARD", payload: response.data });
-      })
-      .catch((error) => {
-        console.log("err: ", error);
-      });
+    let isValid = validateInput(e);
+    console.log(isValid, "Name: ", e);
+    // you validate here
+    if (isValid) {
+      // this.setState({ e });
+      console.log("e: ", e);
+      const newBoardName = await e;
+      setText(e);
+      await BoardService.updateBoardName(boardId, newBoardName)
+        .then(async(response) => {
+          console.log("Board updated name info: ", response.data);
+          await boardDispatch({ type: "SET_CURRENT_BOARD", payload: response.data });
+        })
+        .catch((error) => {
+          console.log("err: ", error);
+        });
+    }
   };
 
 
@@ -146,6 +152,10 @@ const BoardHeader = (props) => {
     history.goBack(1);
   };
 
+  const validateInput = text => {
+    const regex = /'^[yz]*x[xyz]*$'/;
+    return text && regex.test(text);
+  }
   return (
     <>
       <header className="editor_header">

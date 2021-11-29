@@ -56,7 +56,7 @@ const Login = (props) => {
           console.log("login data GOOGLE: ", data);
           dispatch({ type: ACTIONS.LOGIN, payload: data });
           // console.log("data.user: ", data.user.role);
-          localStorage.setItem("userId", data.user.id);
+          localStorage.setItem("userId", data.user._id);
           localStorage.setItem("role", data.user.role);
           message.success(`Login successfully`, 1);
           if (data.user.role === "admin") {
@@ -123,7 +123,7 @@ const Login = (props) => {
                 required: true,
                 message: "Please input your password!",
               },
-              {min: 8}
+              {min: 8, message:"Password must have at least 8 characters"}
             ]}
             hasFeedback
           >  

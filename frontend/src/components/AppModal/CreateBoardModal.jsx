@@ -23,7 +23,7 @@ const CreateBoardModal = ({socket}) => {
 
   const [createBoardModal, setCreateBoardModal] = useState(false);
   const [joinRoomModal, setjoinRoomModal] = useState(false);
-  const [file, setFile] = useState({ loading: false });
+  const [file, setFile] = useState({ loading: false, imageUrl: '' });
   const {elementState, elementDispatch} = useContext(ElementContext)
   // const propsTypes = {
   // 	name: "file",
@@ -54,6 +54,7 @@ const CreateBoardModal = ({socket}) => {
         console.log("newBoard: ", response.board);
         console.log("board COEDNSK RESPONSE: ", response.board.code);
         await socket?.emit("create-room", response.board.code);
+        message.success('Create new board successful!');
         history.push({ pathname: `/board/${response.board._id}` });
       })
       .catch((error) => {

@@ -24,17 +24,7 @@
   justify-content: center;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 15px;
-  .edit_btn {
-    position: absolute;
-    top: 5px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-  }
   .user_avatar_wrap {
-    // border: 1px solid red;
-    // width: 40rem;
-    // height: 30rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -148,8 +138,9 @@
       text-align: center;
     }
     .stats_show{
-      border: 1px solid red;
+      // border: 1px solid red;
       text-align: center;
+      // margin-top: 10px;
     }
   }
 }
