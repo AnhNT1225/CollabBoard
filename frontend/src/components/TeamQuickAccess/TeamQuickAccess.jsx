@@ -90,7 +90,7 @@ const TeamQuickAccess = () => {
       <div className="team_item_container">
 
           {teamState.teams.map((team) => {
-            return <Link className='team_item' to={`/dashboard/teams/${team._id}`}>{team.name}</Link>;
+            return <Link key={team._id} className='team_item' to={`/dashboard/teams/${team._id}`}>{team.name}</Link>;
           })}
 
       </div>

@@ -21,8 +21,8 @@ const OverlayMenu = (props) => {
   const [preview, setPreview] = useState();
   const [isUploadModal, setIsUploadModal] = useState(false);
   const [isNoteModal, setIsNoteModal] = useState(false);
-  const [noteColor, setNoteColor] = useState(null);
-  const [noteTxt, setNoteTxt] = useState(null);
+  const [noteColor, setNoteColor] = useState('');
+  const [noteTxt, setNoteTxt] = useState('');
   const { elementDispatch } = useContext(ElementContext);
 
   const noteColors = [
@@ -64,15 +64,13 @@ const OverlayMenu = (props) => {
   };
 
   const createNewNote = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const newNote = {
       type: 'note',
       id: nextId('note-'),
-      label: {
-        x: 350,
-        y: 250,
-        opacity: 0.75,
-      },
+      x: 400,
+      y: 250,
+      opacity: 0.75,
       tag: {
         color: noteColor,
       },
@@ -86,10 +84,9 @@ const OverlayMenu = (props) => {
     };
 
     elementDispatch({ type: "CREATE_NOTE", payload: newNote });
-    setNoteColor(null);
-    setNoteTxt(null)
+    setNoteColor('');
+    setNoteTxt('')
     setIsNoteModal(false);
-    // setNotes()
   };
 
   
@@ -114,9 +111,15 @@ const OverlayMenu = (props) => {
     const reader = new FileReader();
     reader.onload = () => {
       const imageObj = {
+        x: 300,
+        y: 50,
+        // x: Math.random() * window.innerWidth,
+        // y: Math.random() * window.innerHeight,
         type: 'file',
         id: nextId('file-'),
         src: reader.result,
+        scaleX: 0.5,
+        scaleY: 0.5,
       };
       elementDispatch({ type: "CREATE_FILE", payload: imageObj });
     };
@@ -219,6 +222,7 @@ const OverlayMenu = (props) => {
           okText="Create"
           onCancel={() => setIsNoteModal(false)}
           keyboard
+          destroyOnClose={true}
         >
           <ColorPicker mainColors={noteColors} setColor={setNoteColor} />
           <br />

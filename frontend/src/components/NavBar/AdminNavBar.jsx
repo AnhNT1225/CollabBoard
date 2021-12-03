@@ -1,25 +1,52 @@
-import React from "react";
-import { Input } from "antd";
+import React, {useEffect} from "react";
+import { Input, AutoComplete } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
-const AdminNavBar = () => {
-  const searchItem = () => {};
+import "./styles.scss";
+const AdminNavBar = (props) => {
+  const {setSearchInput, dataSource,setDataSource} = props
+
+  // const searchItem = () => {};
+  const options = [
+    {
+      value: "Burns Bay Road",
+    },
+    {
+      value: "Downing Street",
+    },
+    {
+      value: "Wall Street",
+    },
+  ];
+
   return (
     <div>
-      <Input
-        // className="search_dashoard"
-        prefix={<SearchOutlined style={{ fontSize: 20 }} />}
-        size="large"
-        placeholder="Search for items"
-        style={{
-          borderRadius: 10,
-          width: 300,
-          marginLeft: 70,
-        //   width: "300px",
-        //   height: "50px",
-        }}
-        onChange={searchItem}
-      />
+      <AutoComplete
+        options={options}
+        filterOption={(inputValue, option) =>
+          option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+        }
+      >
+        <Input
+        prefix={<SearchOutlined/>}
+          style={{
+            marginTop: 20,
+            borderRadius: 5,
+            width: 300,
+            marginLeft: 70,
+          }}
+          size="large"
+          placeholder="Search for items"
+          onChange={e => {
+            const currValue = e.target.value;
+            setSearchInput(currValue);
+            const filteredData = dataSource.filter(entry =>
+              entry.name.toLowerCase().includes(currValue.toLowerCase())
+            );
+            setDataSource(filteredData);
+          }}
+        />
+      </AutoComplete>
     </div>
   );
 };

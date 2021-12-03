@@ -11,7 +11,7 @@ import {
 // import { useGoogleLogin } from "react-google-login";
 import Logo from "../../components/Logo";
 import GoogleLogin from "react-google-login";
-import { refreshTokenSetup } from "../../utils/refreshToken";
+// import { refreshTokenSetup } from "../../utils/refreshToken";
 import AuthService from "../../services/authService";
 import { ACTIONS, UserContext } from "../../context/userContext";
 
@@ -29,6 +29,7 @@ const Login = (props) => {
         // console.log("data.user: ", data.user.role);
         localStorage.setItem("userId", data.user.id);
         localStorage.setItem("role", data.user.role);
+        localStorage.setItem("name", data.user.name);
         message.success(`Login successfully`, 1);
         if (data.user.role === "admin") {
           props.history.push("/admin");
@@ -56,13 +57,17 @@ const Login = (props) => {
           console.log("login data GOOGLE: ", data);
           dispatch({ type: ACTIONS.LOGIN, payload: data });
           // console.log("data.user: ", data.user.role);
-          localStorage.setItem("userId", data.user._id);
+          localStorage.setItem("userId", data.user.id);
           localStorage.setItem("role", data.user.role);
+          localStorage.setItem("name", data.user.name);
           message.success(`Login successfully`, 1);
           if (data.user.role === "admin") {
+            console.log('fault')
             props.history.push("/admin");
-          } else {
-            props.history.push("/dashboard");
+          } 
+          else {
+            console.log('props: ', props.history)
+            props.history.replace("/dashboard");
             props.setupSocket();
           }
         });

@@ -13,8 +13,10 @@ class UserService {
   }
 
   async getUserById(userId) {
+    const token =getToken();
+    console.log('token lead: ', token)
     const response = await axios.get(API_URL + `/${userId}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     // console.log("the user data from API: ", response.data.user);
     return response.data;
@@ -55,6 +57,16 @@ class UserService {
         headers: { Authorization: `Bearer ${getToken()}` },
       }
     );
+    // console.log("the user data from API: ", response.data.user);
+    return response.data;
+  }
+
+  async deleteUser(userId){
+    const token =getToken();
+    console.log('token lead: ', token)
+    const response = await axios.delete(API_URL + `/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     // console.log("the user data from API: ", response.data.user);
     return response.data;
   }

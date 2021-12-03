@@ -2,15 +2,18 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "antd";
 import BoardService from "../../services/boardService";
 import { BoardContext } from "../../context/boardContext";
-const BoardManagement = () => {
+const BoardManagement = (props) => {
+  const {setDataSource, dataSource,searchInput} = props
   const [sortedInfo, setSortedInfo] = useState(null);
   const { boardState, boardDispatch } = useContext(BoardContext);
+  console.log('em ko the nao: ', searchInput)
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
     BoardService.getAllBoard()
       .then((response) => {
         console.log("all board: ", response.data);
         boardDispatch({ type: "FETCH_BOARDS_SUCCESS", payload: response.data });
+        setDataSource(response.data)
         // console.log("user response data: ", response.data);
       })
       .catch((error) => {
@@ -18,6 +21,9 @@ const BoardManagement = () => {
       });
   }, []);
 
+  if(searchInput === ''){
+    setDataSource(boardState?.boards)
+  }
   const handleChange = (pagination, sorter) => {
     console.log("Various parameters", pagination, sorter);
     setSortedInfo(sorter);
@@ -68,7 +74,7 @@ const BoardManagement = () => {
       key: "contributors",
 
       sorter: (a, b) => a?.contributors.length - b?.contributors.length,
-      render: (contributors) => <span>{contributors.length}</span>,
+      render: (contributors) => <span>{contributors?.length}</span>,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },
@@ -91,11 +97,12 @@ const BoardManagement = () => {
     <div>
       <h2>Total board: {boardState?.boards.length} </h2>
       <Table
-        rowSelection={{
-          type: "checkbox",
-        }}
+        // rowSelection={{
+        //   type: "checkbox",
+        // }}
+        rowKey='_id'
         columns={columns}
-        dataSource={boardState?.boards}
+        dataSource={dataSource}
         onChange={handleChange}
       />
     </div>

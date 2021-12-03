@@ -17,8 +17,8 @@ import {
 import { ElementContext } from "../../context/elementContext";
 import nextId from "react-id-generator";
 import "./styles.scss";
-const ShapingOptions =() => {
-	// const { setShapingProperty } = props;
+const ShapingOptions =(props) => {
+	const { socket } = props;
 	const { elementDispatch } = useContext(ElementContext);
 	const handleShapeTypes = (e) => {
 		const shapeName = e.currentTarget.name;

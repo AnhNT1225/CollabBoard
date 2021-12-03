@@ -6,7 +6,7 @@ const spaceSchema = new Schema(
 		name: { type: String, required: true, trim: true },
 		createdBy: { type: Schema.Types.ObjectId, ref: "User" },
 		members: [{ type: Schema.Types.ObjectId, ref: "User" }],
-		teamId: { type: Schema.Types.ObjectId, ref: "Team", default: null },
+		teamId: { type: Schema.Types.ObjectId, ref: "Team"},
 		boards: [{ type: Schema.Types.ObjectId, ref: "Board" }],
 		// status: { type: String, enum:['Joined', 'Owned'], default: "Joined" },
 	},

@@ -108,8 +108,9 @@ const AllSpaceTab = () => {
 				bordered
 				dataSource={spaceState.spaces}
 				columns={columns}
-				pagination={{ pageSize: 50 }}
+				pagination={{ pageSize: 8 }}
 				scroll={{ y: 240 }}
+				rowKey='_id'
 			/>
 		</>
 	);

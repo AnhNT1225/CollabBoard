@@ -21,14 +21,14 @@
   align-items: center;
   width: 500px;
   margin: 0 auto;
-  justify-content: center;
+  // justify-content: center;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 15px;
   .user_avatar_wrap {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    flex: 1;
+    // flex-direction: column;
+    // justify-content: center;
+    text-align: center;
     .user_avatar {
       position: relative;
       .avatar_digit {
@@ -39,6 +39,9 @@
         font-size: 50px;
       }
     }
+  }
+  .user_info_wrap{
+    flex: 1;
   }
 }
 

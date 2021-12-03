@@ -3,7 +3,6 @@ import ControlMenu from "../ControlMenu";
 import Conversation from "../Conversation/Conversation";
 import { useParams } from "react-router-dom";
 import { withRouter } from "react-router-dom";
-import { message } from "antd";
 import OverlayMenu from "../OverlayMenu/OverlayMenu";
 import { Stage, Layer, Line, Rect, Transformer } from "react-konva";
 import "./Board.scss";
@@ -35,7 +34,7 @@ const Board = (props) => {
     socket,
   } = props;
   console.log("user from YTF: ", user);
-  console.log('location: ', location)
+  console.log("location: ", location);
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   // const { boardState, boardDispatch } = useContext(BoardContext);
@@ -50,7 +49,7 @@ const Board = (props) => {
   // console.log("text property: ", textProperty);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isButton, setIsButton] = useState(true)
+  const [isButton, setIsButton] = useState(true);
   // console.log("state push by history: ", location.state);
   const dragUrl = useRef();
   const [nodesArray, setNodes] = useState([]);
@@ -173,13 +172,6 @@ const Board = (props) => {
     }
   }, [boardState, elementDispatch]);
 
-  console.log("elementState.lines : ", elementState.lines);
-  console.log("files: ", elementState.files);
-
-  useEffect(() => {
-    console.log("element State: ", elementState?.rectangles);
-  }, [elementState, socket]);
-
   //----------------------------SOCKET IO client connect to server---------------------------------
   useEffect(() => {
     // socket?.on("connect", function () {
@@ -187,12 +179,6 @@ const Board = (props) => {
     //   socket?.emit("create-room", boardState.currentBoard?.code); //  where 'user' is your object containing email.
     // });
     socket?.emit("create-room", boardState.currentBoard?.code);
-    const onNotification = (joinData) => {
-      console.log("join data: ", joinData);
-      message.success(joinData);
-    };
-
-    socket?.on("notification", onNotification);
 
     const onDrawingImage = async (fileData) => {
       await elementDispatch({ type: "SET_FILE", payload: fileData });
@@ -230,7 +216,7 @@ const Board = (props) => {
     socket?.on("note", onDrawingNoteEvent);
     //---------------Socket on delete event -------------------
     socket?.on("handleLineDelete", (lineData) => {
-      console.log('THE LINE DATA: ', lineData)
+      console.log("THE LINE DATA: ", lineData);
       elementDispatch({ type: "REMOVE_LINE", payload: lineData });
     });
     socket?.on("handleTextDelete", (textData) => {
@@ -254,6 +240,7 @@ const Board = (props) => {
         elementDispatch({ type: "REMOVE_STAR", payload: shapeData });
       }
     });
+
     // // 	# the server is restarted, the client automatically reconnects and sends its buffered events
     // // connect
     // let count = 0;
@@ -269,9 +256,39 @@ const Board = (props) => {
       socket?.off("text", onDrawingTextEvent);
       socket?.off("file", onDrawingImage);
       socket?.off("note", onDrawingNoteEvent);
-      socket?.off("notification", onNotification);
     };
   }, [elementDispatch, socket, boardState]);
+
+  useEffect(() => {
+    console.log("I dot'n wanna: ", elementState?.rectangles);
+    switch (menuComponent) {
+      case "shaping":
+        socket?.emit("drawShape", {
+          code: boardState.currentBoard.code,
+          shapes: {
+            rects: elementState?.rectangles,
+            elips: elementState?.ellipses,
+            polys: elementState?.polygons,
+            stars: elementState?.stars,
+          },
+        });
+        break;
+      case "media_upload":
+        socket.emit("drawFile", {
+          code: boardState.currentBoard?.code,
+          files: elementState?.files,
+        });
+        break;
+      case "noting":
+        socket.emit("drawNote", {
+          code: boardState.currentBoard?.code,
+          notes: elementState?.notes,
+        });
+        break;
+      default:
+        break;
+    }
+  }, [elementState, menuComponent]);
 
   const handleCursor = (e) => {
     const container = e.currentTarget.getStage().container();
@@ -387,27 +404,27 @@ const Board = (props) => {
           selectShape(null);
         }
         //emit the shapeInfo to the socket server
-        socket?.emit("drawShape", {
-          code: boardState.currentBoard.code,
-          shapes: {
-            rects: elementState.rectangles,
-            elips: elementState.ellipses,
-            polys: elementState.polygons,
-            stars: elementState.stars,
-          },
-        });
+        // socket?.emit("drawShape", {
+        //   code: boardState.currentBoard.code,
+        //   shapes: {
+        //     // rects: elementState.rectangles,
+        //     elips: elementState.ellipses,
+        //     polys: elementState.polygons,
+        //     stars: elementState.stars,
+        //   },
+        // });
         break;
       case "noting":
-        socket.emit("drawNote", {
-          code: boardState.currentBoard?.code,
-          notes: elementState.notes,
-        });
+        // socket.emit("drawNote", {
+        //   code: boardState.currentBoard?.code,
+        //   notes: elementState.notes,
+        // });
         break;
       case "media_upload":
-        socket.emit("drawFile", {
-          code: boardState.currentBoard?.code,
-          files: elementState?.files,
-        });
+        // socket.emit("drawFile", {
+        //   code: boardState.currentBoard?.code,
+        //   files: elementState?.files,
+        // });
         break;
       default:
         break;
@@ -843,6 +860,10 @@ const Board = (props) => {
                         type: "SET_RECTANGLE",
                         payload: rects,
                       });
+                      socket?.emit("drawRect", {
+                        code: boardState.currentBoard.code,
+                        rects: rects,
+                      });
                     }}
                   />
                 );
@@ -872,7 +893,10 @@ const Board = (props) => {
                       const polys = elementState.polygons.slice();
                       polys[i] = newAttrs;
                       elementDispatch({ type: "SET_POLYGONS", payload: polys });
-                      // setPolygons(polys);
+                      socket?.emit("drawPoly", {
+                        code: boardState.currentBoard.code,
+                        polys: polys,
+                      });
                     }}
                   />
                 );
@@ -904,7 +928,10 @@ const Board = (props) => {
                       const ovals = elementState.ellipses.slice();
                       ovals[i] = newAttrs;
                       elementDispatch({ type: "SET_ELLIPSE", payload: ovals });
-                      // setEllipses(ovals);
+                      socket?.emit("drawElip", {
+                        code: boardState.currentBoard.code,
+                        elips: ovals,
+                      });
                     }}
                   />
                 );
@@ -938,8 +965,10 @@ const Board = (props) => {
                         type: "SET_STAR",
                         payload: starLists,
                       });
-
-                      // setStars(newStars);
+                      socket?.emit("drawStar", {
+                        code: boardState.currentBoard.code,
+                        stars: starLists,
+                      });
                     }}
                   />
                 );
@@ -970,7 +999,10 @@ const Board = (props) => {
                       const imgs = elementState.files.slice();
                       imgs[i] = newAttrs;
                       elementDispatch({ type: "SET_FILE", payload: imgs });
-                      // setFiles(imgs);
+                      socket?.emit("drawFile", {
+                        code: boardState.currentBoard.code,
+                        files: imgs,
+                      });
                     }}
                   />
                 );
@@ -1043,6 +1075,10 @@ const Board = (props) => {
                         type: "SET_NOTE",
                         payload: noteLists,
                       });
+                      socket.emit("drawNote", {
+                        code: boardState.currentBoard.code,
+                        notes: noteLists,
+                      });
                     }}
                   />
                 );
@@ -1068,10 +1104,12 @@ const Board = (props) => {
           />
         </div>
         <div id="menu">
-          <button id="pulse-button" onClick={copyElement}>
+          <button id="copy-button" onClick={copyElement}>
+            <i className="far fa-copy" style={{ fontSize: 18 }}></i>
             Copy
           </button>
-          <button id="delete-button " onClick={deleteElement}>
+          <button id="delete-button" onClick={deleteElement}>
+            <i className="fas fa-ban" style={{ fontSize: 18 }}></i>
             Delete
           </button>
         </div>

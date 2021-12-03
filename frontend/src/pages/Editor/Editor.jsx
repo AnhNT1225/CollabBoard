@@ -3,6 +3,7 @@ import "./style.scss";
 import {withRouter} from 'react-router-dom'
 import Board from "../../components/Board/Board";
 import BoardService from "../../services/boardService";
+import {message} from 'antd'
 import { UserContext, ACTIONS } from "../../context/userContext";
 import { BoardContext } from "../../context/boardContext";
 import UserService from "../../services/userService";
@@ -14,6 +15,18 @@ const Editor = ({match, socket, location}) => {
 	console.log('boardId: ', boardId);
 	console.log('editor socket: ', socket)
 	console.log('state props history: ', location.state)
+
+	useEffect(() => {
+		const onNotification = (joinData) => {
+			console.log("join data: ", joinData);
+			message.success(joinData);
+		  };
+	  
+		  socket?.on("notification", onNotification);
+		return () => {
+			socket?.off("notification", onNotification);
+		}
+	}, [socket])
 	useEffect(() => {
 		boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
 		BoardService.getBoard(boardId)

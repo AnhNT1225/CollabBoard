@@ -61,7 +61,7 @@ route(app);
 io.use(async (socket, next) => {
   // console.log("socket handshake: ", socket.handshake);
   try {
-    const token = socket.handshake.auth.token;
+    const token = await socket.handshake.auth.token;
     const payload = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     socket.userId = await payload._id;
     next();
@@ -70,8 +70,9 @@ io.use(async (socket, next) => {
   }
 });
 onlineUsers = [];
+
 const addNewUser = (userId, socketId) => {
-  !onlineUsers.push({ userId, socketId });
+  onlineUsers.push({ userId, socketId });
 };
 
 const removeUser = (socketId) => {
@@ -86,6 +87,7 @@ io.on("connection", function (socket) {
   console.log("New client connected " + socket.userId);
   socket.on("newUser", (userId) => {
     addNewUser(userId, socket.id);
+    console.log('online user: ', onlineUsers);
   });
   // console.log("socket room: ", socket.rooms);
   // console.log("al room: ", io.sockets.adapter.rooms);
@@ -93,21 +95,23 @@ io.on("connection", function (socket) {
     console.log(count);
   });
 
-  const joinRoom = (boardCode) => {
-    console.log("room code: ", boardCode);
+  const joinRoom = (boardCode, memberInfo) => {
+    console.log("room code: ", memberInfo);
+    console.log('notifyInfo: ', memberInfo)
     console.log("code confirm: ", io.sockets.adapter.rooms.has(boardCode));
     if (io.sockets.adapter.rooms.has(boardCode)) {
       socket.join(boardCode);
       console.log("user joined room: ", boardCode);
       console.log("all room in Join: ", io.of("/").adapter.rooms);
-      //Trả lại thông báo cho người vào phòng
-
       socket.emit("notification", `You have joined the room: ${boardCode}`);
-      //Trả lại thông báo cho tất cả người còn lại trong phòng
-
       io.to(boardCode).emit(
-        "notification",
-        `One people has id ${socket.id} has joined our board.`
+        "getRoomNotification",
+        {
+          memberName: memberInfo.memberName,
+          message: `One people has name ${memberInfo.memberName} joined our board.`,
+          type: memberInfo.type
+        }
+
       );
     } else {
       console.log("There is no room like this key word search");
@@ -143,6 +147,7 @@ io.on("connection", function (socket) {
     console.log("shapeData: ", data);
     socket.in(data.code).emit("shape", data.shapes);
   });
+
   socket.on("drawText", (data) => {
     console.log("textData: ", data);
     socket.in(data.code).emit("text", data.text);

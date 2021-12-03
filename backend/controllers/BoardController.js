@@ -58,7 +58,7 @@ class BoardController {
   async getLastestBoards(req, res) {
     // Querry for getting 4 latest documents
     await Board.find({ contributors: req.user._id })
-      .sort({ _id: -1 })
+      .sort({ updatedAt: -1 })
       .limit(4)
       // .populate("createdBy")
       // .populate("spaceId")
@@ -323,7 +323,7 @@ class BoardController {
           });
         return res.status(200).json({
           success: true,
-          message: "Board is find successfull",
+          message: "Board is find successfully",
           data: board,
         });
       })
@@ -341,9 +341,16 @@ class BoardController {
     console.log("user: ", req.user);
     await Board.findOneAndUpdate(
       { code: board_code },
-      { $addToSet: { contributors: req.user._id } }
+      {
+        $addToSet: { contributors: req.user._id },
+        updatedAt: new Date(Date.now()).toISOString(),
+      },
+      {
+        new: true,
+      }
     )
       .populate("spaceId")
+      .populate("createdBy")
       .then((board) => {
         if (!board) {
           return res.status(404).json({
@@ -369,7 +376,7 @@ class BoardController {
   async setSpaceForBoard(req, res) {
     const boardId = req.params.id;
     const { spaceId } = req.body;
-    console.log("PSAPCE: ", spaceId );
+    console.log("PSAPCE: ", spaceId);
     Board.findByIdAndUpdate(
       { _id: boardId },
       { spaceId: spaceId },
@@ -387,6 +394,41 @@ class BoardController {
         console.log("error: ", error);
         return res.status
           .code(400)
+          .json({ success: false, message: "Bad request!" });
+      });
+  }
+
+  async leaveBoard(req, res) {
+    const boardId = req.params.id;
+    await Board.findByIdAndUpdate(
+      { _id: boardId },
+      {
+        $pull: { contributors: req.user._id },
+        updatedAt: new Date(Date.now()).toISOString(),
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("spaceId")
+      .populate("createdBy")
+      .then((board) => {
+        if (!board) {
+          return res.status(404).json({
+            success: false,
+            message: "Boards not found",
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          message: "Remove a contributor successfully",
+          data: board,
+        });
+      })
+      .catch((error) => {
+        console.log("the catch error: ", error);
+        return res
+          .status(400)
           .json({ success: false, message: "Bad request!" });
       });
   }

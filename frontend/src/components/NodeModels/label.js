@@ -30,6 +30,8 @@ const Note = ({
 				onTap={onSelect}
 				ref={labelRef}
 				{...noteProps}
+				// x={200}
+				// y={200}
 				name="shapes"
 				draggable
 				onDragEnd={(e) => {

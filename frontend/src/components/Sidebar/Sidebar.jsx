@@ -13,6 +13,7 @@ const SideBar = (props) => {
     dispatch({ type: ACTIONS.LOGOUT });
     history.replace("/");
   };
+  console.log('admin side: ', admin)
   const menu = (
     <Menu className="dropdown_menu">
       <Menu.Item key="0" className="dropdown_item">
@@ -40,7 +41,7 @@ const SideBar = (props) => {
         {...props}
         // active={index === activeItem}
       />
-      {admin ? (
+      {admin? (
         <div className="admin_frame">
           <Dropdown overlay={menu} trigger={["click"]}>
             <Button

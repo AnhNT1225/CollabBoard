@@ -117,8 +117,15 @@ class AuthController {
           				expiresIn: 86400, // 24 hours
           			}
           		);
-          		const { _id, name, email, avatar } = user;
-          		res.json({ token, user: { _id, name, email, avatar } });
+          		const { _id, name, email, avatar, role } = user;
+              let foundUser= {
+                id: _id,
+                name: name,
+                email: email,
+                avatar: avatar,
+                role: role,
+              }
+          		res.json({ token, user: foundUser });
           	} else {
               console.log('create')
           		const newUser = new User({

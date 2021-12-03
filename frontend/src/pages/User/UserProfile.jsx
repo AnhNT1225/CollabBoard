@@ -4,7 +4,7 @@ import { Avatar, DatePicker, Input, Button, Space } from "antd";
 import "./styles.scss";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import UserService from "../../services/userService";
-
+import moment from 'moment'
 const UserProfile = (props) => {
   const userId = props.match.params.id;
   const history = useHistory();
@@ -32,6 +32,7 @@ const UserProfile = (props) => {
       </div>
       <div className="profile_form">
         <div className="user_avatar_wrap">
+          <Space direction='vertical'>
           <Avatar
             className="user_avatar"
             style={{ verticalAlign: "middle" }}
@@ -43,8 +44,9 @@ const UserProfile = (props) => {
               {state.user?.name.charAt(0)}
             </span>
           </Avatar>
-          <b>{state.user && state.user.name}</b>
-          <b>Age</b>
+          <b>{state.user?.name}</b>
+          </Space>
+          {/* <b>{new Date(state.user?.DoB).getFullYear}</b> */}
         </div>
 
         <form className="user_info_wrap" >
@@ -54,13 +56,11 @@ const UserProfile = (props) => {
             <label>Gender:</label>
             <Input title="" value="Male" readOnly/>
             <label>DoB:</label>
-            <Input title="" value={state.user?.DoB} readOnly/>
-            <label>Bio:</label>
-            <textarea
-              className="bio_description"
-              value="Make things as simple as possible but no simpler."
-              readOnly
-            />
+            <Input title="" value={state.user?.DoB.split("T")[0]} readOnly/>
+            <label>Working place:</label>
+            <Input title="" value={state.user?.workingPlace ? state.user?.workingPlace : 'Not updated'} readOnly/>
+            <label>Position:</label>
+            <Input title="" value={state.user?.position ? state.user?.position : 'Not updated'} readOnly/>
           </Space>
         </form>
       </div>

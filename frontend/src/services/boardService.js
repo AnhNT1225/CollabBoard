@@ -167,7 +167,7 @@ class BoardService {
 
 	findBoardByCode(boardCode) {
 		return axios
-			.get(API_URL, {
+			.patch(API_URL, {
 				params: { boardCode: boardCode },
 				headers: { Authorization: `Bearer ${getToken()}` },
 			})
@@ -204,6 +204,19 @@ class BoardService {
 			.catch((error) => {
 				console.log("err: ", error);
 			});
+	}
+
+	leaveBoardById(){
+		return axios
+		.patch(API_URL + `/leave/:id`, {
+			headers: { Authorization: `Bearer ${getToken()}` },
+		})
+		.then((response) => {
+			return response.data;
+		})
+		.catch((error) => {
+			console.log("err: ", error);
+		});
 	}
 }
 

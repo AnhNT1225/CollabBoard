@@ -1,115 +1,111 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Table } from "antd";
+import { Table, Space, message, Button, Popconfirm } from "antd";
+import {DeleteOutlined } from '@ant-design/icons'
 import { Pie } from "react-chartjs-2";
 import UserService from "../../services/userService";
 import { UserContext } from "../../context/userContext";
 
 const AccountManagement = (props) => {
-  const [sortedInfo, setSortedInfo] = useState(null);
+  // const [sortedInfo, setSortedInfo] = useState(null);
+  const {setDataSource, dataSource, searchInput} = props
+  const [isOpen, setIsOpen] = useState(false)
   const { state, dispatch } = useContext(UserContext);
-  const [groupAge, setGroupAge] = useState({
-    under10: [],
-    between10and15: [],
-    between15and18: [],
-    over18: [],
-    undefined: [],
-  });
+  const [under10, setUnder10] = useState(0);
+  const [between10and15, setBetween10and15] = useState(0);
+  const [between15and18, setBetween15and18] = useState(0);
+  const [over18, setOver18] = useState(0);
+  const [female, setFemale] = useState(0);
+  const [male, setMale] = useState(0);
+  const [unknown, setUnknown] = useState(0);
+  const currentYear = new Date().getFullYear();
 
+  const filterGender = (userData) => {
+    const userArr = [...userData];
+    const hasGender = userArr.filter((user) => user.DoB !== null);
+    const female = hasGender.filter((user) => {
+      return user.gender ==="Female";
+    });
+    const male = hasGender.filter((user) => {
+      return user.gender === "Male";
+    });
+    setFemale(female.length)
+    setMale(male.length)
+  }
+  
+  const filterAge = (userData) => {
+    const userArr = [...userData];
+    const hasAge = userArr.filter((user) => user.DoB !== null);
+    const min_10 = hasAge.filter((user) => {
+      const userAge = currentYear - new Date(user?.DoB).getFullYear();
+      return userAge <= 10;
+    });
+    const around_15 = hasAge.filter((user) => {
+      const userAge = currentYear - new Date(user?.DoB).getFullYear();
+      return 10 < userAge && userAge <= 15;
+    });
+    const around_18 = hasAge.filter((user) => {
+      const userAge = currentYear - new Date(user?.DoB).getFullYear();
+      return 15 < userAge && userAge <= 18;
+    });
+    const over_18 = hasAge.filter((user) => {
+      const userAge = currentYear - new Date(user?.DoB).getFullYear();
+      return userAge > 18;
+    });
+    setUnder10(min_10.length)
+    setBetween10and15(around_15.length)
+    setBetween15and18(around_18.length)
+    setOver18(over_18.length)
+  };
+
+  // console.log("current Year: ", currentYear);
   useEffect(() => {
     UserService.getAllUser()
       .then((response) => {
-        console.log("all user: ", response.data);
         dispatch({ type: "SET_ALL_USER", payload: response.data });
+        setDataSource(response.data)
         // console.log("user response data: ", response.data);
       })
       .catch((error) => {
         console.log("error: ", error);
       });
-      loopUser();
   }, []);
 
+  useEffect(() => {
+    filterAge(state?.users);
+    filterGender(state?.users)
+  }, [state]);
 
-  const currentYear = new Date().getFullYear();
-  console.log("current Year: ", currentYear);
-
-  const loopUser = () => {
-    // console.log("HUNG NGUYEn")
-    for (const user of state?.users) {
-      console.log("user: ", user);
-      const userAge =
-        currentYear - new Date(user?.DoB).getFullYear();
-      console.log("user Age: ", userAge);
-      if(user?.DoB !== null){
-        setGroupAge({undefined: user});
-      }
-      else if (userAge < 10) {
-        setGroupAge({under10: user} );
-      } else if (userAge >= 10 && userAge < 15) {
-        setGroupAge({between10and15: user} );
-      } else if (userAge >= 15 && userAge < 18) {
-        setGroupAge({between15and18: user} );
-      } else if (userAge >= 18) {
-        setGroupAge({over18: user} );
-        
-      }
-    }
-  };
-  // for (const user in state.users) {
-  //   console.log("user: ", user);
-  //   console.log(`${user}: ${state.users[user]}`);
-  //   const userAge = currentYear - new Date(state.users[user].DoB).getFullYear();
-  //   console.log("user Age: ", userAge);
-  //   if (userAge < 10) {
-  //     let arr1 = [];
-  //     arr1.push(state.users[user]);
-  //     setGroupAge((prev) => ({ ...prev.under10, arr1 }));
-  //   } else if (userAge >= 10 && userAge < 15) {
-  //     setGroupAge((prev) => [...prev.between10and15, user]);
-  //   } else if (userAge >= 15 && userAge < 18) {
-  //     setGroupAge((prev) => [...prev.between15and18, user]);
-  //   } else if (userAge >= 18) {
-  //     let arr2 = [];
-  //     arr2.push(state.users[user]);
-  //     setGroupAge((prev) => ({ ...prev.over18, arr2 }));
-  //   } else {
-  //     setGroupAge((prev) => [...prev.undefined, user]);
-  //   }
-  // }
+  if(searchInput === ''){
+    setDataSource(state?.users)
+  }
 
   const handleChange = (pagination, sorter) => {
     console.log("Various parameters", pagination, sorter);
-    setSortedInfo(sorter);
+    // setSortedInfo(sorter);
   };
 
-  console.log("check array: ", groupAge);
+  // console.log("check array: ", groupAge);
   const ageData = {
     labels: [
       "Under 10 age",
       "From 10 to 15 age",
       "From 15 to 18 age",
       "Over 18 age",
-      "Undefined",
     ],
     datasets: [
       {
-        data: [
-          12, 7, 9, 5,
-          // groupAge.under10?.length,
-          // groupAge.between10and15?.length,
-          // groupAge.between15and18?.length,
-          // groupAge.over18?.length,
-        ],
+        data: [under10, between10and15, between15and18, over18, unknown],
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
           "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
+          "rgba(39, 202, 30, 0.2)",
         ],
         borderColor: [
           "rgba(255, 99, 132, 1)",
           "rgba(54, 162, 235, 1)",
           "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
+          "rgba(39, 202, 30, 1)",
         ],
         borderWidth: 1,
       },
@@ -121,7 +117,7 @@ const AccountManagement = (props) => {
     datasets: [
       {
         // label: '# of Votes',
-        data: [17, 30],
+        data: [female, male],
         backgroundColor: ["rgba(255, 206, 86, 0.2)", "rgba(75, 192, 192, 0.2)"],
         borderColor: ["rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)"],
         borderWidth: 1,
@@ -177,6 +173,42 @@ const AccountManagement = (props) => {
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },
+    {
+      title: "Action",
+      dataIndex: "_id",
+      key: "_id",
+      render: (id) => {
+        console.log("user id: ", id);
+        const confirmDelete = async (e) => {
+          console.log(e);
+          console.log("is that id: ", id);
+          dispatch({ type: "DELETE_USER", payload: id });
+          await UserService.deleteUser(id)
+            .then((result) => {
+              console.log("result: ", result);
+              message.success(result.message);
+            })
+            .catch((error) => {
+              console.log("error: ", error);
+            });
+        };
+
+        return (
+          <Space size="large">
+            <Popconfirm
+              title="Are you sure to delete this task?"
+              onConfirm={confirmDelete}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type='link' className="dangerous_link" style={{color: 'red'}}>
+                <DeleteOutlined /> Delete
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
+    },
   ];
 
   return (
@@ -205,10 +237,14 @@ const AccountManagement = (props) => {
       <Table
         rowSelection={{
           type: "checkbox",
+          onChange: (selectedRowKeys, selectedRows) => {
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            setIsOpen(!isOpen)
+          },
         }}
-        rowKey={state.user?._id}
+        rowKey="_id"
         columns={columns}
-        dataSource={state?.users}
+        dataSource={dataSource}
         onChange={handleChange}
       />
     </>

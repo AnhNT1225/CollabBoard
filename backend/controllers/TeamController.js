@@ -137,7 +137,7 @@ class TeamController {
       });
   }
 
-  //delete team by id
+  //update team by id
   async updateTeamName(req, res) {
     const teamId = req.params.id;
     const { team_name } = req.body;

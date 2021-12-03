@@ -1,18 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import { Dropdown, Menu, Button, Tooltip, Input, Avatar } from "antd";
 import {
   BellOutlined,
   DownOutlined,
   SearchOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
-import { ACTIONS, UserContext } from "../../context/userContext";
+import { ACTIONS } from "../../context/userContext";
 import "./styles.scss";
 const DashBoardNavbar = (props) => {
-  const { state, dispatch } = useContext(UserContext);
-  const { setSearchInput } = props;
-  // console.log("user nav: ", state.user);
+  // const { state, dispatch } = useContext(UserContext);
+  const { setSearchInput, dispatch, state } = props;
 
   const history = useHistory();
   const logout = () => {
@@ -26,6 +24,8 @@ const DashBoardNavbar = (props) => {
     setSearchInput(boardName);
     // history.replace(`/board?name=${boardName}`);
   };
+
+
   const menu = (
     <Menu className="dropdown_menu">
           <div className="user_frame">

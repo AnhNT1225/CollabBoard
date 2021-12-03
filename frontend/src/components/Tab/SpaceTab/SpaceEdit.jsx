@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Input, Button, Space, Select } from "antd";
+import { Input, Button, Space, Select, Form } from "antd";
 import TeamService from "../../../services/teamService";
 import SpaceService from "../../../services/spaceService";
 import { SpaceContext } from "../../../context/spaceContext";
@@ -13,14 +13,9 @@ const SpaceEdit = (props) => {
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const { teamState, teamDispatch } = useContext(TeamContext);
   // const [space, setSpace] = useState(null);
-  const [form, setForm] = useState(null);
-  // const [form, setForm] = useState({
-  //   name: spaceState.space?.name,
-  //   team: {
-  //     id: spaceState.space.teamId?._id,
-  //     name: spaceState.space.teamId?.name,
-  //   },
-  // });
+  const [spaceMessageError, setSpaceMessageError] = useState("");
+  const [form, setForm] = useState({});
+
   useEffect(() => {
     teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
     TeamService.getJoinedTeam()
@@ -40,11 +35,15 @@ const SpaceEdit = (props) => {
       await SpaceService.getSpaceById(spaceId)
         .then((result) => {
           console.log("result space: ", result);
-          setForm({name: result.data.name,
-              team: {
-                id: result.data.teamId?._id,
-                name: result.data.teamId?.name,
-              },})
+          setForm({
+            name: result.data.name,
+            team: {
+              id: result.data.teamId?._id,
+              name: result.data.teamId?.name,
+            },
+            createdBy: result.data.createdBy,
+            initialTeamId: result.data.teamId?._id,
+          });
           spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
           // setSpace(result.data);
         })
@@ -55,41 +54,56 @@ const SpaceEdit = (props) => {
     getSpaceInfo();
   }, [spaceDispatch, spaceId]);
 
-  console.log("teamId: ", spaceState.space.teamId?._id);
+  console.log("teamId: ", form);
 
   const saveSpaceEdit = async (e) => {
     e.preventDefault();
-    //if space doesn not stored in any team, add space to new team
-    if (!spaceState.space.teamId?._id && form) {
-         await SpaceService.updateSpaceInfo(spaceId, form)
-        .then((result) => {
-          console.log("result of updated space name and TEAM spaces: ", result);
-          spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
-        })
-        .catch((err) => {
-          console.log("error: ", err);
-        });
+    let isValidSpace = false;
+    if (!form.name.trim()) {
+      setSpaceMessageError("Space name is required");
     } else {
-      //if space has existed team, remove space from old team -> addToNewTeam
-      await TeamService.removeSpaceFromTeam(
-        spaceId,
-        spaceState.space.teamId?._id,
-      )
-        .then((result) => {
-          console.log("result of remove space from old team: ", result);
-        })
-        .catch((err) => {
-          console.log("error: ", err);
-        });
+      setSpaceMessageError("");
+      isValidSpace = true;
+    }
+    if (isValidSpace) {
+      //if space doesn not stored in any team, add space to new team
+      // if (!spaceState.space.teamId?._id && form) {
+        await SpaceService.updateSpaceInfo(spaceId, form)
+          .then((result) => {
+            console.log(
+              "result of updated space name and TEAM spaces: ",
+              result
+            );
+            spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
+          })
+          .catch((err) => {
+            console.log("error: ", err);
+          });
+      // } else {
+      //   //if space has existed team, remove space from old team -> addToNewTeam
+      //   await TeamService.removeSpaceFromTeam(
+      //     spaceId,
+      //     spaceState.space.teamId?._id
+      //   )
+      //     .then((result) => {
+      //       console.log("result of remove space from old team: ", result);
+      //     })
+      //     .catch((err) => {
+      //       console.log("error: ", err);
+      //     });
 
-      await SpaceService.updateSpaceInfo(spaceId, form)
-        .then((result) => {
-          console.log("result of updated space name and TEAM spaces: ", result);
-          spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
-        })
-        .catch((err) => {
-          console.log("error: ", err);
-        });
+      //   await SpaceService.updateSpaceInfo(spaceId, form)
+      //     .then((result) => {
+      //       console.log(
+      //         "result of updated space name and TEAM spaces: ",
+      //         result
+      //       );
+      //       spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
+      //     })
+      //     .catch((err) => {
+      //       console.log("error: ", err);
+      //     });
+      // }
     }
     // await setForm(null);
   };
@@ -101,7 +115,7 @@ const SpaceEdit = (props) => {
         <span>Back to Dashboard</span>
       </Link>
       <h2>Edit Space</h2>
-      <form className="edit_space_wrapper" onSubmit={saveSpaceEdit}>
+      <form className="room_code_wrapper" onSubmit={saveSpaceEdit}>
         <Space direction="vertical">
           <label htmlFor="space_name" className="edit_space_label">
             Space name:
@@ -115,6 +129,9 @@ const SpaceEdit = (props) => {
               setForm((prev) => ({ ...prev, name: e.target.value }))
             }
           />
+          {spaceMessageError.length > 0 && (
+              <p style={{ color: "red" }}>{spaceMessageError}</p>
+            )}
           <label htmlFor="space_name" className="edit_space_label">
             Created By:
           </label>
@@ -122,12 +139,10 @@ const SpaceEdit = (props) => {
             name="space_host"
             type="text"
             style={{ width: 250, height: 40, textAlign: "center" }}
-            value={spaceState.space.createdBy?.name}
+            value={form.createdBy?.name}
             readOnly
           />
-          <label className="edit_space_label">
-            Total boards: 
-          </label>
+          <label className="edit_space_label">Total boards:</label>
           <Input
             name="space_boards"
             type="text"
@@ -136,29 +151,36 @@ const SpaceEdit = (props) => {
             readOnly
           />
           <Space direction="horizontal">
-          <label htmlFor="space_team" className="edit_space_label">
-            Team:
-          </label>
-          <Select
-            defaultValue={!form?.team.name ? "No space" : form?.team.name}
-            style={{ width: 120 }}
-            onChange={(value, obj) => {
-              console.log("value: ", value, "obj _id: ", obj.name);
-              setForm((prev) => ({
-                ...prev,
-                team: { id: obj.name, name: value },
-              }));
-            }}
-          >
-            {teamState.teams.map((team) => {
-              return (
-                <Option key={team._id} name={team._id} value={team.name}>
-                  {team.name}
-                </Option>
-              );
-            })}
-          </Select>
+            <label htmlFor="space_team" className="edit_space_label">
+              Team:
+            </label>
+            {/* <Select
+              defaultValue={!form.team?.name ? "No space" : form.team?.name}
+              style={{ width: 120 }}
+              onChange={(value, obj) => {
+                console.log("value: ", value, "obj _id: ", obj.name);
+                setForm((prev) => ({
+                  ...prev,
+                  team: { id: obj.name, name: value },
+                }));
+              }}
+            >
+              {teamState.teams.map((team) => {
+                return (
+                  <Option key={team._id} name={team._id} value={team.name}>
+                    {team.name}
+                  </Option>
+                );
+              })}
+            </Select> */}
           </Space>
+          <Input
+            name="space_boards"
+            type="text"
+            style={{ width: 250, height: 40, textAlign: "center" }}
+            value={!form.team?.name ? "No space" : form.team?.name}
+            readOnly
+          />
           <Button htmlType="submit" type="primary" size="middle">
             Save changes
           </Button>

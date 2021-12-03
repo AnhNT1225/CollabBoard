@@ -18,21 +18,21 @@ const Prototypes = (props) => {
   const { boardDispatch } = useContext(BoardContext);
   const { spaceDispatch } = useContext(SpaceContext);
   const {dispatch} = useContext(UserContext)
-  useEffect(() => {
-      const getUser = async() => {
-          UserService.getCurrentUser()
-        .then(async(user) => {
-          await dispatch({type: 'GET_USER', payload: user})
-        })
-        .catch((error) => {
-          if(error){
-            throw new Error(error);
-          }      
-        });
+  // useEffect(() => {
+  //     const getUser = async() => {
+  //         UserService.getCurrentUser()
+  //       .then(async(user) => {
+  //         await dispatch({type: 'GET_USER', payload: user})
+  //       })
+  //       .catch((error) => {
+  //         if(error){
+  //           throw new Error(error);
+  //         }      
+  //       });
           
-      }
-      getUser();
-  }, [])
+  //     }
+  //     getUser();
+  // }, [])
   
   const getJoinedItems = async () => {
     await BoardService.getJoinedBoard()

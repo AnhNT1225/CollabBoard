@@ -11,7 +11,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-	  width: 10vw;
+      width: 10vw;
       .project_name {
         font-size: 20px;
         margin-top: 1em;
@@ -32,4 +32,32 @@
 .tool_container {
   display: flex;
   flex-direction: row;
+}
+
+.notifications {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  color: black;
+  font-weight: 300;
+  flex-direction: column;
+  padding: 10;
+}
+
+.notification_box {
+  height: "auto";
+  background: "white";
+  padding: 10px;
+  // border: 1px solid red;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+
+  .checkBtn{
+    background: rgb(99, 233, 188);
+    border-color: transparent;
+    padding: 5px;
+    border-radius: 5px;
+    width: 80%;
+    color: '#ffffff'
+  }
 }

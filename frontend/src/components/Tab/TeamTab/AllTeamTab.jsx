@@ -82,28 +82,6 @@ const AllTeamTab = (props) => {
       },
     },
   ];
-  // const components = {
-  // 	body: {
-  // 		row: EditableRow,
-  // 		cell: EditableCell,
-  // 	},
-  // };
-  // const columns = this.columns.map((col) => {
-  // 	if (!col.editable) {
-  // 		return col;
-  // 	}
-
-  // 	return {
-  // 		...col,
-  // 		onCell: (record) => ({
-  // 			record,
-  // 			editable: col.editable,
-  // 			dataIndex: col.dataIndex,
-  // 			title: col.title,
-  // 			handleSave: this.handleSave,
-  // 		}),
-  // 	};
-  // });
 
   return (
     <>
@@ -113,6 +91,7 @@ const AllTeamTab = (props) => {
         bordered
         dataSource={teamState.teams}
         columns={columns}
+        rowKey='_id'
       />
     </>
   );

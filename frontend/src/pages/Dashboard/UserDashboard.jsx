@@ -5,22 +5,28 @@ import TopNav from "../../components/NavBar/DashboardNavbar";
 import UserRoutes from "../../pages/Dashboard/UserRoutes";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import UserService from "../../services/userService";
+import { getUserId } from "../../lib/auth";
 const UserDashboard = (props) => {
   const {socket} = props;
   const [searchInput, setSearchInput] = useState("");
   let { path } = useRouteMatch();
-  const { dispatch } = useContext(UserContext);
+  const { state,dispatch } = useContext(UserContext);
+
 
   useEffect(() => {
-    UserService.getCurrentUser()
+    const userId = getUserId();
+    console.log('corona: ', userId)
+    UserService.getUserById(userId)
       .then((response) => {
-        dispatch({ type: ACTIONS.GET_USER, payload: response });
+        console.log('HUNSD: ', response)
+        dispatch({ type: ACTIONS.GET_USER, payload: response.user });
       })
       .catch((error) => {
         console.log("error: ", error);
       });
   }, [dispatch]);
-  // console.log("user: ", state);
+
+  console.log('user dashoard: ', state.user);
   const userItem = [
     {
       link: "/dashboard/prototypes",
@@ -46,7 +52,7 @@ const UserDashboard = (props) => {
       {/* <Layout sidebarItem={userItem}/> */}
       <Sidebar sidebarItem={userItem} />
       <div className="layout__content">
-        <TopNav setSearchInput={setSearchInput} />
+        <TopNav setSearchInput={setSearchInput} dispatch={dispatch} state={state}/>
         <div className="layout__content-main">
           <UserRoutes path={path} searchInput={searchInput} socket={socket}/>
         </div>

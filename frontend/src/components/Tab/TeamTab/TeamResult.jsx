@@ -204,21 +204,21 @@ const TeamResult = (props) => {
   return (
     <div>
       <Breadcrumb>
-        <Link to={"/"}>
-          <Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/"}>
             <HomeOutlined />
-          </Breadcrumb.Item>
-        </Link>
-        <Link to={"/dashboard"}>
-          <Breadcrumb.Item>
+          </Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/dashboard"}>
             <span>Dashboard</span>
-          </Breadcrumb.Item>
-        </Link>
-        <Link to={"/dashboard/teams"}>
-          <Breadcrumb.Item>
+          </Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/dashboard/teams"}>
             <span>Teams</span>
-          </Breadcrumb.Item>
-        </Link>
+          </Link>
+        </Breadcrumb.Item>
         <Breadcrumb.Item>
           <b>{teamState.team?.name}</b>
         </Breadcrumb.Item>
@@ -235,7 +235,7 @@ const TeamResult = (props) => {
           <div className="team_actions">
             <Button>
               {" "}
-              <i class="far fa-trash-alt"></i>
+              <i className="far fa-trash-alt"></i>
               <span> Delete</span>
             </Button>
           </div>
@@ -276,14 +276,17 @@ const TeamResult = (props) => {
                       required: true,
                       message: "Please input your board name!",
                     },
-                    { whitespace: true,  message: "Please enter some characters!"},
+                    {
+                      whitespace: true,
+                      message: "Please enter some characters!",
+                    },
                   ]}
                   hasFeedback
                 >
                   <Input
                     style={{ width: 250, height: 40, textAlign: "center" }}
                     value={boardName}
-                    name='boardName'
+                    name="boardName"
                     // onChange={changeBoardName}
                   />
                 </Form.Item>
@@ -331,16 +334,19 @@ const TeamResult = (props) => {
                       required: true,
                       message: "Please input your space name!",
                     },
-                    { whitespace: true,  message: "Please enter some characters!"},
+                    {
+                      whitespace: true,
+                      message: "Please enter some characters!",
+                    },
                   ]}
                   hasFeedback
                 >
-                <Input
-                  style={{ width: 250, height: 40, textAlign: "center" }}
-                  value={spaceName}
-                  // onChange={changeSpaceName}
-                  name='spaceName'
-                />
+                  <Input
+                    style={{ width: 250, height: 40, textAlign: "center" }}
+                    value={spaceName}
+                    // onChange={changeSpaceName}
+                    name="spaceName"
+                  />
                 </Form.Item>
                 <br />
                 <Button
@@ -351,14 +357,14 @@ const TeamResult = (props) => {
                 >
                   Create
                 </Button>
-                </Form>
+              </Form>
             </Modal>
           </div>
         ) : (
           <div className="team_actions">
             <Button onClick={viewChat}>
               {" "}
-              <i class="far fa-trash-alt"></i>
+              <i className="far fa-trash-alt"></i>
               <span> Delete</span>
             </Button>
           </div>
@@ -377,7 +383,7 @@ const TeamResult = (props) => {
               />
               <Button htmlType="submit">Invite</Button>
             </form>
-            <table class="table table-hover">
+            <table className="table table-hover">
               <tbody>
                 {teamState.team.members?.map((mem) => {
                   return (

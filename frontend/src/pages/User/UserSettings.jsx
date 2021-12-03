@@ -1,5 +1,5 @@
-import React, {useContext} from "react";
-import { Tabs, Form, Input, Button, message } from "antd";
+import React, { useContext } from "react";
+import { Tabs, Form, Input, Button, message, Checkbox, Space } from "antd";
 import { useHistory } from "react-router-dom";
 import {
   SafetyOutlined,
@@ -14,7 +14,7 @@ import { UserContext } from "../../context/userContext";
 const { TabPane } = Tabs;
 const UserSettings = () => {
   const history = useHistory();
-  const {dispatch} = useContext(UserContext);
+  const { dispatch } = useContext(UserContext);
 
   const callback = (key) => {
     console.log(key);
@@ -22,11 +22,10 @@ const UserSettings = () => {
 
   const handleChangePassword = (values) => {
     console.log("Success:", values);
-    UserService
-      .changePassword(values.password)
+    UserService.changePassword(values.password)
       .then((result) => {
         console.log("change password succesful: ", result);
-        message.success('Successfully change the password!')
+        message.success("Successfully change the password!");
       })
       .catch((error) => {
         console.log("error: ", error);
@@ -164,7 +163,43 @@ const UserSettings = () => {
                 Notifications
               </span>
             }
-          ></TabPane>
+          >
+            <div>
+              <p><b>Board activity and conversation</b></p>
+              <div>
+              <Space direction='horizontal'>
+              <p style={{marginBottom: 0}}>When a board is shared with me</p>
+              <Checkbox style={{textAlign:'right'}} onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
+              </Space>
+              </div>
+              <div>
+              <Space direction='horizontal'>
+              <p style={{marginBottom: 0}}>When someone requests access to my board</p>
+              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
+              </Space>
+              </div>
+              <p><b>Project activity</b></p>
+              <div>
+              <Space direction='horizontal'>
+              <p style={{marginBottom: 0}}>When someone adds me to a project</p>
+              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
+              </Space>
+              </div>
+              <p><b>Team activity</b></p>
+              <div>
+              <Space direction='horizontal'>
+              <p style={{marginBottom: 0}}>When someone invites me to a team</p>
+              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
+              </Space>
+              </div>
+              <div>
+              <Space direction='horizontal'>
+              <p style={{marginBottom: 0}}>When someone requests access to my team</p>
+              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
+              </Space>
+              </div>
+            </div>
+          </TabPane>
         </Tabs>
         {/* </div> */}
       </div>

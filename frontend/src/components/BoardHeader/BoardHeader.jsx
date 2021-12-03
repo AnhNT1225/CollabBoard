@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Menu,
   Dropdown,
@@ -8,6 +8,7 @@ import {
   Divider,
   Popover,
   Typography,
+  Badge,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -22,11 +23,11 @@ import ShareContent from "../ShareContent";
 import BoardService from "../../services/boardService";
 import { ElementContext } from "../../context/elementContext";
 import "./boardheader.scss";
-import { useEffect } from "react";
 import ColorPicker from "../ColorPicker/ColorPicker";
 import LineWeight from "../LineWeight/LineWeight";
-import { downloadURI, ToStringBase64 } from "../../lib/process_img";
+import { downloadURI } from "../../lib/process_img";
 const { Paragraph } = Typography;
+
 const BoardHeader = (props) => {
   const history = useHistory();
   const {
@@ -37,14 +38,23 @@ const BoardHeader = (props) => {
     setTextProperty,
     isEditText,
     setIsEditText,
-    boardState, boardDispatch,
-    socket
+    boardState,
+    boardDispatch,
+    socket,
   } = props;
-  // const { boardState, boardDispatch } = useContext(BoardContext);
-  const {elementDispatch} = useContext(ElementContext)
+  // const { boardDispatch } = useContext(BoardContext);
+  const { elementDispatch } = useContext(ElementContext);
   const [text, setText] = useState(null);
   const [contributors, setContributors] = useState([]);
   const [color, setColor] = useState(drawingProperty.brushColor);
+  const [notifications, setNotifications] = useState([
+    {
+      type: 1,
+      memberName: "Tuan Anh",
+      message: `One people has name Tuan joined our board.`,
+    },
+  ]);
+  const [isOpenNotify, setIsOpenNotify] = useState(false);
   const [lineWeight, setLineWeight] = useState(drawingProperty.brushStroke);
   const drawColors = [
     { name: "red", type: "red" },
@@ -63,33 +73,38 @@ const BoardHeader = (props) => {
     }));
   }, [color, lineWeight]);
 
-  // useEffect(() => {
-  //   boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
-  //   BoardService.getBoard(boardId)
-  //     .then((response) => {
-  //       console.log("response at board header: ", response);
-  //       boardDispatch({
-  //         type: "FETCH_CURRENT_BOARD_SUCCESS",
-  //         payload: response.data,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.log("err: ", error);
-  //     });
-  //   return () => {
-  //     boardDispatch({ type: "FETCH_DATA_FAILURE" });
-  //   };
-  // }, []);
+  useEffect(() => {
+    const onRoomNotification = (data) => {
+      setNotifications((prev) => [...prev, data]);
+    };
+    socket?.on("getRoomNotification", onRoomNotification);
+    return () => {
+      socket?.off("getRoomNotification", onRoomNotification);
+    };
+  }, [socket]);
+
+  // const displayNotification = ({ memberName, type }) => {
+  //   let action;
+  //   switch (type) {
+  //     case 1:
+  //       action = "joined";
+  //       break;
+  //     case 2:
+  //       action = "commented";
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   useEffect(() => {
-    
     if (boardState.currentBoard) {
-      console.log('test boardState: ', boardState.currentBoard)
-      console.log('test contributors: ', boardState.currentBoard.contributors)
+      console.log("test boardState: ", boardState.currentBoard);
+      console.log("test contributors: ", boardState.currentBoard.contributors);
       setText(boardState.currentBoard.name);
       setContributors(boardState.currentBoard.contributors);
     }
-  }, [boardState]);
+  }, [boardState, contributors]);
 
   const updateName = async (e) => {
     let isValid = validateInput(e);
@@ -101,9 +116,12 @@ const BoardHeader = (props) => {
       const newBoardName = await e;
       setText(e);
       await BoardService.updateBoardName(boardId, newBoardName)
-        .then(async(response) => {
+        .then(async (response) => {
           console.log("Board updated name info: ", response.data);
-          await boardDispatch({ type: "SET_CURRENT_BOARD", payload: response.data });
+          await boardDispatch({
+            type: "SET_CURRENT_BOARD",
+            payload: response.data,
+          });
         })
         .catch((error) => {
           console.log("err: ", error);
@@ -111,24 +129,38 @@ const BoardHeader = (props) => {
     }
   };
 
-
   async function handleSettingMenu(e) {
     console.log("click", e);
     const item = e.key;
     switch (item) {
       case "1":
-        <h1>Hello2</h1>;
+        let base64ImageString = Buffer.from(
+          boardState.currentBoard?.imageURL,
+          "binary"
+        ).toString("base64");
+        // let base64ImageString = await ToStringBase64(boardState.currentBoard?.imageURL)
+        console.log("BASE 64 STRING: ", base64ImageString);
+        downloadURI(
+          `data:image/png;base64,${base64ImageString}`,
+          `${boardState.currentBoard?.name}.png`
+        );
         break;
       case "2":
-        let base64ImageString = Buffer.from(boardState.currentBoard?.imageURL, "binary").toString(
-          "base64"
-        );
-        // let base64ImageString = await ToStringBase64(boardState.currentBoard?.imageURL)
-        console.log('BASE 64 STRING: ', base64ImageString)
-        downloadURI(`data:image/png;base64,${base64ImageString}`, `${boardState.currentBoard?.name}.png`)
         break;
       case "3":
-        <h1>Hello3</h1>;
+        await BoardService.leaveBoardById(boardId)
+          .then(async (response) => {
+            console.log("Board remove: ", response.data);
+            await boardDispatch({
+              type: "SET_CURRENT_BOARD",
+              payload: response.data,
+            });
+          })
+          .catch((error) => {
+            console.log("err: ", error);
+          });
+        socket?.emit("leave-room", boardState.currentBoard?.code);
+        history.goBack(1);
         break;
       default:
         break;
@@ -138,10 +170,28 @@ const BoardHeader = (props) => {
 
   const menu1 = (
     <Menu onClick={handleSettingMenu}>
-      <Menu.Item key="1">View history version</Menu.Item>
-      <Menu.Item key="2">Export to image</Menu.Item>
-      <Menu.Item key="3">View comment</Menu.Item>
+      <Menu.Item key="1">Export to image</Menu.Item>
+      <Menu.Item key="2">View comment</Menu.Item>
+      <Menu.Item key="3">Leave room</Menu.Item>
     </Menu>
+  );
+
+  const menu = (
+    <div
+      className="notification_box"
+      style={{ inlineSize: 200, wordWrap: "break-word" }}
+    >
+      {notifications.map((n, i) => (
+        <div key={i}>
+          <div>
+            <p>{n.message}</p>
+          </div>
+        </div>
+      ))}
+      <button className="checkBtn" onClick={() => setNotifications([])}>
+        Mark as read
+      </button>
+    </div>
   );
 
   const backToDashboard = async (e) => {
@@ -152,10 +202,11 @@ const BoardHeader = (props) => {
     history.goBack(1);
   };
 
-  const validateInput = text => {
-    const regex = /'^[yz]*x[xyz]*$'/;
+  const validateInput = (text) => {
+    const regex = /^[a-zA-Z\\s]+$/;
     return text && regex.test(text);
-  }
+  };
+
   return (
     <>
       <header className="editor_header">
@@ -189,7 +240,10 @@ const BoardHeader = (props) => {
           ) : null}
           {menuComponent && menuComponent === "shaping" ? (
             <div className="tool_container">
-              <ShapingOptions boardCode={boardState.currentBoard?.code}/>
+              <ShapingOptions
+                socket={socket}
+                boardCode={boardState.currentBoard?.code}
+              />
             </div>
           ) : null}
           {menuComponent && menuComponent === "typing" ? (
@@ -223,12 +277,8 @@ const BoardHeader = (props) => {
             {contributors &&
               contributors.map((user, index) => {
                 return (
-                  <Tooltip
-                    key={index}
-                    title={`${user?.name}`}
-                    placement="top"
-                  >
-                    <Avatar>{user?.name.charAt(0)}</Avatar>
+                  <Tooltip key={index} title={`${user?.name}`} placement="top">
+                    <Avatar>{user.name?.charAt(0)}</Avatar>
                   </Tooltip>
                 );
               })}
@@ -247,10 +297,28 @@ const BoardHeader = (props) => {
             </Popover>
           </Tooltip>
           <Divider type="vertical" />
-          <Button
-            type="text"
-            icon={<BellOutlined style={{ fontSize: 18 }} />}
-          ></Button>
+          <div
+            className="notification_wrap"
+            style={{
+              marginRight: 10,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Badge size="small" count={notifications.length} overflowCount={10}>
+              <Dropdown overlay={menu} trigger={["click"]}>
+                <Button
+                  type="text"
+                  icon={
+                    <BellOutlined
+                      style={{ fontSize: 18 }}
+                      // onClick={() => setIsOpenNotify(!isOpenNotify)}
+                    />
+                  }
+                />
+              </Dropdown>
+            </Badge>
+          </div>
         </div>
       </header>
     </>

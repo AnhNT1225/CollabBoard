@@ -68,7 +68,7 @@ const NavBar = ({socket}) => {
 										Document
 									</Link>
 								</li>
-								{state.isAuthenticated ? (
+								{state.isAuthenticated && state.user.role === 'user'? (
 									<li className="nav-item">
 										<Link
 											to={"/dashboard"}
@@ -78,7 +78,17 @@ const NavBar = ({socket}) => {
 											Dashboard
 										</Link>
 									</li>
-								) : null}
+								) : state.isAuthenticated && state.user.role === 'admin'?
+								<li className="nav-item">
+										<Link
+											to={"/admin"}
+											data-toggle="collapse"
+											data-target=".navbar-collapse.show"
+										>
+											Admin dashboard
+										</Link>
+									</li>
+								: null}
 
 								<li className="nav-item">
 									<Link

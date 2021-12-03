@@ -30,6 +30,8 @@ router.patch("/update/name/:id", permit("user"), boardController.updateBoardName
 router.patch("/update/space/:id", permit("user"), boardController.setSpaceForBoard)
 //route for update board by id
 router.patch("/update/canvas/:id", permit("user"), boardController.updateBoardCanvas);
+//route for leave board by id
+router.patch("/leave/:id", permit("user"), boardController.leaveBoard);
 
 // route for delete board by id
 router.delete("/delete/:id", permit("user"), boardController.deleteBoard);
@@ -47,7 +49,7 @@ router.delete("/delete/:id", permit("user"), boardController.deleteBoard);
 //     }
 //   });
 // route for find board by searching board name
-router.get("/", permit("user"), boardController.findBoardByCode);
+router.patch("/", permit("user"), boardController.findBoardByCode);
 
 
 

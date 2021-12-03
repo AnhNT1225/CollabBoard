@@ -28,18 +28,28 @@ let upload = multer({ storage, fileFilter });
 // const {isAuth} = require('../middleware/verifyUser')
 const userController = require("../controllers/UserController");
 //CRUD
+
+
+
 //router for get all users in system
 router.get("/all", permit('admin'), userController.findAllUsers);
 //router for get all users in system
 router.get("/new", permit('admin'), userController.findNewUsers);
 //route for get current user
 router.get("/details", permit('user', 'admin'), userController.findUserByEmail);
-//router for update user password with Id
-router.patch("/edit/password", permit('user'), userController.updateUserPassword);
 //router for update user info
 router.patch("/edit", upload.single('avatar'), userController.updateUserInfo);
+//router for delete user info
+router.delete("/:id", permit('admin'), userController.deleteUser);
 //router for get any user info with Id
-router.get("/:userId", permit('user', 'admin'), userController.findUserById);
+router.get("/:id", permit('user', 'admin'), userController.findUserById);
+
+//router for update user password with Id
+router.patch("/edit/password", permit('user'), userController.updateUserPassword);
+
+
+
+
 
 
 

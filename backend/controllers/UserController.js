@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const endOfDay= require("date-fns/endOfDay");
+const endOfDay = require("date-fns/endOfDay");
 const startOfDay = require("date-fns/startOfDay");
 const bcrypt = require("bcryptjs");
 
@@ -25,18 +25,21 @@ class UserController {
   }
 
   async findUserById(req, res) {
-    const userId = req.params.userId;
+    const userId = req.params.id;
+    console.log("userId: ", userId);
     try {
       const user = await User.findById({ _id: userId }).lean();
-      if (!user) {
+      console.log("NOi voi em 1 loi", user);
+      const foundUser = { ...user };
+      if (!foundUser) {
         return res
           .status(404)
           .json({ success: false, message: "User Not found." });
       }
-      user.password = undefined;
+      delete foundUser.password;
       return res.status(200).json({
         success: true,
-        user: user,
+        user: foundUser,
       });
     } catch (error) {
       console.log("the catch error: ", error);
@@ -49,7 +52,7 @@ class UserController {
     console.log("time from client: ", timeFromClient);
     try {
       const filter = {};
-      const user = await User.find({role: "user"}).lean();
+      const user = await User.find({ role: "user" }).lean();
       if (!user) {
         return res
           .status(404)
@@ -68,7 +71,11 @@ class UserController {
   async findNewUsers(req, res) {
     try {
       const user = await User.find({
-        createdAt: { $gte: startOfDay(new Date()), $lte: endOfDay(new Date()), role:'user' },
+        createdAt: {
+          $gte: startOfDay(new Date()),
+          $lte: endOfDay(new Date()),
+          role: "user",
+        },
       });
       if (!user) {
         return res
@@ -127,6 +134,22 @@ class UserController {
         });
       })
       .catch((err) => res.status(400).json("Error: " + err));
+  }
+
+  async deleteUser() {
+    const userId = req.params.id;
+    console.log("userId: ", userId);
+    try {
+      const user = await User.findByIdAndDelete({ _id: userId }).lean();
+      return res.status(200).json({
+        success: true,
+        message: "Delete a user successful",
+        data: user,
+      });
+    } catch (error) {
+      console.log("the catch error: ", error);
+      return res.status(400).json({ success: false, message: "Bad request!" });
+    }
   }
 }
 module.exports = new UserController();

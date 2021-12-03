@@ -25,7 +25,7 @@ import ResetPassword from "./pages/RecoveryPassword/ForgotPassword";
 // import Overview from "./pages/AdminPage/Overview";
 import TeamResult from "./components/Tab/TeamTab/TeamResult";
 import UserSettings from "./pages/User/UserSettings";
-import { getToken } from "./lib/auth";
+import { getToken, getUserId } from "./lib/auth";
 import { message } from "antd";
 
 const UserDashboard = React.lazy(() =>
@@ -34,9 +34,11 @@ const UserDashboard = React.lazy(() =>
 
 function App() {
   const [socket, setSocket] = useState(null);
+
   const setupSocket = () => {
     const token = getToken();
     if (token?.length > 0 && !socket) {
+      console.log("token is: ", token);
       const newSocket = io(process.env.REACT_APP_SERVER_URL, {
         forceNew: true,
         auth: {
@@ -47,11 +49,11 @@ function App() {
       newSocket.on("disconnect", () => {
         setSocket(null);
         setTimeout(setupSocket, 3000);
-        message.error("Socket Disconnected!")
+        message.error("Socket Disconnected!");
       });
 
       newSocket.on("connect", () => {
-        message.success("Socket Connected")
+        message.success("Socket Connected");
       });
 
       setSocket(newSocket);
@@ -61,12 +63,21 @@ function App() {
   useEffect(() => {
     setupSocket();
   }, []);
+
+  // useEffect(() => {
+  //   const userId= getUserId()
+  //   socket?.emit("newUser", userId)
+  // }, [socket])
   return (
     <Suspense fallback={<Spinner />}>
       <Router>
         <Switch>
           <Route path="/register" component={Register} />
-          <Route path="/login" render={() => <Login setupSocket={setupSocket}/>} exact/>
+          <Route
+            path="/login"
+            render={() => <Login setupSocket={setupSocket} />}
+            exact
+          />
           <Route path="/admin" component={AdminPage} />
           {/* <PrivateRoute
             path="/admin"
@@ -88,8 +99,8 @@ function App() {
           <Route
             path="/dashboard"
             render={() => {
-              return localStorage.getItem("token") ? (
-                <UserDashboard socket={socket}/>
+              return localStorage.getItem('token') ? (
+                <UserDashboard socket={socket} />
               ) : (
                 <Redirect to="/login" />
               );
@@ -105,9 +116,9 @@ function App() {
 						}} /> */}
           {/* <Route exact path="/admin/overview" component={Overview} /> */}
           <Route path="/teams/:id" component={TeamResult} />
-          <Route path="/board/:id" render={() => <Editor socket={socket}/>}  />
+          <Route path="/board/:id" render={() => <Editor socket={socket} />} />
 
-          <Route exact path="/" render={() => <HomePage socket={socket}/>}  />
+          <Route exact path="/" render={() => <HomePage socket={socket} />} />
           {/* <Route path="*" component={NotFound} /> */}
         </Switch>
       </Router>

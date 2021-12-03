@@ -11,16 +11,16 @@ const AdminRoutes = (props) => {
 	return (
 		<Switch>
 			<Route path={`${props.path}/overview`}>
-				<Overview searchInput={props.searchInput} />
+				<Overview searchInput={props.searchInput}/>
 			</Route>
 			<Route path={`${props.path}/accounts`}>
-				<AccountManagement searchInput={props.searchInput} />
+				<AccountManagement searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
 			</Route>
             <Route path={`${props.path}/boards`}>
-				<BoardManagement searchInput={props.searchInput} />
+				<BoardManagement searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
 			</Route>
 			<Route path={`${props.path}/teams`}>
-				<TeamManagement searchInput={props.searchInput}/>
+				<TeamManagement searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
 			</Route>
 		</Switch>
 	);

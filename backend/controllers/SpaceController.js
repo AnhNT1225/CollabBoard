@@ -83,6 +83,13 @@ class SpaceController {
     const spaceId = req.params.id;
     console.log("spaceId: ", spaceId);
     const { boardId } = req.body;
+    const updateBoard = await Board.findByIdAndUpdate(
+      { _id: boardId },
+      { spaceId: spaceId },
+      { new: true }
+    )
+      .populate("spaceId");
+    // console.log('today: ', updateBoard._id)
     await Space.findByIdAndUpdate(
       { _id: spaceId },
       { $addToSet: { boards: boardId } },
@@ -211,14 +218,14 @@ class SpaceController {
   async updateSpaceInfo(req, res) {
     const spaceId = req.params.id;
 
-    const { name, team } = req.body;
-    console.log("form: ", name, team.id);
+    const { name, team, form } = req.body;
+    console.log("name: ", name, 'team: ', team, 'initialTeamId: ', form);
     let newUpdate;
-    if (team && team.id !== undefined && name) {
+    if (team && team.id && team.name) {
       //Find the team has name === new modified name, add spaceId to that team
       await Team.findByIdAndUpdate(
         { _id: team.id },
-        { $addToSet: { spaces: spaceId } },
+        { $push: { spaces: spaceId } },
         { new: true }
       ).lean();
       newUpdate = {

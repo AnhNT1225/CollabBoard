@@ -47,7 +47,11 @@ const authReducer = (state, action) => {
         isAuthenticated: true,
         user: action.payload,
       };
-
+    case "DELETE_USER":
+      return {
+        ...state,
+        users: state.users.filter((user) => user._id !== action.payload),
+      };
     case "SET_ALL_USER":
       return {
         ...state,

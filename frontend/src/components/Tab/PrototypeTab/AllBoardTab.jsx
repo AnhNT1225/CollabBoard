@@ -66,6 +66,7 @@ const AllBoardTab = (props) => {
         {boardState?.foundBoards
           .slice(itemNumber.minValue, itemNumber.maxValue)
           .map((board, index) => {
+            console.log('di chup: ', board)
             return (
               <ItemCards key={index} board={board} spaces={spaceState.spaces} socket={socket}/>
             );

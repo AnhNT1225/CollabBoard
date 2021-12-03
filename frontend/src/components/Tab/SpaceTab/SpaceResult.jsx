@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { Breadcrumb, Button, Empty, Modal, Select } from "antd";
-import { Link } from "react-router-dom";
+import { Breadcrumb, Button, Empty, Modal, Select, message } from "antd";
+import { Link, useHistory } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
 import SpaceService from "../../../services/spaceService";
 import { SpaceContext } from "../../../context/spaceContext";
@@ -11,6 +11,7 @@ import "./styles.scss";
 const { Option } = Select;
 const SpaceResult = (props) => {
   const spaceId = props.match.params.spaceId;
+  const history = useHistory();
   // const [space, setSpace] = useState(null);
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
@@ -38,7 +39,7 @@ const SpaceResult = (props) => {
         });
     };
     getSpaceInfo();
-  }, []);
+  }, [spaceDispatch]);
 
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
@@ -70,15 +71,15 @@ const SpaceResult = (props) => {
   const submitBoard = async (e) => {
     try {
       e.preventDefault();
-      await BoardService.setSpaceForBoard(boardId.current, spaceId.current)
-			.then((result) => {
-				console.log("result 1: ", result);
-				boardDispatch({type: "UPDATE_BOARDS_INFO", payload: result.data})
-			})
-			.catch((error) => {
-				console.log("error: ", error);
-				throw new Error("The board haven't add to the space.");
-			});
+      // await BoardService.setSpaceForBoard(boardId.current, spaceId.current)
+      // .then((result) => {
+      // 	console.log("result 1: ", result);
+      // 	boardDispatch({type: "UPDATE_BOARDS_INFO", payload: result.data})
+      // })
+      // .catch((error) => {
+      // 	console.log("error: ", error);
+      // 	throw new Error("The board haven't add to the space.");
+      // });
 
       await SpaceService.addBoardToSpace(spaceId, boardId.current)
         .then((result) => {
@@ -95,25 +96,38 @@ const SpaceResult = (props) => {
     }
   };
 
-  console.log("tai soa ko lne: ", spaceState.space.boards?.spaceId)
+  console.log("tai soa ko lne: ", spaceState.space.boards?.spaceId);
+  const deleteSpace = async (id) => {
+    console.log("is that id: ", id);
+    spaceDispatch({ type: "DELETE_SPACE", payload: id });
+    await SpaceService.deleteSpace(id)
+      .then((result) => {
+        console.log("result: ", result);
+        history.goBack();
+        message.success(result.message);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+  };
   return (
     <div>
       <Breadcrumb>
-        <Link to={"/"}>
-          <Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/"}>
             <HomeOutlined />
-          </Breadcrumb.Item>
-        </Link>
-        <Link to={"/dashboard"}>
-          <Breadcrumb.Item>
+          </Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/dashboard"}>
             <span>Dashboard</span>
-          </Breadcrumb.Item>
-        </Link>
-        <Link to={"/dashboard/spaces"}>
-          <Breadcrumb.Item>
+          </Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/dashboard/spaces"}>
             <span>Spaces</span>
-          </Breadcrumb.Item>
-        </Link>
+          </Link>
+        </Breadcrumb.Item>
         <Breadcrumb.Item>
           <b>{spaceState.space?.name}</b>
         </Breadcrumb.Item>
@@ -144,9 +158,9 @@ const SpaceResult = (props) => {
             zIndex={1000}
             footer={null}
             keyboard
+            destroyOnClose={true}
           >
             <form onSubmit={submitBoard}>
-              
               <label>Current Board: </label>{" "}
               <Select
                 showSearch
@@ -177,7 +191,7 @@ const SpaceResult = (props) => {
               </Button>
             </form>
           </Modal>
-          <Button>
+          <Button onClick={() => deleteSpace(spaceId)}>
             <i class="far fa-trash-alt"></i>
             <span> Delete</span>
           </Button>
@@ -186,6 +200,7 @@ const SpaceResult = (props) => {
       <h3>Board list</h3>
       <div className="item_wrap">
         {spaceState.space.boards?.map((board, index) => {
+          console.log("boardID: ", board);
           return <ItemCards key={index} board={board} />;
         })}
       </div>

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "antd";
 import TeamService from "../../services/teamService";
 import { TeamContext } from "../../context/teamContext";
-const TeamManagement = () => {
+const TeamManagement = (props) => {
+  const {setDataSource, dataSource,searchInput} = props
   const [sortedInfo, setSortedInfo] = useState(null);
   const { teamState, teamDispatch } = useContext(TeamContext);
   useEffect(() => {
@@ -11,6 +12,7 @@ const TeamManagement = () => {
       .then((response) => {
         console.log("all team: ", response.data);
         teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: response.data });
+        setDataSource(response.data)
         // console.log("user response data: ", response.data);
       })
       .catch((error) => {
@@ -22,6 +24,10 @@ const TeamManagement = () => {
     console.log("Various parameters", pagination, sorter);
     setSortedInfo(sorter);
   };
+
+  if(searchInput === ''){
+    setDataSource(teamState?.teams)
+  }
 
   const columns = [
     {
@@ -38,7 +44,7 @@ const TeamManagement = () => {
       dataIndex: "createdBy",
       key: "createdBy",
       sorter: (a, b) => a.name - b.name,
-      render: (user) => <span>{user.name}</span>,
+      render: (user) => <span>{user?.name}</span>,
       // sortOrder: sortedInfo.columnKey === "age" && sortedInfo.order,
       ellipsis: true,
     },
@@ -49,7 +55,7 @@ const TeamManagement = () => {
 
       onFilter: (value, record) => record.address.includes(value),
       sorter: (a, b) => a.members.length - b.members.length,
-      render: (members) => <span>{members.length} people</span>,
+      render: (members) => <span>{members?.length} people</span>,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },
@@ -60,7 +66,7 @@ const TeamManagement = () => {
 
       onFilter: (value, record) => record.address.includes(value),
       sorter: (a, b) => a.address.length - b.address.length,
-      render: (boards) => <span>{boards.length} boards</span>,
+      render: (boards) => <span>{boards?.length} boards</span>,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },
@@ -71,7 +77,7 @@ const TeamManagement = () => {
 
       onFilter: (value, record) => record.address.includes(value),
       sorter: (a, b) => a.address.length - b.address.length,
-      render: (spaces) => <span>{spaces.length} spaces</span>,
+      render: (spaces) => <span>{spaces?.length} spaces</span>,
       // sortOrder: sortedInfo.columnKey === "address" && sortedInfo.order,
       ellipsis: true,
     },
@@ -98,12 +104,13 @@ const TeamManagement = () => {
     <div>
       <h2>Total team: {teamState?.teams.length} </h2>
       <Table
-        rowSelection={{
-          type: "checkbox",
-        }}
+        // rowSelection={{
+        //   type: "checkbox",
+        // }}
         columns={columns}
-        dataSource={teamState?.teams}
+        dataSource={dataSource}
         onChange={handleChange}
+        rowKey='_id'
       />
     </div>
   );

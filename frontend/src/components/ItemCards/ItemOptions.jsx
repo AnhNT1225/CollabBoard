@@ -83,10 +83,11 @@ const ItemOptions = (props) => {
   return (
     <>
       <Menu onClick={handleMenuClick}>
-        <Menu.Item key="1" className="item_class">
+        {spaceId ? <Menu.Item key="1" className="item_class">
           <i className="fas fa-box"></i>
           <span> Remove from space</span>
-        </Menu.Item>
+        </Menu.Item> : null}
+        
         <Menu.Item key="2" danger className="item_class">
           <Popconfirm
             title="Are you sure to delete this board?"
