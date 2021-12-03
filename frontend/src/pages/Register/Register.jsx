@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Button, Form, DatePicker, Select, Row, Col } from "antd";
+import { Input, Button, Form, DatePicker, Select, Row, Col, message } from "antd";
 import AuthService from "../../services/authService";
 import { useHistory } from "react-router-dom";
 import moment from "moment";
@@ -38,6 +38,7 @@ const Register = () => {
       })
       .catch((error) => {
         console.log("error: ", error);
+        message.error('Failed! This email has been used')
         // setIsLoading(false);
       });
     // setForm({});
