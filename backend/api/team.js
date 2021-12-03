@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { permit } = require("../middleware/permissionRole");
+const {checkTeamName} = require('../middleware/validateDuplicated')
 const teamController = require("../controllers/TeamController");
 //CRUD
 //route for create new team (user)
-router.post("/create", permit("user"), teamController.createTeam);
+router.post("/create", [permit("user"), checkTeamName], teamController.createTeam);
 
 //router for get all Team
 router.get("/all", permit("admin"), teamController.getAllTeams);

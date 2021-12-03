@@ -48,6 +48,7 @@ class MessageController {
     }
   }
 
+  //delete all message in a board
   async deleteMessages(req, res) {
     try {
       const messages = await Message.deleteMany({

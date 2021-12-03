@@ -169,6 +169,8 @@ class TeamController {
   async deleteTeam(req, res) {
     //Get team id through params on URL
     const teamId = req.params.id;
+    await Space.deleteMany({ teamId: teamId }).lean();
+    await Board.deleteMany({ teamId: teamId }).lean();
     await Team.findByIdAndDelete({ _id: teamId })
       .lean()
       .then((team) => {
@@ -222,10 +224,14 @@ class TeamController {
 
     const { boardName } = req.body;
     console.log("boardName: ", boardName);
-    const foundBoard = await Board.findOne({
-      createdBy: req.user._id,
-      name: boardName,
-    }).lean();
+    const foundBoard = await Board.findOneAndUpdate(
+      {
+        createdBy: req.user._id,
+        name: boardName,
+      },
+      { teamId: teamId },
+      { new: true }
+    ).lean();
     console.log("BOARD ID: ", foundBoard._id);
 
     // const { boardId } = req.body;
@@ -235,7 +241,10 @@ class TeamController {
       { $addToSet: { boards: foundBoard._id } },
       { new: true }
     )
+      .populate("members")
       .populate("boards")
+      .populate({ path: "spaces", populate: "createdBy" })
+      .populate("createdBy")
       .then((team) => {
         // team.populated("boards").boardId.teamId = teamId;
 
@@ -255,14 +264,19 @@ class TeamController {
 
   async addSpaceToTeam(req, res) {
     const teamId = req.params.id;
+    console.log("chi nhu vay ma thoi");
     console.log("teamId: ", teamId);
 
     const { spaceName } = req.body;
     console.log("spaceName: ", spaceName);
-    const foundSpace = await Space.findOne({
-      createdBy: req.user._id,
-      name: spaceName,
-    }).lean();
+    const foundSpace = await Space.findOneAndUpdate(
+      {
+        createdBy: req.user._id,
+        name: spaceName,
+      },
+      { teamId: teamId },
+      { new: true }
+    ).lean();
     console.log("SPACE ID: ", foundSpace._id);
 
     await Team.findByIdAndUpdate(
@@ -271,10 +285,12 @@ class TeamController {
       { new: true }
     )
       .lean()
-      .populate("spaces")
+      .populate("members")
+      .populate("boards")
+      .populate({ path: "spaces", populate: "createdBy" })
+      .populate("createdBy")
       .then((team) => {
         // team.populated("spaces").spaceId.teamId = teamId;
-
         return res.status(200).json({
           success: true,
           message: "Update spaces in team successful",
@@ -303,10 +319,11 @@ class TeamController {
       { new: true }
     )
       .populate("members")
+      .populate("boards")
+      .populate({ path: "spaces", populate: "createdBy" })
       .populate("createdBy")
       .then((team) => {
         // team.populated("spaces").memberEmail.teamId = teamId;
-
         return res.status(200).json({
           success: true,
           message: "Update teams successful",

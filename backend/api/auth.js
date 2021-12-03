@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 // const jwt = require("jsonwebtoken");
 const router = express.Router();
-const { checkDuplicatedEmail } = require("../middleware/verifySignUp");
+const { checkDuplicatedEmail } = require("../middleware/validateDuplicated");
 const { permit } = require("../middleware/permissionRole");
 const authController = require("../controllers/AuthControlller");
 // OLD WAY

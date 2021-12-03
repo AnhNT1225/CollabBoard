@@ -125,18 +125,19 @@ const TeamResult = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-    setCreateSpaceModal(false);
+
     await TeamService.addSpaceToTeam(teamId, form.spaceName)
       .then((result) => {
-        console.log("add space to team result: ", result);
-        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
+        console.log("add space to team result: ", result );
+        teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data});
       })
       .catch((error) => {
         console.log("error: ", error);
-        if (error) {
-          throw new Error("The space haven't add to the team.");
-        }
+        // if (error) {
+        //   throw new Error("The space haven't add to the team.");
+        // }
       });
+      setCreateSpaceModal(false);
     // setSpaceName("");
   };
 
@@ -150,7 +151,7 @@ const TeamResult = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-    setCreateBoardModal(false);
+
     await TeamService.addBoardToTeam(teamId, form.boardName)
       .then((result) => {
         console.log("add board to team result: ", result);
@@ -162,6 +163,7 @@ const TeamResult = (props) => {
           throw new Error("The board haven't add to the team.");
         }
       });
+    setCreateBoardModal(false);
   };
 
   const inviteMember = async (e) => {
@@ -181,24 +183,6 @@ const TeamResult = (props) => {
   //----------------------------------------------------------------
 
   const viewChat = () => {};
-
-  // const submitBoard = async (e) => {
-  //   try {
-  //     e.preventDefault();
-  //     await TeamService.addBoardToTeam(teamId, boardId.current)
-  //       .then((result) => {
-  //         console.log("add board to team result: ", result);
-  //         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
-  //       })
-  //       .catch((error) => {
-  //         console.log("error: ", error);
-  //         throw new Error("The board haven't add to the team.");
-  //       });
-  //       setCreateBoardModal(false);
-  //   } catch (error) {
-  //     console.log("error: ", error);
-  //   }
-  // };
 
   //-------------------------------Return-----------------------------------------
   return (

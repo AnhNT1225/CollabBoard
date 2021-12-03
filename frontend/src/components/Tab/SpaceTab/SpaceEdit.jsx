@@ -12,7 +12,6 @@ const SpaceEdit = (props) => {
   const spaceId = props.match.params.spaceId;
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const { teamState, teamDispatch } = useContext(TeamContext);
-  // const [space, setSpace] = useState(null);
   const [spaceMessageError, setSpaceMessageError] = useState("");
   const [form, setForm] = useState({});
 
@@ -22,7 +21,6 @@ const SpaceEdit = (props) => {
       .then((result) => {
         console.log("result team: ", result);
         teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: result.data });
-        // setSpace(result.data);
       })
       .catch((err) => {
         throw new Error(err);
@@ -35,6 +33,7 @@ const SpaceEdit = (props) => {
       await SpaceService.getSpaceById(spaceId)
         .then((result) => {
           console.log("result space: ", result);
+          console.log("lam dong: ", result.data.teamId?._id);
           setForm({
             name: result.data.name,
             team: {
@@ -45,7 +44,6 @@ const SpaceEdit = (props) => {
             initialTeamId: result.data.teamId?._id,
           });
           spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
-          // setSpace(result.data);
         })
         .catch((err) => {
           throw new Error(err);
@@ -105,7 +103,6 @@ const SpaceEdit = (props) => {
       //     });
       // }
     }
-    // await setForm(null);
   };
 
   return (
@@ -154,7 +151,7 @@ const SpaceEdit = (props) => {
             <label htmlFor="space_team" className="edit_space_label">
               Team:
             </label>
-            {/* <Select
+            <Select
               defaultValue={!form.team?.name ? "No space" : form.team?.name}
               style={{ width: 120 }}
               onChange={(value, obj) => {
@@ -172,15 +169,15 @@ const SpaceEdit = (props) => {
                   </Option>
                 );
               })}
-            </Select> */}
+            </Select>
           </Space>
-          <Input
+          {/* <Input
             name="space_boards"
             type="text"
             style={{ width: 250, height: 40, textAlign: "center" }}
             value={!form.team?.name ? "No space" : form.team?.name}
             readOnly
-          />
+          /> */}
           <Button htmlType="submit" type="primary" size="middle">
             Save changes
           </Button>

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import {  Button, Modal, Input, message } from "antd";
+import { Button, Modal, Input, message, Form } from "antd";
 import { FolderAddOutlined } from "@ant-design/icons";
 import AllSpaceTab from "../../components/Tab/SpaceTab/AllSpaceTab";
 
@@ -10,16 +10,12 @@ import { SpaceContext } from "../../context/spaceContext";
 const Spaces = (props) => {
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const { spaceDispatch } = useContext(SpaceContext);
-  const [spaceName, setSpaceName] = useState(null);
-  const changeSpaceName = async (e) => {
-    const name = e.target.value;
-    console.log("space name: ", name);
-    setSpaceName(name);
-  };
 
-  const createNewSpace = async (e) => {
-    e.preventDefault();
-    await SpaceService.createSpace(spaceName)
+
+  const createNewSpace = async (form) => {
+    // e.preventDefault();
+    console.log('form: ', form)
+    await SpaceService.createSpace(form.spaceName)
       .then((result) => {
         console.log("result: ", result);
         spaceDispatch({ type: "CREATE_SPACE", payload: result.space });
@@ -28,7 +24,7 @@ const Spaces = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-    await setSpaceName(null);
+    // await setSpaceName(null);
     setCreateSpaceModal(false);
   };
   return (
@@ -52,15 +48,34 @@ const Spaces = (props) => {
           onCancel={() => setCreateSpaceModal(false)}
           footer={null}
           keyboard
+          destroyOnClose={true}
         >
-          <form className="room_code_wrapper" onSubmit={createNewSpace}>
+          <Form
+            className="room_code_wrapper"
+            onFinish={createNewSpace}
+            scrollToFirstError
+            autoComplete="off"
+          >
+            {/* <form className="room_code_wrapper" onSubmit={createNewSpace}> */}
             <label className="room_code_label">Space name</label>
             <br />
-            <Input
-              style={{ width: 250, height: 40, textAlign: "center" }}
-              value={spaceName}
-              onChange={changeSpaceName}
-            />
+            <Form.Item
+              name="spaceName"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input space name!",
+                },
+                { whitespace: true, message: "Please enter some characters!" },
+              ]}
+              hasFeedback
+            >
+              <Input
+                style={{ width: 250, height: 40, textAlign: "center" }}
+                // value={spaceName}
+                // onChange={changeSpaceName}
+              />
+            </Form.Item>
             <br />
             <Button
               htmlType="submit"
@@ -70,7 +85,8 @@ const Spaces = (props) => {
             >
               Create
             </Button>
-          </form>
+            {/* </form> */}
+          </Form>
         </Modal>
       </div>
       <div className="category_card">

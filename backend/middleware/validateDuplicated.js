@@ -1,7 +1,6 @@
 const db = require("../models");
-const ROLE = db.ROLES;
 const User = db.user;
-
+const Team = require("../models/Team");
 const checkDuplicatedEmail = (req, res, next) => {
 	//Email
 	User.findOne({ email: req.body.email }).exec((err, user) => {
@@ -10,8 +9,23 @@ const checkDuplicatedEmail = (req, res, next) => {
 			return;
 		}
 		if (user) {
-			console.log('true is same')
-			res.status(400).json({ message: "Failed! Email is already in use!" });
+			res.status(400).json({ message: "Failed! Email is already in used!" });
+			return;
+		}
+		next();
+	});
+};
+
+const checkTeamName = (req, res, next) => {
+	//Email
+	const { teamName } = req.body;
+	Team.findOne({ name: teamName }).exec((err, team) => {
+		if (err) {
+			res.status(500).json({ message: err });
+			return;
+		}
+		if (team) {
+			res.status(400).json({ message: "Failed! Team name is already in used!" });
 			return;
 		}
 		next();
@@ -35,4 +49,5 @@ const checkDuplicatedEmail = (req, res, next) => {
 
 module.exports = {
 	checkDuplicatedEmail: checkDuplicatedEmail,
+	checkTeamName: checkTeamName
 };

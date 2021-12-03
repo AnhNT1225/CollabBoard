@@ -9,6 +9,7 @@ const boardSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Space",
     },
+    teamId: { type: Schema.Types.ObjectId, ref: "Team"},
     contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
 
     code: { type: String, default: null },

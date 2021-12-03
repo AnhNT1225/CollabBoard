@@ -144,6 +144,10 @@ class TeamService {
         }
       )
       .then((response) => {
+        console.log('nhin an ngan han: ', response.data)
+        // const resData = JSON.parse(response.data.data)
+        // console.log('resDta: ', resData)
+        // console.log('nhin an dai han: ', JSON.parse(response.data))
         return response.data;
       })
       .catch((error) => {
