@@ -103,20 +103,6 @@ const boardReducer = (state, action) => {
 export const BoardProvider = ({ children }) => {
   const [boardState, boardDispatch] = useReducer(boardReducer, initialState);
 
-  // const [currentBoard, setCurrentBoard] = useState(null);
-
-  // const updateBoard = async (boardId, boardInfo) => {
-  // 	console.log("boardID: ", boardId, "BoardInfo: ", boardInfo);
-  // 	await BoardService.updateBoard(boardId, boardInfo)
-  // 		.then((response) => {
-  // 			console.log("Board updated info: ", response);
-  // 			setCurrentBoard(response);
-  // 		})
-  // 		.catch((error) => {
-  // 			console.log("err: ", error);
-  // 		});
-  // };
-
   // const searchBoardByName = (boardName) => {
   // 		// return board.name.toLowerCase().indexOf(boardName) !== -1;
   // };

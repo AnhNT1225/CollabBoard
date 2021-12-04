@@ -87,8 +87,7 @@ class SpaceController {
       { _id: boardId },
       { spaceId: spaceId },
       { new: true }
-    )
-      .populate("spaceId");
+    ).populate("spaceId");
     // console.log('today: ', updateBoard._id)
     await Space.findByIdAndUpdate(
       { _id: spaceId },
@@ -218,22 +217,53 @@ class SpaceController {
   async updateSpaceInfo(req, res) {
     const spaceId = req.params.id;
 
-    const { name, team, form } = req.body;
-    console.log("name: ", name, 'team: ', team, 'initialTeamId: ', form);
+    const { name, team, initialTeamId } = req.body;
+    console.log(
+      "name: ",
+      name,
+      "team: ",
+      team,
+      "initialTeamId: ",
+      initialTeamId
+    );
     let newUpdate;
-    if (team && team.id && team.name) {
+
+    if (name && team && initialTeamId === undefined) {
       //Find the team has name === new modified name, add spaceId to that team
+      console.log("nhay vao undefined");
+      // await Space.findByIdAndUpdate(
+      //   { _id: team.id },
+      //   { $addToSet: { spaces: spaceId } },
+      //   { new: true }
+      // ).lean();
       await Team.findByIdAndUpdate(
         { _id: team.id },
-        { $push: { spaces: spaceId } },
+        { $addToSet: { spaces: spaceId } },
         { new: true }
       ).lean();
       newUpdate = {
         name: name,
         teamId: team.id,
       };
-    }
-    if (name) {
+    } else if (name && team && initialTeamId !== undefined) {
+      console.log("nhay vao teamID");
+      //Find the team has name === new modified name, add spaceId to that team
+      await Team.findByIdAndUpdate(
+        { _id: initialTeamId },
+        { $pull: { spaces: spaceId } },
+        { new: true }
+      ).lean();
+      const teamB = await Team.findByIdAndUpdate(
+        { _id: team.id },
+        { $addToSet: { spaces: spaceId } },
+        { new: true }
+      ).lean();
+      newUpdate = {
+        name: name,
+        teamId: teamB._id,
+      };
+    } else {
+      console.log("ngon");
       newUpdate = {
         name: name,
       };
@@ -242,6 +272,7 @@ class SpaceController {
     console.log("teamId input: ", team.id);
     //Find the space by Id and update name and teamId
     await Space.findByIdAndUpdate({ _id: spaceId }, newUpdate, { new: true })
+      .populate("createdBy", "_id name")
       .then((space) => {
         return res.status(200).json({
           success: true,

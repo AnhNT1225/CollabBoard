@@ -28,28 +28,28 @@ const SpaceEdit = (props) => {
   }, [teamDispatch]);
 
   useEffect(() => {
-    const getSpaceInfo = async () => {
-      spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
-      await SpaceService.getSpaceById(spaceId)
-        .then((result) => {
-          console.log("result space: ", result);
-          console.log("lam dong: ", result.data.teamId?._id);
-          setForm({
-            name: result.data.name,
-            team: {
-              id: result.data.teamId?._id,
-              name: result.data.teamId?.name,
-            },
-            createdBy: result.data.createdBy,
-            initialTeamId: result.data.teamId?._id,
-          });
-          spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
-        })
-        .catch((err) => {
-          throw new Error(err);
+    // const getSpaceInfo = async () => {
+    spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
+    SpaceService.getSpaceById(spaceId)
+      .then(async (result) => {
+        console.log("result space: ", result);
+        console.log("lam dong: ", result.data.teamId?._id);
+        await setForm({
+          name: result.data.name,
+          team: {
+            id: result.data.teamId?._id,
+            name: result.data.teamId?.name,
+          },
+          createdBy: result.data.createdBy,
+          initialTeamId: result.data.teamId?._id,
         });
-    };
-    getSpaceInfo();
+        spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+    // };
+    // getSpaceInfo();
   }, [spaceDispatch, spaceId]);
 
   console.log("teamId: ", form);
@@ -66,17 +66,14 @@ const SpaceEdit = (props) => {
     if (isValidSpace) {
       //if space doesn not stored in any team, add space to new team
       // if (!spaceState.space.teamId?._id && form) {
-        await SpaceService.updateSpaceInfo(spaceId, form)
-          .then((result) => {
-            console.log(
-              "result of updated space name and TEAM spaces: ",
-              result
-            );
-            spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
-          })
-          .catch((err) => {
-            console.log("error: ", err);
-          });
+      await SpaceService.updateSpaceInfo(spaceId, form)
+        .then((result) => {
+          console.log("result of updated space name and TEAM spaces: ", result);
+          spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
+        })
+        .catch((err) => {
+          console.log("error: ", err);
+        });
       // } else {
       //   //if space has existed team, remove space from old team -> addToNewTeam
       //   await TeamService.removeSpaceFromTeam(
@@ -127,8 +124,8 @@ const SpaceEdit = (props) => {
             }
           />
           {spaceMessageError.length > 0 && (
-              <p style={{ color: "red" }}>{spaceMessageError}</p>
-            )}
+            <p style={{ color: "red" }}>{spaceMessageError}</p>
+          )}
           <label htmlFor="space_name" className="edit_space_label">
             Created By:
           </label>
@@ -152,7 +149,8 @@ const SpaceEdit = (props) => {
               Team:
             </label>
             <Select
-              defaultValue={!form.team?.name ? "No space" : form.team?.name}
+              defaultValue="No space"
+              value={form.team?.name}
               style={{ width: 120 }}
               onChange={(value, obj) => {
                 console.log("value: ", value, "obj _id: ", obj.name);

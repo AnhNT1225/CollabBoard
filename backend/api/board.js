@@ -5,7 +5,8 @@ const boardController = require("../controllers/BoardController");
 const { permit } = require("../middleware/permissionRole");
 //BoardController.index
 // router.use("/", boardController.index);
-
+// route for find board by searching board name
+router.get("/", permit("user"), boardController.findBoardByCode);
 //router for get all existed boards in system (admin) --> for manage and statistic
 router.get("/all", permit("admin"), boardController.getAllBoards);
 //router for get new boards that user created on one days
@@ -48,8 +49,7 @@ router.delete("/delete/:id", permit("user"), boardController.deleteBoard);
 //       res.status(500).json(err);
 //     }
 //   });
-// route for find board by searching board name
-router.patch("/", permit("user"), boardController.findBoardByCode);
+
 
 
 

@@ -9,21 +9,21 @@ const OwnedBoardTab = (props) => {
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const [itemNumber, setItemNumber] = useState({ minValue: 0, maxValue: 4 });
-  useEffect(() => {
-    boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
-    BoardService.getOwnedBoard()
-      .then((response) => {
-        boardDispatch({
-          type: "FETCH_BOARDS_SUCCESS",
-          payload: response.data,
-        });
-        // setBoards(response.data);
-      })
-      .catch((error) => {
-        console.log("error: ", error);
-      });
+  // useEffect(() => {
+  //   boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
+  //   BoardService.getOwnedBoard()
+  //     .then((response) => {
+  //       boardDispatch({
+  //         type: "FETCH_BOARDS_SUCCESS",
+  //         payload: response.data,
+  //       });
+  //       // setBoards(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log("error: ", error);
+  //     });
     
-  }, []);
+  // }, [boardDispatch]);
 
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });

@@ -34,6 +34,11 @@ const Prototypes = (props) => {
   //     getUser();
   // }, [])
   
+    useEffect(() => {
+    boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
+    getJoinedItems()
+  }, []);
+
   const getJoinedItems = async () => {
     await BoardService.getJoinedBoard()
       .then((response) => {
@@ -80,6 +85,16 @@ const Prototypes = (props) => {
 
   const changeTab = async (tab) => {
     console.log("key ", tab);
+    switch (tab) {
+      case "1":
+        getJoinedItems()
+        break;
+      case "2":
+        getOwnedItems()
+        break;
+      default:
+        break;
+    }
   };
 
   return (

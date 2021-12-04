@@ -167,7 +167,7 @@ class BoardService {
 
 	findBoardByCode(boardCode) {
 		return axios
-			.patch(API_URL, {
+			.get(API_URL, {
 				params: { boardCode: boardCode },
 				headers: { Authorization: `Bearer ${getToken()}` },
 			})
