@@ -91,7 +91,7 @@ function Teams(props) {
       </Modal>
       <br />
       <div className="category_card">
-        <AllTeamTab />
+        <AllTeamTab searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
       </div>
     </div>
   );

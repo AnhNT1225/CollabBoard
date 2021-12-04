@@ -8,7 +8,7 @@ import "./styles.scss";
 
 const AllTeamTab = (props) => {
   const { teamState, teamDispatch } = useContext(TeamContext);
-
+  const { searchInput, setDataSource, dataSource } = props;
   const { path, url } = useRouteMatch();
   console.log("team all path: ", path);
   useEffect(() => {
@@ -16,13 +16,16 @@ const AllTeamTab = (props) => {
     TeamService.getJoinedTeam()
       .then((result) => {
         console.log("all join team: ", result);
+        setDataSource(result.data);
         teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: result.data });
       })
       .catch((error) => {
         console.log("error: ", error);
       });
   }, []);
-
+  if (searchInput === "") {
+    setDataSource(teamState.teams);
+  }
   const columns = [
     {
       title: "Team Name",
@@ -89,9 +92,11 @@ const AllTeamTab = (props) => {
         // components={components}
         // rowClassName={() => "editable-row"}
         bordered
-        dataSource={teamState.teams}
+        dataSource={dataSource}
         columns={columns}
-        rowKey='_id'
+        pagination={{ pageSize: 8 }}
+        scroll={{ y: 240 }}
+        rowKey="_id"
       />
     </>
   );

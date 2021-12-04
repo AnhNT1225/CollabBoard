@@ -8,6 +8,7 @@ import SpaceService from "../../services/spaceService";
 import { SpaceContext } from "../../context/spaceContext";
 
 const Spaces = (props) => {
+  const {searchInput, setDataSource, dataSource} = props
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const { spaceDispatch } = useContext(SpaceContext);
 
@@ -91,7 +92,7 @@ const Spaces = (props) => {
       </div>
       <div className="category_card">
         <SortTool />
-        <AllSpaceTab />
+        <AllSpaceTab searchInput={searchInput} setDataSource={setDataSource} dataSource={dataSource}/>
       </div>
     </div>
   );

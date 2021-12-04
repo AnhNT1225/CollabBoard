@@ -5,23 +5,26 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Link, useRouteMatch } from "react-router-dom";
 import {SpaceContext} from '../../../context/spaceContext';
 import { getUserId } from "../../../lib/auth";
-const AllSpaceTab = () => {
+const AllSpaceTab = (props) => {
 	const ownedId = getUserId();
 	const { url } = useRouteMatch();
-	const { spaceState, spaceDispatch } = useContext(SpaceContext);
+	const {searchInput, setDataSource, dataSource} = props
+	const { spaceState, spaceDispatch} = useContext(SpaceContext);
 	useEffect(() => {
 		spaceDispatch({type: "FETCH_SPACES_REQUEST"})
 		SpaceService.getOwnedSpaces()
 			.then((result) => {
 				console.log("result: ", result);
-				// setDataSource(result.data);
+				setDataSource(result.data);
 				spaceDispatch({ type: "FETCH_SPACES_SUCCESS", payload: result.data });
 			})
 			.catch((error) => {
 				console.log("error: ", error);
 			});
 	}, []);
-
+	if(searchInput === '' ){
+		setDataSource(spaceState?.spaces)
+	  }
 	const columns = [
 		{
 			title: "Name",
@@ -35,7 +38,7 @@ const AllSpaceTab = () => {
 			title: "Documents",
 			dataIndex: "boards",
 			key: "boards",
-			render: (boards) => <p>{boards.length} boards</p>,
+			render: (boards) => <p>{boards?.length} boards</p>,
 		},
 		{
 			title: "Author",
@@ -106,7 +109,7 @@ const AllSpaceTab = () => {
 				// components={components}
 				// rowClassName={() => "editable-row"}
 				bordered
-				dataSource={spaceState.spaces}
+				dataSource={dataSource}
 				columns={columns}
 				pagination={{ pageSize: 8 }}
 				scroll={{ y: 240 }}

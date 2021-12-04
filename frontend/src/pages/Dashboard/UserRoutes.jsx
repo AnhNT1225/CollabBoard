@@ -22,10 +22,10 @@ const UserRoutes = (props) => {
 				<Propotypes searchInput={props.searchInput} socket={props.socket}/>
 			</Route>
 			<Route exact path={`${props.path}/spaces`}>
-				<Spaces searchInput={props.searchInput}/>
+				<Spaces searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
 			</Route>
 			<Route exact path={`${props.path}/teams`}>
-				<Teams />
+				<Teams searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
 			</Route>
 			<Route exact path={`${props.path}/teams/:teamId`} component={TeamResult}/>
 			<Route path={`${props.path}/teams/:teamId/edit`} component={TeamEdit}/>

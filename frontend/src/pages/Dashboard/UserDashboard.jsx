@@ -7,18 +7,18 @@ import { UserContext, ACTIONS } from "../../context/userContext";
 import UserService from "../../services/userService";
 import { getUserId } from "../../lib/auth";
 const UserDashboard = (props) => {
-  const {socket} = props;
+  const { socket } = props;
   const [searchInput, setSearchInput] = useState("");
   let { path } = useRouteMatch();
-  const { state,dispatch } = useContext(UserContext);
-
+  const { state, dispatch } = useContext(UserContext);
+  const [dataSource, setDataSource] = useState([]);
 
   useEffect(() => {
     const userId = getUserId();
-    console.log('corona: ', userId)
+    console.log("corona: ", userId);
     UserService.getUserById(userId)
       .then((response) => {
-        console.log('HUNSD: ', response)
+        console.log("HUNSD: ", response);
         dispatch({ type: ACTIONS.GET_USER, payload: response.user });
       })
       .catch((error) => {
@@ -26,7 +26,7 @@ const UserDashboard = (props) => {
       });
   }, [dispatch]);
 
-  console.log('user dashoard: ', state.user);
+  console.log("user dashoard: ", state.user);
   const userItem = [
     {
       link: "/dashboard/prototypes",
@@ -52,9 +52,21 @@ const UserDashboard = (props) => {
       {/* <Layout sidebarItem={userItem}/> */}
       <Sidebar sidebarItem={userItem} />
       <div className="layout__content">
-        <TopNav setSearchInput={setSearchInput} dispatch={dispatch} state={state}/>
+        <TopNav
+          dataSource={dataSource}
+          setDataSource={setDataSource}
+          setSearchInput={setSearchInput}
+          dispatch={dispatch}
+          state={state}
+        />
         <div className="layout__content-main">
-          <UserRoutes path={path} searchInput={searchInput} socket={socket}/>
+          <UserRoutes
+            path={path}
+            searchInput={searchInput}
+            socket={socket}
+            dataSource={dataSource}
+            setDataSource={setDataSource}
+          />
         </div>
       </div>
     </div>
