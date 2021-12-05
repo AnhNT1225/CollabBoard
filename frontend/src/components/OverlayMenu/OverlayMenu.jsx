@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Drawer, Modal } from "antd";
+import { Button, Drawer, Modal} from "antd";
 import nextId from "react-id-generator";
 import { ElementContext } from "../../context/elementContext";
 import ColorPicker from "../ColorPicker/ColorPicker";

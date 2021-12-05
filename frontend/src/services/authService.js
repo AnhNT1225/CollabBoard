@@ -54,8 +54,8 @@ class AuthService {
       )
       .then((response) => {
         console.log("res google login: ", response.data);
-        if (response.data.token) {
-          localStorage.setItem("token", JSON.stringify(response.data.token));
+        if (response.data.accessToken) {
+          localStorage.setItem("token", response.data.accessToken);
           return response.data;
         }
       });

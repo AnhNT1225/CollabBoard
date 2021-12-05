@@ -169,17 +169,17 @@ const BoardHeader = (props) => {
   //Menu component ant design for DropDown Menu
 
   const menu1 = (
-    <Menu onClick={handleSettingMenu}>
-      <Menu.Item key="1">Export to image</Menu.Item>
-      <Menu.Item key="2">View comment</Menu.Item>
-      <Menu.Item key="3">Leave room</Menu.Item>
+    <Menu style={{ borderRadius: 10}} onClick={handleSettingMenu}>
+      <Menu.Item key="1"><i className="fas fa-download"></i>Export to image</Menu.Item>
+      <Menu.Item key="2"><i className="far fa-comment-alt"></i>View comment</Menu.Item>
+      <Menu.Item key="3"><i className="fas fa-sign-out-alt"></i>Leave room</Menu.Item>
     </Menu>
   );
 
   const menu = (
     <div
       className="notification_box"
-      style={{ inlineSize: 200, wordWrap: "break-word" }}
+      style={{ inlineSize: 200, wordWrap: "break-word", background: 'white', borderRadius: 10 }}
     >
       {notifications.map((n, i) => (
         <div key={i}>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Button } from "antd";
 import {
 	RectangleIcon,
@@ -18,8 +18,8 @@ import { ElementContext } from "../../context/elementContext";
 import nextId from "react-id-generator";
 import "./styles.scss";
 const ShapingOptions =(props) => {
-	const { socket } = props;
-	const { elementDispatch } = useContext(ElementContext);
+	const { socket, boardCode } = props;
+	const { elementState, elementDispatch } = useContext(ElementContext);
 	const handleShapeTypes = (e) => {
 		const shapeName = e.currentTarget.name;
 		switch (shapeName) {
@@ -35,6 +35,12 @@ const ShapingOptions =(props) => {
 					type: 'rect'
 				};
 				elementDispatch({ type: "CREATE_RECTANGLE", payload: rectData });
+				// const arrRect = []
+				// arrRect.push(rectData)
+				// socket?.emit("drawRect", {
+				// 	code: boardCode,
+				// 	rects: arrRect,
+				//   });
 				break;
 			case "square":
 				let squareData = {
@@ -170,6 +176,25 @@ const ShapingOptions =(props) => {
 				break;
 		}
 	};
+	// const drawingShape = (elementState) => {
+	// 	socket.emit("drawShape", {
+	// 		code: boardCode,
+	// 		shapes: {
+	// 		  rects: elementState.rectangles,
+	// 		  elips: elementState.ellipses,
+	// 		  polys: elementState.polygons,
+	// 		  stars: elementState.stars,
+	// 		},
+	// 	  });
+	// }
+	// useEffect(() => {
+	// 	drawingShape(elementState)
+	// }, [elementState])
+
+
+	// console.log('element thoi diem nay: ', elementState?.rectangles)
+	// console.log('element polygons: ', elementState?.polygons)
+
 	return (
 		<div className="shape_container">
 			<div className="shape_types">

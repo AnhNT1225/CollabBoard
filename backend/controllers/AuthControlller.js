@@ -118,14 +118,14 @@ class AuthController {
           			}
           		);
           		const { _id, name, email, avatar, role } = user;
-              let foundUser= {
+              const foundUser= {
                 id: _id,
                 name: name,
                 email: email,
                 avatar: avatar,
                 role: role,
               }
-          		res.json({ token, user: foundUser });
+          		res.status(200).json({ success: true,  accessToken: token, user: foundUser });
           	} else {
               console.log('create')
           		const newUser = new User({
@@ -152,10 +152,17 @@ class AuthController {
           			);
 
           			// const { _id, name, email, avatar } = data;
-                const createdUser =  data;
-                delete createdUser.password
-          			res.json({
-          				token,
+                createdUser ={
+                  id: data._id,
+                  name: data.name,
+                  email: data.email,
+                  avatar: data.avatar,
+                  role: data.role,
+                }
+                // delete createdUser.password;
+          			res.status(200).json({
+                  success: true,
+          				accessToken: token,
           				user: createdUser,
           			});
           		});

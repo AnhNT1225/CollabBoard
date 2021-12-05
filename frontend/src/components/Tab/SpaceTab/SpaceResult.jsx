@@ -192,7 +192,7 @@ const SpaceResult = (props) => {
             </form>
           </Modal>
           <Button onClick={() => deleteSpace(spaceId)}>
-            <i class="far fa-trash-alt"></i>
+            <i className="far fa-trash-alt"></i>
             <span> Delete</span>
           </Button>
         </div>

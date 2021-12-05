@@ -1,32 +1,32 @@
 import React, { useRef, useContext } from "react";
-import { Modal, Input, Button, message } from "antd";
+import { Modal, Input, Button, message, Form } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Logo from "../Logo";
 import { BoardContext } from "../../context/boardContext";
 import BoardService from "../../services/boardService";
 import { useHistory } from "react-router-dom";
-import { getUserId, getUserName } from "../../lib/auth";
+import { getUserName } from "../../lib/auth";
 const JoinRoomModal = (props) => {
   const { joinRoomModal, setjoinRoomModal, setCreateBoardModal, socket } =
     props;
   const { boardState, boardDispatch } = useContext(BoardContext);
 
   const history = useHistory();
-  const inputRef = useRef(null);
+  // const inputRef = useRef(null);
   // console.log("test JoinRoomModal : ", joinRoomModal);
   const backToPrevious = () => {
     setjoinRoomModal(false);
     setCreateBoardModal(true);
   };
 
-  const handleJoinRoom = async (e) => {
-    e.preventDefault();
-    await BoardService.findBoardByCode(inputRef.current)
+  const handleJoinRoom = async (form) => {
+    // e.preventDefault();
+    await BoardService.findBoardByCode(form.codeInput)
       .then(async (result) => {
         console.log("result from join lomeo: ", result);
         const memberInfo = {
           memberName: getUserName(),
-        //   receiver: result.data.createdBy.id,
+          //   receiver: result.data.createdBy.id,
           type: 1,
         };
         await socket?.emit("join-room", result.data.code, memberInfo);
@@ -50,8 +50,14 @@ const JoinRoomModal = (props) => {
       onOk={() => setjoinRoomModal(false)}
       onCancel={() => setjoinRoomModal(false)}
       title={<ArrowLeftOutlined onClick={backToPrevious} />}
+      destroyOnClose={true}
     >
-      <form className="room_code_wrapper" onSubmit={handleJoinRoom}>
+      <Form
+        className="room_code_wrapper"
+        onFinish={handleJoinRoom}
+        scrollToFirstError
+        autoComplete="off"
+      >
         <Logo />
         <section className="room_code_description">
           <b>Collaborate with others via Collab Board.</b>
@@ -64,12 +70,24 @@ const JoinRoomModal = (props) => {
         <label className="room_code_label">
           <b>ENTER THE CODE TO JOIN A SESSION</b>
         </label>
-        <Input
-          ref={inputRef}
-          style={{ width: 250, height: 50, textAlign: "center" }}
-          placeholder="ENTER invite code"
-          onChange={(e) => (inputRef.current = e.target.value)}
-        />
+        <Form.Item
+          name="codeInput"
+          rules={[
+            {
+              required: true,
+              message: "Please input your board code!",
+            },
+            { whitespace: true, message: "Please enter some characters" },
+          ]}
+          hasFeedback
+        >
+          <Input
+            // ref={inputRef}
+            style={{ width: 250, height: 50, textAlign: "center" }}
+            placeholder="ENTER invite code"
+            // onChange={(e) => (inputRef.current = e.target.value)}
+          />
+        </Form.Item>
         <br />
         <Button
           htmlType="submit"
@@ -79,7 +97,7 @@ const JoinRoomModal = (props) => {
         >
           Join
         </Button>
-      </form>
+      </Form>
     </Modal>
   );
 };

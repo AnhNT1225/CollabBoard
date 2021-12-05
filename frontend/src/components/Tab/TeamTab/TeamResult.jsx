@@ -31,9 +31,8 @@ const TeamResult = (props) => {
   // const [boardSelectionModal, setBoardSelectionModal] = useState(false);
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const [createBoardModal, setCreateBoardModal] = useState(false);
-  const emailRef = useRef(null);
-  const [boardName, setBoardName] = useState("");
-  const [spaceName, setSpaceName] = useState("");
+  const [email, setEmail] = useState('')
+  // const emailRef = useRef('');
 
   const time = new Date(teamState?.team.createdAt).toLocaleDateString("en-EN", {
     day: "numeric",
@@ -168,7 +167,7 @@ const TeamResult = (props) => {
 
   const inviteMember = async (e) => {
     e.preventDefault();
-    await TeamService.addMemberToTeam(teamId, emailRef.current)
+    await TeamService.addMemberToTeam(teamId, email)
       .then((result) => {
         console.log("add member to team result: ", result);
         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
@@ -179,6 +178,8 @@ const TeamResult = (props) => {
           throw new Error("Failed to add new member to the team.");
         }
       });
+      setEmail('')
+      // emailRef.current = ''
   };
   //----------------------------------------------------------------
 
@@ -269,7 +270,6 @@ const TeamResult = (props) => {
                 >
                   <Input
                     style={{ width: 250, height: 40, textAlign: "center" }}
-                    value={boardName}
                     name="boardName"
                     // onChange={changeBoardName}
                   />
@@ -327,7 +327,6 @@ const TeamResult = (props) => {
                 >
                   <Input
                     style={{ width: 250, height: 40, textAlign: "center" }}
-                    value={spaceName}
                     // onChange={changeSpaceName}
                     name="spaceName"
                   />
@@ -363,7 +362,8 @@ const TeamResult = (props) => {
                 type="email"
                 style={{ width: 300 }}
                 placeholder="Enter user email"
-                onChange={(e) => (emailRef.current = e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Button htmlType="submit">Invite</Button>
             </form>

@@ -3,7 +3,7 @@ import { Button, Modal, Input, message, Form } from "antd";
 import { FolderAddOutlined } from "@ant-design/icons";
 import AllSpaceTab from "../../components/Tab/SpaceTab/AllSpaceTab";
 
-import SortTool from "../../components/SortTool";
+import SortTool from "../../components/SortTool/SortTool";
 import SpaceService from "../../services/spaceService";
 import { SpaceContext } from "../../context/spaceContext";
 

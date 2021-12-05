@@ -12,7 +12,6 @@ import SpaceResult from '../../components/Tab/SpaceTab/SpaceResult';
 
 
 const UserRoutes = (props) => {
-	console.log("props path: ", props);
 	return (
 		<Switch>
 			<Route exact path={`${props.path}`}>

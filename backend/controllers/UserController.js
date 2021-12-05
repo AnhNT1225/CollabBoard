@@ -29,7 +29,6 @@ class UserController {
     console.log("userId: ", userId);
     try {
       const user = await User.findById({ _id: userId }).lean();
-      console.log("NOi voi em 1 loi", user);
       const foundUser = { ...user };
       if (!foundUser) {
         return res

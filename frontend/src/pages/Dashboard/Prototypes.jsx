@@ -3,11 +3,9 @@ import CreateBoardModal from "../../components/AppModal/CreateBoardModal";
 import { Tabs } from "antd";
 import AllBoardTab from "../../components/Tab/PrototypeTab/AllBoardTab";
 import OwnedBoardTab from "../../components/Tab/PrototypeTab/OwnedBoardTab";
-import SortTool from "../../components/SortTool";
+import SortTool from "../../components/SortTool/SortTool";
 import BoardService from "../../services/boardService";
 import { BoardContext } from "../../context/boardContext";
-import {UserContext} from '../../context/userContext';
-import UserService from '../../services/userService';
 import {SpaceContext} from '../../context/spaceContext';
 import SpaceService from "../../services/spaceService";
 const { TabPane } = Tabs;
@@ -17,22 +15,6 @@ const Prototypes = (props) => {
   // const [deletedId, setDeletedId] = useState(null)
   const { boardDispatch } = useContext(BoardContext);
   const { spaceDispatch } = useContext(SpaceContext);
-  const {dispatch} = useContext(UserContext)
-  // useEffect(() => {
-  //     const getUser = async() => {
-  //         UserService.getCurrentUser()
-  //       .then(async(user) => {
-  //         await dispatch({type: 'GET_USER', payload: user})
-  //       })
-  //       .catch((error) => {
-  //         if(error){
-  //           throw new Error(error);
-  //         }      
-  //       });
-          
-  //     }
-  //     getUser();
-  // }, [])
   
     useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });

@@ -13,10 +13,14 @@ class UserService {
   }
 
   async getUserById(userId) {
-    const token =getToken();
-    console.log('token lead: ', token)
+    // const adu =getToken();
+//     console.log('adu: ', adu)
+//     const token = adu.includes("") ? adu.slice(1, adu.length-1): getToken
+// console.log('token lead: ', token)
+//     console.log(API_URL + `/${userId}`)
+//     console.log(`Bearer ${token}`)
     const response = await axios.get(API_URL + `/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
     // console.log("the user data from API: ", response.data.user);
     return response.data;

@@ -61,7 +61,7 @@ class BoardController {
       .sort({ updatedAt: -1 })
       .limit(4)
       // .populate("createdBy")
-      // .populate("spaceId")
+      .populate("spaceId")
       .then((boards) => {
         if (!boards)
           return res.status(404).json({

@@ -65,7 +65,7 @@ const Register = () => {
                 required: true,
                 message: "Please input your full name!",
               },
-              { whitespace: true },
+              { whitespace: true, message:'Please enter some characters' },
             ]}
             hasFeedback
           >
@@ -134,7 +134,7 @@ const Register = () => {
                 required: true,
                 message: "Please input your E-mail!",
               },
-              { whitespace: true },
+              { whitespace: true, message:'Please enter some characters' },
             ]}
             hasFeedback
           >
@@ -160,6 +160,7 @@ const Register = () => {
                 message:
                   "Password must have at least 8 characters!",
               },
+              { whitespace: true, message:'Please enter some characters' },
             ]}
             hasFeedback
           >
@@ -188,6 +189,7 @@ const Register = () => {
                 message:
                   "Password must have at least 8 characters!",
               },
+              { whitespace: true, message:'Please enter some characters' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   console.log(

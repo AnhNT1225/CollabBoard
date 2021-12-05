@@ -16,7 +16,7 @@ import { ElementContext } from "../../context/elementContext";
 import BoardService from "../../services/boardService";
 import nextId from "react-id-generator";
 import Note from "../NodeModels/label";
-
+import PenCursor from '../../assets/editor_icon/pen_cursor.png'
 const Board = (props) => {
   const {
     menuComponent,
@@ -24,7 +24,6 @@ const Board = (props) => {
     setDrawingProperty,
     textProperty,
     setMenuComponent,
-    location,
     boardId,
     user,
     isEditText,
@@ -34,10 +33,8 @@ const Board = (props) => {
     socket,
   } = props;
   console.log("user from YTF: ", user);
-  console.log("location: ", location);
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
-  // const { boardState, boardDispatch } = useContext(BoardContext);
   //----------------------------------
   const stageRef = useRef();
   const layerRef = useRef();
@@ -45,15 +42,11 @@ const Board = (props) => {
   //check the text element is edit or not
 
   const isDrawing = useRef(false);
-
-  // console.log("text property: ", textProperty);
-
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isButton, setIsButton] = useState(true);
   // console.log("state push by history: ", location.state);
   const dragUrl = useRef();
   const [nodesArray, setNodes] = useState([]);
-  // console.log("nodeArray: ", nodesArray);
   const trRef = useRef();
   //Accessing to Konva through window object
   const Konva = window.Konva;
@@ -67,7 +60,6 @@ const Board = (props) => {
     y2: 0,
   });
   const [selectedId, selectShape] = useState(null);
-  const [count, setCount] = useState(null);
   // our history
   // let appHistory = [elementState.appState]; //before params is files
   // let appHistoryStep = 0;
@@ -256,54 +248,50 @@ const Board = (props) => {
       socket?.off("text", onDrawingTextEvent);
       socket?.off("file", onDrawingImage);
       socket?.off("note", onDrawingNoteEvent);
+      socket?.off("handleLineDelete");
+      socket?.off("handleTextDelete");
+      socket?.off("handleFileDelete");
+      socket?.off("handleShapeDelete");
     };
   }, [elementDispatch, socket, boardState]);
 
   useEffect(() => {
     console.log("I dot'n wanna: ", elementState?.rectangles);
-    switch (menuComponent) {
-      case "shaping":
-        socket?.emit("drawShape", {
-          code: boardState.currentBoard.code,
-          shapes: {
-            rects: elementState?.rectangles,
-            elips: elementState?.ellipses,
-            polys: elementState?.polygons,
-            stars: elementState?.stars,
-          },
-        });
-        break;
-      case "media_upload":
-        socket.emit("drawFile", {
-          code: boardState.currentBoard?.code,
-          files: elementState?.files,
-        });
-        break;
-      case "noting":
-        socket.emit("drawNote", {
-          code: boardState.currentBoard?.code,
-          notes: elementState?.notes,
-        });
-        break;
-      default:
-        break;
-    }
+  //   switch (menuComponent) {
+  //     case "shaping":
+  //       socket?.emit("drawShape", {
+  //         code: boardState.currentBoard?.code,
+  //         shapes: {
+  //           rects: elementState?.rectangles,
+  //           elips: elementState?.ellipses,
+  //           polys: elementState?.polygons,
+  //           stars: elementState?.stars,
+  //         },
+  //       });
+  //       break;
+  //     case "media_upload":
+  //       socket.emit("drawFile", {
+  //         code: boardState.currentBoard?.code,
+  //         files: elementState?.files,
+  //       });
+  //       break;
+  //     case "noting":
+  //       socket.emit("drawNote", {
+  //         code: boardState.currentBoard?.code,
+  //         notes: elementState?.notes,
+  //       });
+  //       break;
+  //     default:
+  //       break;
+  //   }
   }, [elementState, menuComponent]);
 
   const handleCursor = (e) => {
     const container = e.currentTarget.getStage().container();
-    // console.log("test ref: ", stageRef.current.container().style.cursor);
     switch (menuComponent) {
-      // case "pen":
-      // 	// container.style.cursor = "url(icons/editor_icon/pen.png), auto";
-      // 	container.style.cursor = "pointer";
-      // 	break;
-      // case "eraser":
-      // 	container.style.cursor = "move";
-      // 	break;
       case "drawing":
-        stageRef.current.container().style.cursor =
-          'url("/icons/editor_icon/pen.png"),auto;';
+        container.style.cursor =
+        `url(${PenCursor}) 0 100,auto`
         break;
       case "useHand":
         container.style.cursor = "grab";
@@ -337,8 +325,6 @@ const Board = (props) => {
         if (isElement || isTransformer) {
           return;
         }
-
-        // const pos = e.target.getStage().getPointerPosition();
         selection.current.visible = true;
         selection.current.x1 = pos.x;
         selection.current.y1 = pos.y;
@@ -353,6 +339,8 @@ const Board = (props) => {
         break;
       case "drawing":
         //if choose "Pen" tool cannot draggable on board
+        container.style.cursor =
+        `url(${PenCursor}) 0 100, auto`
         stageRef.current.draggable(false);
         isDrawing.current = true;
 
@@ -434,6 +422,7 @@ const Board = (props) => {
 
   const handleMouseMove = async (e) => {
     //GET Relative position for zooming pan get current pos
+    const container = stageRef.current.container();
     const pos = stageRef.current.getRelativePointerPosition();
     switch (menuComponent) {
       case "usePointer":
@@ -450,6 +439,8 @@ const Board = (props) => {
         if (!isDrawing.current) {
           return;
         }
+        container.style.cursor =
+        `url(${PenCursor}) 0 100,auto`
         let lastLine = elementState.lines[elementState.lines.length - 1];
         // add point
         lastLine.points = lastLine.points.concat([pos.x, pos.y]);
@@ -486,7 +477,8 @@ const Board = (props) => {
           code: boardState.currentBoard.code,
           line: elementState.lines,
         });
-
+        container.style.cursor =
+        `url(${PenCursor}) 0 100, auto`
         break;
       case "useHand":
         container.style.cursor = "grab";

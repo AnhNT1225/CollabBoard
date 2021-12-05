@@ -13,7 +13,6 @@ const Editor = ({match, socket, location}) => {
 	const {  boardState, boardDispatch } = useContext(BoardContext);
 	const boardId = match.params.id;
 	console.log('boardId: ', boardId);
-	console.log('editor socket: ', socket)
 	console.log('state props history: ', location.state)
 
 	useEffect(() => {

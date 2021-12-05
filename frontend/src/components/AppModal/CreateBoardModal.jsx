@@ -4,7 +4,8 @@ import { useHistory } from "react-router-dom";
 import BoardService from "../../services/boardService";
 import "./styles.scss";
 import JoinRoomModal from "./JoinRoomModal";
-import {ElementContext} from '../../context/elementContext';
+import ThemeModal from "./ThemeModal";
+import { ElementContext } from "../../context/elementContext";
 
 // import crypto from "crypto";
 //media import
@@ -17,14 +18,14 @@ import enterRoom from "../../assets/media/enter_key.png";
 //   console.log("randomCode: ", randomCode);
 //   return randomCode;
 // };
-const CreateBoardModal = ({socket}) => {
-
+const CreateBoardModal = ({ socket }) => {
   const history = useHistory();
 
   const [createBoardModal, setCreateBoardModal] = useState(false);
   const [joinRoomModal, setjoinRoomModal] = useState(false);
-  const [file, setFile] = useState({ loading: false, imageUrl: '' });
-  const {elementState, elementDispatch} = useContext(ElementContext)
+  const [themeModal, setThemeModal] = useState(false);
+  const [file, setFile] = useState({ loading: false, imageUrl: "" });
+  const { elementState, elementDispatch } = useContext(ElementContext);
   // const propsTypes = {
   // 	name: "file",
   // 	// action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
@@ -44,7 +45,6 @@ const CreateBoardModal = ({socket}) => {
   // 	},
   // };
 
-
   const createBlankBoard = async (e) => {
     e.preventDefault();
     // const boardCode = await genRandomCode();
@@ -54,7 +54,7 @@ const CreateBoardModal = ({socket}) => {
         console.log("newBoard: ", response.board);
         console.log("board COEDNSK RESPONSE: ", response.board.code);
         await socket?.emit("create-room", response.board.code);
-        message.success('Create new board successful!');
+        message.success("Create new board successful!");
         history.push({ pathname: `/board/${response.board._id}` });
       })
       .catch((error) => {
@@ -81,30 +81,34 @@ const CreateBoardModal = ({socket}) => {
     setjoinRoomModal(true);
   };
 
-  function getBase64(img, callback) {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => callback(reader.result));
-    reader.readAsDataURL(img);
-  }
-
-  const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setFile({ loading: true });
-      return;
-    }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(
-        info.file.originFileObj,
-        async (imageUrl) =>
-          await setFile((prev) => ({
-            ...prev,
-            imageUrl: imageUrl,
-            loading: false,
-          }))
-      );
-    }
+  const showThemeModal = () => {
+    setCreateBoardModal(false);
+    setThemeModal(true);
   };
+  // function getBase64(img, callback) {
+  //   const reader = new FileReader();
+  //   reader.addEventListener("load", () => callback(reader.result));
+  //   reader.readAsDataURL(img);
+  // }
+
+  // const handleChange = (info) => {
+  //   if (info.file.status === "uploading") {
+  //     setFile({ loading: true });
+  //     return;
+  //   }
+  //   if (info.file.status === "done") {
+  //     // Get this url from response in real world.
+  //     getBase64(
+  //       info.file.originFileObj,
+  //       async (imageUrl) =>
+  //         await setFile((prev) => ({
+  //           ...prev,
+  //           imageUrl: imageUrl,
+  //           loading: false,
+  //         }))
+  //     );
+  //   }
+  // };
 
   return (
     <div className="content_header">
@@ -135,17 +139,20 @@ const CreateBoardModal = ({socket}) => {
               </div>
               <span className="media_name">Blank canvas</span>
             </Button>
-            <Button className="option_items" onClick={createInitialFileBoard}>
-              <Upload onChange={handleChange}>
-                <div className="media_wrap">
-                  <img
-                    className="item_media"
-                    src={fileToCanvas}
-                    alt="upload_file_media"
-                  />
-                </div>
-                <span className="media_name">Upload File</span>
-              </Upload>
+            <Button className="option_items" onClick={showThemeModal}
+            // onClick={createInitialFileBoard}
+            >
+              {/* <Upload onChange={handleChange}> */}
+              <div className="media_wrap">
+                <img
+                  className="item_media"
+                  src={fileToCanvas}
+                  alt="upload_file_media"
+                />
+              </div>
+              <span className="media_name">Custom theme</span>
+              {/* <span className="media_name">Upload File</span> */}
+              {/* </Upload> */}
             </Button>
             <Button className="option_items" onClick={showCodeModal}>
               <div className="media_wrap">
@@ -163,6 +170,12 @@ const CreateBoardModal = ({socket}) => {
       <JoinRoomModal
         joinRoomModal={joinRoomModal}
         setjoinRoomModal={setjoinRoomModal}
+        setCreateBoardModal={setCreateBoardModal}
+        socket={socket}
+      />
+      <ThemeModal
+        themeModal={themeModal}
+        setThemeModal={setThemeModal}
         setCreateBoardModal={setCreateBoardModal}
         socket={socket}
       />

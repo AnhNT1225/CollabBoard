@@ -1,6 +1,7 @@
 import { createContext, useMemo, useReducer } from "react";
 export const ACTIONS = {
   LOGIN: "LOGIN",
+  LOGIN_API: "LOGIN_API",
   LOGOUT: "LOGOUT",
   GET_USER: "GET_USER",
 };
@@ -17,6 +18,7 @@ export const UserContext = createContext();
 const authReducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
+      console.log('payload: ', action.payload)
       if (action.payload.user.role === "admin") {
         return {
           ...state,
@@ -34,6 +36,23 @@ const authReducer = (state, action) => {
         isAdmin: false,
       };
 
+    case "LOGIN_API":
+      if (action.payload.user.role === "admin") {
+        return {
+          ...state,
+          isAuthenticated: true,
+          user: action.payload.user,
+          token: action.payload.token,
+          isAdmin: true,
+        };
+      }
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAdmin: false,
+      };
     case "LOGOUT":
       localStorage.clear();
       return {

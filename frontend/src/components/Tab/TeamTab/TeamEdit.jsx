@@ -10,7 +10,8 @@ const TeamEdit = (props) => {
   const [isCheck, setIsCheck] = useState(false);
   const [updateName, setUpdateName] = useState(null);
   const [selectedMemberId, setSelectedMemberId] = useState(null);
-  const emailRef = useRef(null);
+  const [email, setEmail] = useState('')
+  // const emailRef = useRef(null);
   useEffect(() => {
     const getTeamInfo = async () => {
       await TeamService.getTeamById(teamId)
@@ -58,7 +59,7 @@ const TeamEdit = (props) => {
   };
 
   const inviteMember = async() => {
-    await TeamService.addMemberToTeam(teamId, emailRef.current)
+    await TeamService.addMemberToTeam(teamId, email)
       .then((result) => {
         console.log("add member to team result: ", result);
         teamDispatch({type: "FETCH_TEAM_SUCCESS", payload: result.data});
@@ -67,7 +68,7 @@ const TeamEdit = (props) => {
         console.log("error: ", error);
         throw new Error("The space haven't add to the team.");
       });
-    emailRef.current = null;
+    setEmail('');
   };
   return (
     <div>
@@ -108,9 +109,8 @@ const TeamEdit = (props) => {
               type="email"
               placeholder="Enter email you want to add"
               style={{ width: 250 }}
-              onChange={(e) => {
-                emailRef.current = e.target.value;
-              }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <Button onClick={inviteMember}>Invite</Button>
           </div>

@@ -53,7 +53,7 @@ const Login = (props) => {
       if (googleData) {
         const token = googleData.code;
         console.log("Google data: ", token);
-        await AuthService.loginWithGoogle(token).then((data) => {
+        await AuthService.loginWithGoogle(token).then(async(data) => {
           console.log("login data GOOGLE: ", data);
           dispatch({ type: ACTIONS.LOGIN, payload: data });
           // console.log("data.user: ", data.user.role);
@@ -63,17 +63,18 @@ const Login = (props) => {
           message.success(`Login successfully`, 1);
           if (data.user.role === "admin") {
             console.log('fault')
-            props.history.push("/admin");
+            await props.history.push("/admin");
           } 
           else {
-            console.log('props: ', props.history)
-            props.history.replace("/dashboard");
-            props.setupSocket();
+            console.log('passed')
+            // window.location.href='/dashboard'
+            props.history.push("/dashboard");
+            // await props.setupSocket();
           }
         });
       }
     } catch (error) {
-      throw new Error(error);
+      console.log("error: ",error);
     }
   };
 

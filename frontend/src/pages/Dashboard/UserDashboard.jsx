@@ -15,7 +15,7 @@ const UserDashboard = (props) => {
 
   useEffect(() => {
     const userId = getUserId();
-    console.log("corona: ", userId);
+    console.log("userId: ", userId);
     UserService.getUserById(userId)
       .then((response) => {
         console.log("HUNSD: ", response);
@@ -24,9 +24,9 @@ const UserDashboard = (props) => {
       .catch((error) => {
         console.log("error: ", error);
       });
-  }, [dispatch]);
+  }, []);
 
-  console.log("user dashoard: ", state.user);
+  console.log("user dashoard: ", state?.user);
   const userItem = [
     {
       link: "/dashboard/prototypes",

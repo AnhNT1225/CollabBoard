@@ -78,7 +78,6 @@ const boardReducer = (state, action) => {
     case "SEARCH_BOARD":
       console.log("search payload: ", action.payload);
       if (action.payload === "") {
-        console.log("ok empty is true");
         return {
           ...state,
           foundBoards: state.boards,
