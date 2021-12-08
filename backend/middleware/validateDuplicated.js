@@ -1,6 +1,7 @@
 const db = require("../models");
 const User = db.user;
 const Team = require("../models/Team");
+const Space = require("../models/Space");
 const checkDuplicatedEmail = (req, res, next) => {
 	//Email
 	User.findOne({ email: req.body.email }).exec((err, user) => {
@@ -32,6 +33,22 @@ const checkTeamName = (req, res, next) => {
 	});
 };
 
+const checkSpaceName = (req, res, next) => {
+	//Email
+	const { spaceName } = req.body;
+	Space.findOne({ name: spaceName }).exec((err, space) => {
+		if (err) {
+			res.status(500).json({ message: err });
+			return;
+		}
+		if (space) {
+			res.status(400).json({ message: "Failed! Space name is already in used!" });
+			return;
+		}
+		next();
+	});
+};
+
 // checkRolesExisted = (req, res, next) => {
 // 	const roles = req.body.roles;
 // 	if (roles) {
@@ -49,5 +66,6 @@ const checkTeamName = (req, res, next) => {
 
 module.exports = {
 	checkDuplicatedEmail: checkDuplicatedEmail,
-	checkTeamName: checkTeamName
+	checkTeamName: checkTeamName,
+	checkSpaceName:checkSpaceName
 };

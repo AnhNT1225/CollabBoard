@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext, memo } from "react";
 import ControlMenu from "../ControlMenu";
 import Conversation from "../Conversation/Conversation";
-import { useParams } from "react-router-dom";
+import {message} from 'antd'
 import { withRouter } from "react-router-dom";
 import OverlayMenu from "../OverlayMenu/OverlayMenu";
 import { Stage, Layer, Line, Rect, Transformer } from "react-konva";
@@ -31,8 +31,9 @@ const Board = (props) => {
     boardState,
     boardDispatch,
     socket,
+    boardTheme
   } = props;
-  console.log("user from YTF: ", user);
+  // console.log("user from YTF: ", user);
   //----------------USE FOR SET SHAPING COMBINATION -------------------
   const { elementState, elementDispatch } = useContext(ElementContext);
   //----------------------------------
@@ -51,8 +52,8 @@ const Board = (props) => {
   //Accessing to Konva through window object
   const Konva = window.Konva;
   const selectionRectRef = useRef();
-  const oldPos = React.useRef(null);
-  const selection = React.useRef({
+  const oldPos = useRef(null);
+  const selection = useRef({
     visible: false,
     x1: 0,
     y1: 0,
@@ -102,6 +103,43 @@ const Board = (props) => {
   //       });
   //     });
   // }, []);
+
+
+
+  // ---------------------------------CHANGE BACKGROUND--------------------------
+  // useEffect(() => {
+  //   //Method 1
+  //   // stageRef.current.container().style.backgroundColor = '#86fe84';
+  //   //Method 2
+  //   console.log('sao lai the nho: ', boardState.currentBoard?.background )
+  //   let background = new Konva.Layer();
+  //   let colorBackground = new Konva.Rect({
+  //     x: 0,
+  //     y: 0,
+  //     width: stageRef.current.width(),
+  //     height: stageRef.current.height(),
+  //     fill: boardState.currentBoard?.background,
+  //     // remove background from hit graph for better performance
+  //     // because we don't need any events on the background
+  //     listening: false,
+      
+  //   });
+  //   background.add(colorBackground);
+  //   stageRef.current.add(layerRef.current)
+  //   stageRef.current.add(background);
+  //   background.setZIndex(0);
+  //   layerRef.current.setZIndex(1);
+  //   console.log('background zIndex: ', background.getZIndex());
+  //   console.log('layer zIndex: ',layerRef.current.getZIndex());
+  //   // the stage is draggable
+  //   // that means absolute position of background may change
+  //   // so we need to reset it back to {0, 0}
+
+  //   stageRef.current.on('dragmove', () => {
+  //     background.absolutePosition({ x: 0, y: 0 });
+  //   });
+  // }, [boardState, Konva])
+
   const updateSelectionRect = () => {
     const node = selectionRectRef.current;
     node.setAttrs({
@@ -122,8 +160,8 @@ const Board = (props) => {
       boardState.currentBoard.storage &&
       boardState.currentBoard.media
     ) {
-      console.log("test boardState: ", boardState.currentBoard);
-      console.log("test contributors: ", boardState.currentBoard.media);
+      // console.log("test boardState: ", boardState.currentBoard);
+      // console.log("test contributors: ", boardState.currentBoard.media);
       const files = [...boardState.currentBoard.media];
       files.forEach((el) => {
         let base64ImageString = Buffer.from(el.src, "binary").toString(
@@ -185,15 +223,36 @@ const Board = (props) => {
     };
     socket?.on("line", onDrawingEvent);
 
-    const onDrawingShapeEvent = (shapeData) => {
+    // const onDrawingShapeEvent = (shapeData) => {
+    //   console.log("Shape data response: ", shapeData);
+    //   // elementDispatch({ type: "SET_LINE", payload: shapeData.lines });
+    //   // elementDispatch({ type: "SET_RECTANGLE", payload: shapeData?.rects });
+    //   // elementDispatch({ type: "SET_ELLIPSE", payload: shapeData?.elips });
+    //   // elementDispatch({ type: "SET_POLYGONS", payload: shapeData?.polys });
+    //   // elementDispatch({ type: "SET_STAR", payload: shapeData?.stars });
+    // };
+    // socket?.on("shape", onDrawingShapeEvent);
+
+    const onDrawingRectEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
-      // elementDispatch({ type: "SET_LINE", payload: shapeData.lines });
-      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData?.rects });
-      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData?.elips });
-      elementDispatch({ type: "SET_POLYGONS", payload: shapeData?.polys });
-      elementDispatch({ type: "SET_STAR", payload: shapeData?.stars });
+      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData});
     };
-    socket?.on("shape", onDrawingShapeEvent);
+    socket?.on("receiveRect", onDrawingRectEvent);
+    const onDrawingPolyEvent = (shapeData) => {
+      console.log("Shape data response: ", shapeData);
+      elementDispatch({ type: "SET_POLYGONS", payload: shapeData});
+    };
+    socket?.on("receivePoly", onDrawingPolyEvent);
+    const onDrawingElipEvent = (shapeData) => {
+      console.log("Shape data response: ", shapeData);
+      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData});
+    };
+    socket?.on("receiveElip", onDrawingElipEvent);
+    const onDrawingStarEvent = (shapeData) => {
+      console.log("Shape data response: ", shapeData);
+      elementDispatch({ type: "SET_STAR", payload: shapeData});
+    };
+    socket?.on("receiveStar", onDrawingStarEvent);
 
     const onDrawingTextEvent = (textData) => {
       console.log("text data response: ", textData);
@@ -244,7 +303,7 @@ const Board = (props) => {
     return () => {
       // socket.disconnect();
       socket?.off("line", onDrawingEvent);
-      socket?.off("shape", onDrawingShapeEvent);
+      // socket?.off("shape", onDrawingShapeEvent);
       socket?.off("text", onDrawingTextEvent);
       socket?.off("file", onDrawingImage);
       socket?.off("note", onDrawingNoteEvent);
@@ -254,37 +313,6 @@ const Board = (props) => {
       socket?.off("handleShapeDelete");
     };
   }, [elementDispatch, socket, boardState]);
-
-  useEffect(() => {
-    console.log("I dot'n wanna: ", elementState?.rectangles);
-  //   switch (menuComponent) {
-  //     case "shaping":
-  //       socket?.emit("drawShape", {
-  //         code: boardState.currentBoard?.code,
-  //         shapes: {
-  //           rects: elementState?.rectangles,
-  //           elips: elementState?.ellipses,
-  //           polys: elementState?.polygons,
-  //           stars: elementState?.stars,
-  //         },
-  //       });
-  //       break;
-  //     case "media_upload":
-  //       socket.emit("drawFile", {
-  //         code: boardState.currentBoard?.code,
-  //         files: elementState?.files,
-  //       });
-  //       break;
-  //     case "noting":
-  //       socket.emit("drawNote", {
-  //         code: boardState.currentBoard?.code,
-  //         notes: elementState?.notes,
-  //       });
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  }, [elementState, menuComponent]);
 
   const handleCursor = (e) => {
     const container = e.currentTarget.getStage().container();
@@ -403,16 +431,16 @@ const Board = (props) => {
         // });
         break;
       case "noting":
-        // socket.emit("drawNote", {
-        //   code: boardState.currentBoard?.code,
-        //   notes: elementState.notes,
-        // });
+        socket.emit("drawNote", {
+          code: boardState.currentBoard?.code,
+          notes: elementState.notes,
+        });
         break;
       case "media_upload":
-        // socket.emit("drawFile", {
-        //   code: boardState.currentBoard?.code,
-        //   files: elementState?.files,
-        // });
+        socket.emit("drawFile", {
+          code: boardState.currentBoard?.code,
+          files: elementState?.files,
+        });
         break;
       default:
         break;
@@ -508,7 +536,6 @@ const Board = (props) => {
     }
   };
 
-  console.log("appState: ", elementState.appState);
 
   //Zooming pan by relative position (by MOUSE Wheel)
   //define scale rate of the stage on zooming
@@ -536,6 +563,13 @@ const Board = (props) => {
       };
       e.target.getStage().position(newPos);
     }
+  };
+  const key = 'updatable';
+  const openMessage = () => {
+    message.loading({ content: 'Saving...', key });
+    setTimeout(() => {
+      message.success({ content: 'Saved board!', key, duration: 2 });
+    }, 1000);
   };
 
   const handleKeyDown = async (e) => {
@@ -567,6 +601,7 @@ const Board = (props) => {
             type: "SET_CURRENT_BOARD",
             payload: response.data,
           });
+          openMessage()
           elementDispatch({ type: "RESET_STATE" });
         })
         .catch((error) => {
@@ -790,7 +825,7 @@ const Board = (props) => {
             draggable={false}
             ref={stageRef}
           >
-            <Layer ref={layerRef}>
+            <Layer ref={layerRef} >
               {/* Line using for drawing */}
               {elementState?.lines.map((line, i) => {
                 return (
@@ -808,7 +843,7 @@ const Board = (props) => {
                         let temp = nodesArray;
                         if (!nodesArray.includes(e.current))
                           temp.push(e.current);
-                        setNodes(temp);
+                        setNodes(temp); 
                         trRef.current.nodes(nodesArray);
                         trRef.current.getLayer().batchDraw();
                       }

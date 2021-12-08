@@ -83,8 +83,10 @@ h1 {
 						flex: 1;
 						align-self: center;
 						justify-self: center;
+						width: 200px;
 						img {
-							width: 200px;
+							padding: 50px;
+							width: 100%;
 							object-fit: cover;
 						}
 					}

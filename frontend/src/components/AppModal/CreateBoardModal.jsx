@@ -62,19 +62,19 @@ const CreateBoardModal = ({ socket }) => {
       });
   };
 
-  const createInitialFileBoard = async () => {
-    await BoardService.createBoard()
-      .then((response) => {
-        console.log("newBoard: ", response.board);
-        history.push({
-          pathname: `/board/${response.board._id}`,
-          state: file?.imageUrl,
-        });
-      })
-      .catch((error) => {
-        console.log("error: ", error);
-      });
-  };
+  // const createInitialFileBoard = async () => {
+  //   await BoardService.createBoard()
+  //     .then((response) => {
+  //       console.log("newBoard: ", response.board);
+  //       history.push({
+  //         pathname: `/board/${response.board._id}`,
+  //         state: file?.imageUrl,
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.log("error: ", error);
+  //     });
+  // };
 
   const showCodeModal = () => {
     setCreateBoardModal(false);

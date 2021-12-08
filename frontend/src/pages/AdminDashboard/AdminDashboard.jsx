@@ -12,6 +12,7 @@ const AdminDashboard = () => {
   let { path, url } = useRouteMatch();
   const { dispatch } = useContext(UserContext);
   const [user, setUser] = useState(null)
+  const [sideComponent, setSideComponent] = useState('')
   const [dataSource, setDataSource] = useState([])
   useEffect(() => {
     const userId = getUserId()
@@ -51,7 +52,7 @@ const AdminDashboard = () => {
   console.log('dataSOuce: ', dataSource)
   return (
     <>
-      <Sidebar sidebarItem={adminItem} admin={user?.user}/>
+      <Sidebar sidebarItem={adminItem} admin={user?.user} setSideComponent={setSideComponent}/>
       <div className="layout__content">
         <TopNav setSearchInput={setSearchInput} dataSource={dataSource} setDataSource={setDataSource}/>
         <div className="layout__content-main">

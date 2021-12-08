@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { Breadcrumb, Button, Empty, Modal, Select, message } from "antd";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
 import SpaceService from "../../../services/spaceService";
 import { SpaceContext } from "../../../context/spaceContext";
@@ -8,16 +8,20 @@ import { BoardContext } from "../../../context/boardContext";
 import BoardService from "../../../services/boardService";
 import ItemCards from "../../ItemCards/ItemCard";
 import "./styles.scss";
+import { getUserId } from "../../../lib/auth";
 const { Option } = Select;
 const SpaceResult = (props) => {
   const spaceId = props.match.params.spaceId;
+  const location = useLocation();
   const history = useHistory();
+  console.log("location space: ", location);
+  const userId = getUserId();
   // const [space, setSpace] = useState(null);
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const [boardSelectionModal, setBoardSelectionModal] = useState(false);
   const boardId = useRef(null);
-
+  const [filterBoard, setFilterBoard] = useState([]);
   const time = new Date(spaceState.space?.createdAt).toLocaleDateString(
     "en-EN",
     {
@@ -35,7 +39,7 @@ const SpaceResult = (props) => {
           spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
         })
         .catch((err) => {
-          throw new Error(err);
+          console.log('error: ', err)
         });
     };
     getSpaceInfo();
@@ -88,7 +92,6 @@ const SpaceResult = (props) => {
         })
         .catch((error) => {
           console.log("error: ", error);
-          throw new Error("The board haven't add to the space.");
         });
       setBoardSelectionModal(false);
     } catch (error) {
@@ -96,7 +99,6 @@ const SpaceResult = (props) => {
     }
   };
 
-  console.log("tai soa ko lne: ", spaceState.space.boards?.spaceId);
   const deleteSpace = async (id) => {
     console.log("is that id: ", id);
     spaceDispatch({ type: "DELETE_SPACE", payload: id });
@@ -110,6 +112,20 @@ const SpaceResult = (props) => {
         console.log("error: ", error);
       });
   };
+
+  // const filterBoard = boardState?.boards.filter((board)=> {}})
+  // console.log('filterBoard: ', filterBoard)
+  useEffect(() => {
+    spaceState.space.boards?.forEach((element) => {
+      console.log("nhung board ID: ", element._id);
+      const a = boardState.boards?.filter((board) => {
+        return board._id !== element._id;
+      });
+      console.log("test A: ", a);
+      setFilterBoard(a);
+    });
+  }, [spaceState, boardState]);
+
   return (
     <div>
       <Breadcrumb>
@@ -139,63 +155,80 @@ const SpaceResult = (props) => {
           <p>Created At: {time}</p>
           <b>Host: {spaceState.space.createdBy?.name}</b>
         </div>
-        <div className="space_actions">
-          <Button
-            onClick={(e) => {
-              setBoardSelectionModal(true);
-            }}
-          >
-            <i class="fas fa-pen"></i>
-            <span> Add new board</span>
-          </Button>
-          <Modal
-            title="Choose board"
-            style={{ textAlign: "center" }}
-            centered
-            visible={boardSelectionModal}
-            onOk={() => setBoardSelectionModal(false)}
-            onCancel={() => setBoardSelectionModal(false)}
-            zIndex={1000}
-            footer={null}
-            keyboard
-            destroyOnClose={true}
-          >
-            <form onSubmit={submitBoard}>
-              <label>Current Board: </label>{" "}
-              <Select
-                showSearch
-                style={{ width: 200 }}
-                placeholder="Select a board"
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.children
-                    .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
-                }
-                onChange={changeBoardSelection}
-              >
-                {boardState?.boards.map((board) => (
-                  <Option key={board._id} value={board.name} name={board._id}>
-                    {board.name}
-                  </Option>
-                ))}
-              </Select>
-              <br />
-              <br />
-              <Button type="primary" htmlType="submit">
-                Insert
-              </Button>
-            </form>
-          </Modal>
-          <Button onClick={() => deleteSpace(spaceId)}>
-            <i className="far fa-trash-alt"></i>
-            <span> Delete</span>
-          </Button>
-        </div>
+        {spaceState.space.createdBy?._id === userId ? (
+          <div className="space_actions">
+            <Button
+              onClick={(e) => {
+                setBoardSelectionModal(true);
+              }}
+            >
+              <i className="fas fa-pen"></i>
+              <span> Add new board</span>
+            </Button>
+            <Modal
+              title="Choose board"
+              style={{ textAlign: "center" }}
+              centered
+              visible={boardSelectionModal}
+              onOk={() => setBoardSelectionModal(false)}
+              onCancel={() => setBoardSelectionModal(false)}
+              zIndex={1000}
+              footer={null}
+              keyboard
+              destroyOnClose={true}
+            >
+              <form onSubmit={submitBoard}>
+                <label>Current Board: </label>{" "}
+                <Select
+                  showSearch
+                  style={{ width: 200 }}
+                  placeholder="Select a board"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onChange={changeBoardSelection}
+                >
+                  {filterBoard.length > 0
+                    ? filterBoard.map((board) => (
+                        <Option
+                          key={board._id}
+                          value={board.name}
+                          name={board._id}
+                        >
+                          {board.name}
+                        </Option>
+                      ))
+                    : boardState.boards?.map((board) => (
+                        <Option
+                          key={board._id}
+                          value={board.name}
+                          name={board._id}
+                        >
+                          {board.name}
+                        </Option>
+                      ))}
+                </Select>
+                <br />
+                <br />
+                <Button type="primary" htmlType="submit">
+                  Insert
+                </Button>
+              </form>
+            </Modal>
+            <Button onClick={() => deleteSpace(spaceId)}>
+              <i className="far fa-trash-alt"></i>
+              <span> Delete</span>
+            </Button>
+          </div>
+        ) : null}
       </div>
       <h3>Board list</h3>
       <div className="item_wrap">

@@ -23,6 +23,23 @@ class BoardService {
 				console.log("err: ", error);
 			});
 	}
+	
+	createThemeBoard(boardTheme) {
+		return axios
+			.post(
+				API_URL + "/theme/create",
+				{ boardTheme: boardTheme },
+				{
+					headers: { Authorization: `Bearer ${getToken()}` },
+				}
+			)
+			.then((response) => {
+				return response.data;
+			})
+			.catch((error) => {
+				console.log("err: ", error);
+			});
+	}
 
 	///FOR ADMIN GET ALL BOARD IN SYSTEM
 	getAllBoard() {
@@ -206,9 +223,11 @@ class BoardService {
 			});
 	}
 
-	leaveBoardById(){
+	leaveBoardById(boardId){
+		const a= getToken()
+		console.log('a: ', a)
 		return axios
-		.patch(API_URL + `/leave/:id`, {
+		.patch(API_URL + `/leave/${boardId}`,null, {
 			headers: { Authorization: `Bearer ${getToken()}` },
 		})
 		.then((response) => {

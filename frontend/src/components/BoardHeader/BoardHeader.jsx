@@ -104,7 +104,7 @@ const BoardHeader = (props) => {
       setText(boardState.currentBoard.name);
       setContributors(boardState.currentBoard.contributors);
     }
-  }, [boardState, contributors]);
+  }, [boardState]);
 
   const updateName = async (e) => {
     let isValid = validateInput(e);
@@ -274,8 +274,8 @@ const BoardHeader = (props) => {
           >
             {/* using map for users arr to render the user.name and user.avatar */}
             {/* if the user into room is not signin as anymous user with the avatar ? and background color random style, render a div like modal must sign up with GG or email*/}
-            {contributors &&
-              contributors.map((user, index) => {
+            {
+               boardState.currentBoard.contributors?.map((user, index) => {
                 return (
                   <Tooltip key={index} title={`${user?.name}`} placement="top">
                     <Avatar>{user.name?.charAt(0)}</Avatar>

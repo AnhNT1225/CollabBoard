@@ -12,7 +12,8 @@ const UserDashboard = (props) => {
   let { path } = useRouteMatch();
   const { state, dispatch } = useContext(UserContext);
   const [dataSource, setDataSource] = useState([]);
-
+  const [sideComponent, setSideComponent] = useState('')
+  console.log('click on side component: ', sideComponent);
   useEffect(() => {
     const userId = getUserId();
     console.log("userId: ", userId);
@@ -50,7 +51,7 @@ const UserDashboard = (props) => {
   return (
     <div>
       {/* <Layout sidebarItem={userItem}/> */}
-      <Sidebar sidebarItem={userItem} />
+      <Sidebar sidebarItem={userItem} setSideComponent={setSideComponent}/>
       <div className="layout__content">
         <TopNav
           dataSource={dataSource}
@@ -61,6 +62,7 @@ const UserDashboard = (props) => {
         />
         <div className="layout__content-main">
           <UserRoutes
+          sideComponent={sideComponent}
             path={path}
             searchInput={searchInput}
             socket={socket}

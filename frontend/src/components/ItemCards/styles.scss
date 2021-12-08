@@ -17,16 +17,16 @@
       width: 250px;
       overflow: hidden;
       text-overflow: ellipsis;
-	  font-size: 30px;
+      font-size: 30px;
       .card_title {
         color: $txt-color;
         font-size: 30px;
-		&:hover{
-			text-decoration: underline;
-		}
-		&:active{
-			color: $color-blue-active;
-		}
+        &:hover {
+          text-decoration: underline;
+        }
+        &:active {
+          color: $color-blue-active;
+        }
       }
     }
     .detail_dropdown {
@@ -37,7 +37,11 @@
   }
 }
 
-// .board_options {
-// 	margin-left: 10px;
-// 	padding: 10px;
+// .item_class {
+// 	border-radius: 15px;
+// 	background-color: transparent;
+// 	&:hover {
+// 		color: #ffffff;
+// 		background-color: $color-blue-active;
+// 	}
 // }

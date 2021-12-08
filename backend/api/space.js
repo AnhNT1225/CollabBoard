@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { permit } = require("../middleware/permissionRole");
 const spaceController = require("../controllers/SpaceController");
+const { checkSpaceName } = require("../middleware/validateDuplicated");
 //CRUD
 //route for create new board (user)
-router.post("/create", permit("user"), spaceController.createSpace);
+router.post("/create", [permit("user"), checkSpaceName], spaceController.createSpace);
 
 //router for get joined space
 router.get("/joined", permit("user"), spaceController.getJoinedSpaces);

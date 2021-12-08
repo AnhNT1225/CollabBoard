@@ -60,15 +60,6 @@
 	align-items: center;
 }
 
-.item_class {
-	border-radius: 15px;
-	background-color: transparent;
-	&:hover {
-		color: #ffffff;
-		background-color: $color-blue-active;
-	}
-}
-
 
 .recently_workspace_wrap{
 	display: flex;

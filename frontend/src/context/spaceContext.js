@@ -5,7 +5,7 @@ const initialState = {
   spaces: [],
   isFetch: false,
   hasError: false,
-  space: {}
+  space: {},
 };
 
 const spaceReducer = (state, action) => {
@@ -22,7 +22,7 @@ const spaceReducer = (state, action) => {
         isFetch: false,
         spaces: action.payload,
       };
-      case "FETCH_SPACE_SUCCESS":
+    case "FETCH_SPACE_SUCCESS":
       return {
         ...state,
         isFetch: false,
@@ -37,7 +37,7 @@ const spaceReducer = (state, action) => {
     case "CREATE_SPACE":
       return {
         ...state,
-        spaces: [...state.spaces, action.payload]
+        spaces: [...state.spaces, action.payload],
       };
     case "DELETE_SPACE":
       return {
@@ -46,15 +46,30 @@ const spaceReducer = (state, action) => {
       };
     case "UPDATE_SPACE":
       const spaceArr = [...state.spaces];
-      const spaceIndex = spaceArr.findIndex((el) => el.id === action.payload.id);
+      const spaceIndex = spaceArr.findIndex(
+        (el) => el.id === action.payload.id
+      );
       console.log("spaceIndex: ", spaceIndex);
       spaceArr.splice(spaceIndex, 1, action.payload);
       console.log("space State  after: ", spaceArr);
-      return{
+      return {
         ...state,
         spaces: [...spaceArr],
-        space: action.payload
-      }
+        space: action.payload,
+      };
+    // case "UPDATE_SPACE_MEMBER":
+    //   const currentArr = [...state.spaces];
+    //   const index = currentArr.findIndex(
+    //     (el) => el.teamId === action.payload.teamId
+    //   );
+    //   console.log("index: ", index);
+    //   currentArr.splice(index, 1, action.payload);
+    //   console.log("space State  after: ", currentArr);
+    //   return {
+    //     ...state,
+    //     spaces: [...spaceArr],
+    //     space: action.payload,
+    //   };
     // case "UPDATE_BOARD":
     // 	return {
 

@@ -96,9 +96,8 @@ io.on("connection", function (socket) {
   });
 
   const joinRoom = (boardCode, memberInfo) => {
-    console.log("room code: ", memberInfo);
-    console.log('notifyInfo: ', memberInfo)
-    console.log("code confirm: ", io.sockets.adapter.rooms.has(boardCode));
+    console.log("room code: ", boardCode);
+    // console.log("code confirm: ", io.sockets.adapter.rooms.has(boardCode));
     if (io.sockets.adapter.rooms.has(boardCode)) {
       socket.join(boardCode);
       console.log("user joined room: ", boardCode);
@@ -111,7 +110,6 @@ io.on("connection", function (socket) {
           message: `One people has name ${memberInfo.memberName} joined our board.`,
           type: memberInfo.type
         }
-
       );
     } else {
       console.log("There is no room like this key word search");
@@ -123,7 +121,7 @@ io.on("connection", function (socket) {
     if (boardCode !== null) {
     socket.join(boardCode);
     console.log("all room in create: ", io.sockets.adapter.rooms);
-    socket.emit("notification", `You have joined the room: ${boardCode}`);
+    // socket.emit("notification", `You have joined the room: ${boardCode}`);
     }
   };
 
@@ -146,6 +144,23 @@ io.on("connection", function (socket) {
   socket.on("drawShape", (data) => {
     console.log("shapeData: ", data);
     socket.in(data.code).emit("shape", data.shapes);
+  });
+
+  socket.on("drawRect", (data) => {
+    console.log("shapeData: ", data);
+    socket.in(data.code).emit("receiveRect", data.rects);
+  });
+  socket.on("drawPoly", (data) => {
+    console.log("shapeData: ", data);
+    socket.in(data.code).emit("receivePoly", data.polys);
+  });
+  socket.on("drawElip", (data) => {
+    console.log("shapeData: ", data);
+    socket.in(data.code).emit("receiveElip", data.elips);
+  });
+  socket.on("drawStar", (data) => {
+    console.log("shapeData: ", data);
+    socket.in(data.code).emit("receiveStar", data.stars);
   });
 
   socket.on("drawText", (data) => {

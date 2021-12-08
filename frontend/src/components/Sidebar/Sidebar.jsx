@@ -6,7 +6,7 @@ import { Link, useHistory} from "react-router-dom";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import TeamQuickAccess from "../TeamQuickAccess/TeamQuickAccess";
 const SideBar = (props) => {
-  const { admin } = props;
+  const { admin} = props;
   const { dispatch } = useContext(UserContext);
     const history = useHistory();
   const logout = () => {

@@ -1,3 +1,4 @@
+import { AccountBookTwoTone } from "@ant-design/icons";
 import { createContext, useReducer, useMemo } from "react";
 
 export const TeamContext = createContext();
@@ -6,7 +7,7 @@ const initialState = {
   isFetch: false,
   hasError: false,
   team: {},
-  newTeams: []
+  newTeams: [],
 };
 
 const teamReducer = (state, action) => {
@@ -52,18 +53,35 @@ const teamReducer = (state, action) => {
           (team) => team._id === action.payload._id
         ).name = action.payload.name),
       };
-
-      //remove team member from current team
+    case "UPDATE_TEAM_BOARDS":
+      const teamClone = { ...state.team };
+      teamClone.boards = action.payload.boards;
+      return {
+        ...state,
+        team: teamClone,
+      };
+    case "UPDATE_REMOVE_TEAM_SPACES":
+      const teamClone1 = { ...state.team };
+      console.log('teamClone: ', teamClone1);
+      return {
+        ...state,
+        team: (state.team.boards.find(
+          (board) => board._id === action.payload._id
+        ).spaceId = action.payload.spaceId),
+      };
+    //remove team member from current team
     case "REMOVE_TEAM_MEMBER":
       return {
         ...state,
-        team: state.team.members.filter((member) => member._id !== action.payload),
+        team: state.team.members.filter(
+          (member) => member._id !== action.payload
+        ),
       };
     case "SET_NEW_TEAM":
       return {
         ...state,
-        newTeams: action.payload
-      }
+        newTeams: action.payload,
+      };
     default:
       return state;
   }

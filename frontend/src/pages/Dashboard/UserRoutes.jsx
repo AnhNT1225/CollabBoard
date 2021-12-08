@@ -15,16 +15,16 @@ const UserRoutes = (props) => {
 	return (
 		<Switch>
 			<Route exact path={`${props.path}`}>
-				<RecentWorkspace searchInput={props.searchInput} socket={props.socket}/>
+				<RecentWorkspace searchInput={props.searchInput} socket={props.socket} />
 			</Route>
 			<Route exact path={`${props.path}/prototypes`}>
-				<Propotypes searchInput={props.searchInput} socket={props.socket}/>
+				<Propotypes searchInput={props.searchInput} socket={props.socket} sideComponent={props.sideComponent}/>
 			</Route>
 			<Route exact path={`${props.path}/spaces`}>
-				<Spaces searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
+				<Spaces searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource} sideComponent={props.sideComponent}/>
 			</Route>
 			<Route exact path={`${props.path}/teams`}>
-				<Teams searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource}/>
+				<Teams searchInput={props.searchInput} setDataSource={props.setDataSource} dataSource={props.dataSource} sideComponent={props.sideComponent}/>
 			</Route>
 			<Route exact path={`${props.path}/teams/:teamId`} component={TeamResult}/>
 			<Route path={`${props.path}/teams/:teamId/edit`} component={TeamEdit}/>

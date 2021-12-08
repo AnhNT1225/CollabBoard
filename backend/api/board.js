@@ -22,6 +22,8 @@ router.get("/owned", permit("user"),boardController.getOwnedBoards);
 //CRUD
 //route for create new board (user)
 router.post("/create", permit("user"), boardController.createBoard);
+//route for create new board (user)
+router.post("/theme/create", permit("user"), boardController.createThemeBoard);
 //route for get detail board
 router.get("/:boardId", permit("user"), boardController.getDetails);
 

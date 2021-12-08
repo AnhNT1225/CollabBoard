@@ -11,7 +11,7 @@ import SpaceService from "../../services/spaceService";
 const { TabPane } = Tabs;
 
 const Prototypes = (props) => {
-  const { searchInput, socket } = props;
+  const { searchInput, socket, sideComponent } = props;
   // const [deletedId, setDeletedId] = useState(null)
   const { boardDispatch } = useContext(BoardContext);
   const { spaceDispatch } = useContext(SpaceContext);
@@ -86,11 +86,11 @@ const Prototypes = (props) => {
         <Tabs defaultActiveKey="1" onChange={changeTab}>
           <TabPane tab="All" key="1">
             <SortTool />
-            <AllBoardTab searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists} socket={socket}/>
+            <AllBoardTab searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
           </TabPane>
           <TabPane tab="Created by me" key="2">
             <SortTool />
-            <OwnedBoardTab searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists} socket={socket}/>
+            <OwnedBoardTab searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
           </TabPane>
         </Tabs>
       </div>

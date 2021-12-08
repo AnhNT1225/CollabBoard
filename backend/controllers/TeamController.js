@@ -10,7 +10,7 @@ class TeamController {
     const { teamName } = req.body;
     const team = new Team({
       name: teamName,
-      createdBy: req.user._id,
+      createdBy: req.user,
     });
     team.members.addToSet(req.user);
     // space: space,
@@ -115,7 +115,7 @@ class TeamController {
   async getJoinedTeams(req, res) {
     await Team.find({ members: req.user._id })
       .populate("members")
-      .populate("boards")
+      .populate({ path: "boards", populate: "spaceId" })
       .populate("spaces")
       .then((result) => {
         if (!result)
@@ -189,13 +189,13 @@ class TeamController {
   }
 
   //get team info
-  async getDetails(req, res) {
+  async getTeamDetails(req, res) {
     const teamId = req.params.teamId;
     // console.log("test team Id: ", teamId);
 
     await Team.findById(teamId)
       .populate("members")
-      .populate("boards")
+      .populate({ path: "boards", populate: "spaceId" })
       .populate({ path: "spaces", populate: "createdBy" })
       .populate("createdBy")
       .then((team) => {
@@ -221,15 +221,15 @@ class TeamController {
   async addBoardToTeam(req, res) {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
-
     const { boardName } = req.body;
     console.log("boardName: ", boardName);
+    const foundTeam = await Team.findById({ _id: teamId }).lean();
     const foundBoard = await Board.findOneAndUpdate(
       {
         createdBy: req.user._id,
         name: boardName,
       },
-      { teamId: teamId },
+      { teamId: teamId, contributors: foundTeam.members },
       { new: true }
     ).lean();
     console.log("BOARD ID: ", foundBoard._id);
@@ -242,7 +242,7 @@ class TeamController {
       { new: true }
     )
       .populate("members")
-      .populate("boards")
+      .populate({ path: "boards", populate: ["spaceId", 'createdBy'] })
       .populate({ path: "spaces", populate: "createdBy" })
       .populate("createdBy")
       .then((team) => {
@@ -264,17 +264,16 @@ class TeamController {
 
   async addSpaceToTeam(req, res) {
     const teamId = req.params.id;
-    console.log("chi nhu vay ma thoi");
     console.log("teamId: ", teamId);
-
     const { spaceName } = req.body;
     console.log("spaceName: ", spaceName);
+    const foundTeam = await Team.findById({ _id: teamId }).lean();
     const foundSpace = await Space.findOneAndUpdate(
       {
         createdBy: req.user._id,
         name: spaceName,
       },
-      { teamId: teamId },
+      { teamId: teamId, members: foundTeam.members },
       { new: true }
     ).lean();
     console.log("SPACE ID: ", foundSpace._id);
@@ -286,11 +285,12 @@ class TeamController {
     )
       .lean()
       .populate("members")
-      .populate("boards")
+      .populate({path: "boards", populate: ["spaceId", 'createdBy']})
       .populate({ path: "spaces", populate: "createdBy" })
       .populate("createdBy")
       .then((team) => {
         // team.populated("spaces").spaceId.teamId = teamId;
+        console.log('LLLLLLLL team: ', team)
         return res.status(200).json({
           success: true,
           message: "Update spaces in team successful",
@@ -307,12 +307,28 @@ class TeamController {
 
   async addMemberToTeam(req, res) {
     const teamId = req.params.id;
-    console.log("teamId: ", teamId);
+    // console.log("teamId: ", teamId);
 
     const { memberEmail } = req.body;
-    console.log("memberEmail: ", memberEmail);
+    // console.log("memberEmail: ", memberEmail);
     const user = await User.findOne({ email: memberEmail }).lean();
-    console.log("USER ID: ", user._id);
+    // console.log("USER ID: ", user._id);
+    const spaceInTeam = await Space.find({teamId: teamId})
+    console.log('spaces in team: ', spaceInTeam)
+    spaceInTeam.map(async(space) => {
+      space.members.push(user._id)
+      console.log('space members: ', space.members)
+      await space.save()
+    })
+
+    const boardInTeam = await Board.find({teamId: teamId})
+    console.log('boards in team: ', boardInTeam)
+    boardInTeam.map(async(board) => {
+      board.contributors.push(user._id)
+      console.log('board members: ', board.contributors)
+      await board.save()
+    })
+    console.log('boards in team 2: ', boardInTeam)
     await Team.findByIdAndUpdate(
       { _id: teamId },
       { $addToSet: { members: user._id } },
@@ -328,6 +344,7 @@ class TeamController {
           success: true,
           message: "Update teams successful",
           data: team,
+          updateSpace: spaceInTeam
         });
       })
       .catch((error) => {
@@ -364,11 +381,28 @@ class TeamController {
       });
   }
 
-  removeMemberFromTeam(req, res) {
+  async removeMemberFromTeam(req, res) {
     const teamId = req.params.id;
     console.log("teamId: ", teamId);
     const { selectedMemberId } = req.body;
     console.log("selectedMemberId: ", selectedMemberId);
+
+    const spaceInTeam = await Space.find({teamId: teamId})
+    console.log('spaces in team: ', spaceInTeam)
+    spaceInTeam.map(async(space) => {
+      space.members.pull(selectedMemberId)
+      console.log('space members: ', space.members)
+      await space.save()
+    })
+
+    const boardInTeam = await Board.find({teamId: teamId})
+    console.log('boards in team: ', boardInTeam)
+    boardInTeam.map(async(board) => {
+      board.contributors.pull(selectedMemberId)
+      console.log('board contributors: ', board.contributors)
+      await board.save()
+    })
+
     selectedMemberId.forEach(async (memId) => {
       await Team.findByIdAndUpdate(
         { _id: teamId },

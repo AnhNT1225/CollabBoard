@@ -33,6 +33,7 @@ const boardSchema = new Schema(
       notes: [],
       lines: []
     },
+    background: { type: String, default: '#ffffff' },
     createdAt: {type: Date, default: Date.now},
     updateAt: {type: Date, default: Date.now}
   },

@@ -4,12 +4,16 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import Logo from "../Logo";
 import { BoardContext } from "../../context/boardContext";
 import BoardService from "../../services/boardService";
-import Patern1 from "../../assets/images/double-bubble-dark.png";
-import Patern2 from "../../assets/images/double-bubble-outline.png";
-import Patern3 from "../../assets/images/moroccan-flower.png";
-import Patern4 from "../../assets/images/repeated-square.png";
-import Patern5 from "../../assets/images/watercolor.png";
-import Patern6 from "../../assets/images/y-so-serious-white.png";
+import Patern1 from "../../assets/media/dark_bacground.png";
+import Patern2 from "../../assets/media/double-bubble-outline.png";
+import Patern3 from "../../assets/media/moroccan-flower.png";
+import Patern4 from "../../assets/media/repeated-square.png";
+import Patern5 from "../../assets/media/watercolor.png";
+import Patern6 from "../../assets/media/y-so-serious-white.png";
+import YellowTheme from '../../assets/media/background_yellow.png';
+import GreenTheme from '../../assets/media/background_green.png';
+import AquaTheme from '../../assets/media/background_aqua.png';
+import VioletTheme from '../../assets/media/background_violet.png';
 import { useHistory } from "react-router-dom";
 
 const ThemeModal = (props) => {
@@ -24,13 +28,36 @@ const ThemeModal = (props) => {
 
   const themes = [
     {
-      base64Src: Patern1,
-      title: "Overview",
+      image: VioletTheme,
+      value: "#e09af9",
+    },
+    {
+      image: YellowTheme,
+      value: '#f9dd99'
+    },
+    {
+      image: GreenTheme,
+      value: '#d3f99a'
+    },
+    {
+      image: AquaTheme,
+      value: '#9af3f9'
     },
   ];
 
-  const createThemeBoard = (value) => {
-    // console.log('e: ', value)
+  const createThemeBoard = async(value) => {
+    console.log('e: ', value)
+    await BoardService.createThemeBoard(value)
+    .then((response) => {
+      console.log("newBoard: ", response.board);
+      history.push({
+        pathname: `/board/${response.board._id}`,
+        state: value,
+      });
+    })
+    .catch((error) => {
+      console.log("error: ", error);
+    });
   }
   return (
     <Modal
@@ -53,71 +80,23 @@ const ThemeModal = (props) => {
                 <Col key={index} span={6}>
                   <button
                     className="theme_frame"
-                    onClick={createThemeBoard(t.base64Src)}
+                    onClick={() =>createThemeBoard(t.value)}
                   >
                     <img
                       className="theme_item"
                       // width={190}
                       // height={190}
-                      src={t.base64Src}
+                      src={t.image}
                       alt="blank_canvas_media"
                     />
                   </button>
                 </Col>
               ))}
-              {/* <Col span={6}>
-                <button
-                  className="theme_frame"
-                  onClick={(e) => console.log("e: ", e.target.value)}
-                >
-                  <img
-                    className="theme_item"
-                    // width={190}
-                    // height={190}
-                    src={Patern1}
-                    alt="blank_canvas_media"
-                  />
-                </button>
-              </Col>
-              <Col span={6}>
-                <button className="theme_frame">
-                  <img
-                    className="theme_item"
-                    // width={190}
-                    // height={190}
-                    src={Patern2}
-                    alt="blank_canvas_media"
-                  />
-                </button>
-              </Col>
-              <Col span={6}>
-                <button className="theme_frame">
-                  <img
-                    className="theme_item"
-                    // width={190}
-                    // height={190}
-                    src={Patern3}
-                    alt="blank_canvas_media"
-                  />
-                </button>
-              </Col>
-              <Col span={6}>
-                {" "}
-                <button className="theme_frame">
-                  <img
-                    className="theme_item"
-                    // width={190}
-                    // height={190}
-                    src={Patern4}
-                    alt="blank_canvas_media"
-                  />
-                </button>
-              </Col> */}
             </Row>
           </div>
         </div>
         <div style={{ textAlign: "center", marginTop: 20 }}>
-          <Button type="primary">Select</Button>
+          <Button type="primary" htmlType='submit'>Select</Button>
         </div>
       </div>
     </Modal>

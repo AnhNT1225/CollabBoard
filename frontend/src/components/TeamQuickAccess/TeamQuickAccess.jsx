@@ -22,7 +22,7 @@ const TeamQuickAccess = () => {
           // setSpace(result.data);
         })
         .catch((err) => {
-          throw new Error(err);
+          console.log('error: ', err)
         });
     } else {
       return null;

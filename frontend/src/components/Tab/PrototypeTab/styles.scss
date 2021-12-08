@@ -37,11 +37,3 @@ $color-nav-hover: rgb(24, 167, 233);
 	align-items: center;
 }
 
-.item_class {
-	border-radius: 15px;
-	background-color: transparent;
-	&:hover {
-		color: #ffffff;
-		background-color: $color-nav-hover;
-	}
-}

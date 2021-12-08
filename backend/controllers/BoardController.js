@@ -1,4 +1,6 @@
 const Board = require("../models/Board");
+const Space = require("../models/Space");
+const Team = require("../models/Team");
 const endOfDay = require("date-fns/endOfDay");
 const startOfDay = require("date-fns/startOfDay");
 const { genRandomCode } = require("../utils/genRandomCodeString");
@@ -86,7 +88,8 @@ class BoardController {
   async getJoinedBoards(req, res) {
     console.log("req: ", req.user);
     await Board.find({ contributors: req.user._id })
-      .populate("spaceId")
+    .populate("createdBy", "_id firstName lastName")
+      .populate("createdBy")
       .then((result) => {
         if (!result)
           return res.status(404).json({
@@ -218,15 +221,34 @@ class BoardController {
   async deleteBoard(req, res) {
     //Get board id through params on URL
     const boardId = req.params.id;
+    const board = await Board.findById({ _id: boardId }).lean();
+    console.log("board to delete: ", board);
+    console.log("is owned: ", board.hasOwnProperty("spaceId"));
+    if (board.hasOwnProperty("spaceId")) {
+      const spaceId = board.spaceId._id;
+      await Space.findByIdAndUpdate(
+        { _id: spaceId },
+        { $pull: { boards: boardId } },
+        { new: true }
+      );
+    }
+    const team = await Team.findOneAndUpdate(
+      { boards: boardId },
+      { $pull: { boards: boardId } },
+      { new: true }
+    )
+      .populate("members")
+      .populate({ path: "boards", populate: "spaceId" })
+      .populate({ path: "spaces", populate: "createdBy" })
+      .populate("createdBy");
+    console.log("team: ", team);
     await Board.findByIdAndDelete({ _id: boardId })
       .populate("spaceId")
-      .then((board) => {
-        // if(board.populated('spaceId') !== null){
-        //   board.spaceId.delete
-        // }
+      .then(async (board) => {
         return res.status(200).json({
           success: true,
           message: "Delete a board successful",
+          updateTeam: team,
         });
       })
       .catch((error) => {
@@ -284,6 +306,45 @@ class BoardController {
     if (boardName) {
       board.name = boardName;
     }
+    board.contributors.addToSet(req.user);
+    // board.storage = { elements: null, medias: null };
+    // board.markModified("storage");
+    // space: space,
+    // contributors: contributors,
+
+    //This populates the author id with actual author information!
+
+    board
+      .save()
+      .then((data) => {
+        console.log("Board saved successfully!");
+        return res.status(201).json({
+          success: true,
+          message: `New boards is created successfully`,
+          board: data,
+        });
+      })
+      .catch((err) => {
+        console.log("Error: ", err);
+        return res.status(400).json({
+          success: false,
+          message: err,
+        });
+      });
+  }
+
+  async createThemeBoard(req, res) {
+    // const { boardCode } = req.body;
+    const boardCode = await genRandomCode();
+    const { boardTheme } = req.body;
+    const bindata = Buffer.from(BLANK_BOARD.split(",")[1], "base64");
+
+    const board = new Board({
+      createdBy: req.user,
+      code: boardCode,
+      imageURL: bindata,
+      background: boardTheme,
+    });
     board.contributors.addToSet(req.user);
     // board.storage = { elements: null, medias: null };
     // board.markModified("storage");

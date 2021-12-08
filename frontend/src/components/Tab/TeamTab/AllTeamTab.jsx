@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {  useEffect, useContext } from "react";
 import { Table, Popconfirm, Space, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link, useRouteMatch } from "react-router-dom";
@@ -8,7 +8,7 @@ import "./styles.scss";
 
 const AllTeamTab = (props) => {
   const { teamState, teamDispatch } = useContext(TeamContext);
-  const { searchInput, setDataSource, dataSource } = props;
+  const { searchInput, setDataSource, dataSource, sideComponent } = props;
   const { path, url } = useRouteMatch();
   console.log("team all path: ", path);
   useEffect(() => {
@@ -32,7 +32,11 @@ const AllTeamTab = (props) => {
       dataIndex: ["_id", "name"],
       key: "_id",
       render: (unknown, team) => {
-        return <Link to={`${url}/${team._id}`}>{team.name}</Link>;
+        const newTo = { 
+          pathname: `${url}/${team._id}`, 
+          param1: sideComponent
+        };
+        return <Link to={newTo}>{team.name}</Link>;
       },
     },
     {

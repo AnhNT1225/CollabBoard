@@ -29,11 +29,12 @@ const JoinRoomModal = (props) => {
           //   receiver: result.data.createdBy.id,
           type: 1,
         };
-        await socket?.emit("join-room", result.data.code, memberInfo);
         await boardDispatch({
           type: "SET_CURRENT_BOARD",
           payload: result.data,
         });
+        await socket?.emit("join-room", result.data.code, memberInfo);
+
 
         // message.success(`You have joined the room: ${result.data.code}`)
         history.push(`/board/${result.data._id}`);

@@ -8,7 +8,14 @@ const SideBarItem = (props) => {
     <>
       {props.sidebarItem.map((item, index) => {
         return (
-          <Link key={item.index} to={item.link}>
+          <Link
+            key={index}
+            to={item.link}
+            onClick={() => {
+              
+              props.setSideComponent(item.title);
+            }}
+          >
             <div className="sidebar__item">
               <div className={`sidebar__item-inner `} tabIndex={0}>
                 <i className={item.icon}></i>

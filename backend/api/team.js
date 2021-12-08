@@ -18,7 +18,7 @@ router.get("/top5", permit("admin"), teamController.getMaxBoardsTeams);
 router.get("/joined", permit("user"), teamController.getJoinedTeams);
 
 //route for get detail team
-router.get("/:teamId", permit("user"), teamController.getDetails);
+router.get("/:teamId", permit("user"), teamController.getTeamDetails);
 
 // //router for add selected board to Team
 // router.patch("/update/:id", permit('user'), teamController.addBoardToTeam);

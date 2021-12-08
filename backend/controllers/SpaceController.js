@@ -11,6 +11,7 @@ class SpaceController {
       name: spaceName,
       createdBy: req.user,
     });
+    space.members.addToSet(req.user);
     space
       .save()
       .then((data) => {
@@ -33,7 +34,6 @@ class SpaceController {
   async getJoinedSpaces(req, res) {
     await Space.find({ members: req.user._id })
       .populate("createdBy", "_id name")
-      .populate("spaces")
       .then((result) => {
         if (!result)
           return res.status(404).json({
@@ -83,7 +83,7 @@ class SpaceController {
     const spaceId = req.params.id;
     console.log("spaceId: ", spaceId);
     const { boardId } = req.body;
-    const updateBoard = await Board.findByIdAndUpdate(
+    await Board.findByIdAndUpdate(
       { _id: boardId },
       { spaceId: spaceId },
       { new: true }
@@ -91,10 +91,11 @@ class SpaceController {
     // console.log('today: ', updateBoard._id)
     await Space.findByIdAndUpdate(
       { _id: spaceId },
-      { $addToSet: { boards: boardId } },
+      { $addToSet: { boards: boardId }, updatedAt: new Date(Date.now()).toISOString() },
       { new: true }
     )
       .populate({ path: "boards", populate: "spaceId" })
+      .populate('createdBy')
       .then((space) => {
         // space.populated("boards").boardId.spaceId = spaceId;
 
@@ -117,22 +118,23 @@ class SpaceController {
     const spaceId = req.params.id;
     console.log("spaceId: ", spaceId);
     const { boardId } = req.body;
-    await Board.findByIdAndUpdate(
+    const updateBoard = await Board.findByIdAndUpdate(
       { _id: boardId },
       { spaceId: null },
       { new: true }
     );
     await Space.findByIdAndUpdate(
       { _id: spaceId },
-      { $pull: { boards: boardId } },
+      { $pull: { boards: boardId }, updatedAt: new Date(Date.now()).toISOString(), },
       { new: true }
     )
-      .populate("boards")
+    .populate({ path: "boards", populate: "spaceId" })
       .then((space) => {
         return res.status(200).json({
           success: true,
           message: "Remove the board from spaces successful",
           data: space,
+          updatedBoard: updateBoard
         });
       })
       .catch((error) => {
@@ -197,7 +199,7 @@ class SpaceController {
   async setTeamForSpace(req, res) {
     const spaceId = req.params.id;
     const { teamId } = req.body;
-    Space.findByIdAndUpdate({ _id: spaceId }, { teamId: teamId }, { new: true })
+    Space.findByIdAndUpdate({ _id: spaceId }, { teamId: teamId, updatedAt: new Date(Date.now()).toISOString(), }, { new: true })
       .then((space) => {
         return res.status(200).json({
           success: true,
@@ -230,7 +232,6 @@ class SpaceController {
 
     if (name && team && initialTeamId === undefined) {
       //Find the team has name === new modified name, add spaceId to that team
-      console.log("nhay vao undefined");
       // await Space.findByIdAndUpdate(
       //   { _id: team.id },
       //   { $addToSet: { spaces: spaceId } },
@@ -244,6 +245,7 @@ class SpaceController {
       newUpdate = {
         name: name,
         teamId: team.id,
+        updatedAt: new Date(Date.now()).toISOString(),
       };
     } else if (name && team && initialTeamId !== undefined) {
       console.log("nhay vao teamID");
@@ -261,11 +263,13 @@ class SpaceController {
       newUpdate = {
         name: name,
         teamId: teamB._id,
+        updatedAt: new Date(Date.now()).toISOString(),
       };
     } else {
       console.log("ngon");
       newUpdate = {
         name: name,
+        updatedAt: new Date(Date.now()).toISOString(),
       };
     }
 

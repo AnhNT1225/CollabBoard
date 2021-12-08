@@ -8,10 +8,10 @@ import SpaceService from "../../services/spaceService";
 import { SpaceContext } from "../../context/spaceContext";
 
 const Spaces = (props) => {
-  const {searchInput, setDataSource, dataSource} = props
+  const {searchInput, setDataSource, dataSource, sideComponent} = props
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const { spaceDispatch } = useContext(SpaceContext);
-
+  const [sortType, setSortType] = useState('')
 
   const createNewSpace = async (form) => {
     // e.preventDefault();
@@ -24,6 +24,7 @@ const Spaces = (props) => {
       })
       .catch((error) => {
         console.log("error: ", error);
+        message.error("The space name has been used before!");
       });
     // await setSpaceName(null);
     setCreateSpaceModal(false);
@@ -91,8 +92,8 @@ const Spaces = (props) => {
         </Modal>
       </div>
       <div className="category_card">
-        <SortTool />
-        <AllSpaceTab searchInput={searchInput} setDataSource={setDataSource} dataSource={dataSource}/>
+        <SortTool setSortType={setSortType}/>
+        <AllSpaceTab sortType={sortType} searchInput={searchInput} setDataSource={setDataSource} dataSource={dataSource} sideComponent={sideComponent}/>
       </div>
     </div>
   );
