@@ -75,6 +75,7 @@ const ItemOptions = (props) => {
               type: "UPDATE_SPACE",
               payload: response.data,
             });
+            window.location.reload()
             // teamDispatch({type: 'UPDATE_REMOVE_TEAM_SPACES', payload: response.updatedBoard})
           })
           .catch((error) => {

@@ -35,6 +35,7 @@ const Register = () => {
       .then((userInfo) => {
         history.push("/dashboard");
         console.log("returned data: ", userInfo);
+        message.success('Create account successfully!')
       })
       .catch((error) => {
         console.log("error: ", error);

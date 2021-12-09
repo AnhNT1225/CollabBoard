@@ -26,8 +26,8 @@ const { TabPane } = Tabs;
 const TeamResult = (props) => {
   const teamId = props.match.params.teamId;
   const sideComponent = useLocation();
-  console.log("teamId handler pass Link: ", teamId);
-  console.log("param1 handler pass Link: ", sideComponent.param1);
+  // console.log("teamId handler pass Link: ", teamId);
+  // console.log("param1 handler pass Link: ", sideComponent.param1);
   const userId = getUserId();
   // const [team, setTeam] = useState(null);
   const { boardDispatch } = useContext(BoardContext);
@@ -143,7 +143,7 @@ const TeamResult = (props) => {
     // emailRef.current = ''
   };
 
-  const deleteTeam = async() => {
+  const deleteTeam = async () => {
     // console.log(e);
     // console.log("is that id: ", id);
     teamDispatch({ type: "DELETE_TEAM", payload: teamId });
@@ -186,7 +186,7 @@ const TeamResult = (props) => {
       <div className="team_result_wrap">
         <div className="team_info">
           <h1>Team : {teamState.team?.name}</h1>
-          <span>Total Members: {teamState.team.members?.length}</span>
+          <span>Total Members: {teamState.team?.members?.length}</span>
           <p>Created At: {time}</p>
           <b>Host: {teamState.team.createdBy?.name}</b>
         </div>
@@ -407,7 +407,6 @@ const TeamResult = (props) => {
             </thead>
             <tbody>
               {teamState.team.spaces?.map((space, index) => {
-                console.log('spaces here: ', space)
                 const newTo = {
                   pathname: `/dashboard/spaces/${space._id}`,
                   paramSpace: sideComponent.param1,
@@ -426,6 +425,11 @@ const TeamResult = (props) => {
                         hour: "2-digit",
                         minute: "2-digit",
                         // second: '2-digit',
+                      })}  {" "}
+                      {new Date(space.updatedAt).toLocaleDateString("en-EN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
                       })}
                     </td>
                   </tr>

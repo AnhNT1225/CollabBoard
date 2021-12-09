@@ -13,14 +13,9 @@ const catchError = (err, res) => {
 };
 
 const authenticateToken = (req, res, next) => {
-	// console.log(req);
 	const authHeader = req.headers.authorization;
-	// console.log("authHeader: ", authHeader);
 	const token = authHeader && authHeader.split(" ")[1];
-	console.log('authHeader: ', authHeader);
-	console.log('token: ', token)
 	if (!token) {
-
 		return res.status(403).json({ message: "No token provided! Please login" });
 	}
 

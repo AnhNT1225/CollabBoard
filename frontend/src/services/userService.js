@@ -43,11 +43,12 @@ class UserService {
     return response.data;
   }
 
-  async editUserInfo(formData) {
-    const response = await axios.patch(API_URL + "/edit", formData, {
-      headers: {
+  async editUserInfo(userData) {
+    console.log('userData: ', userData)
+    const response = await axios.patch(API_URL + "/edit", userData, {
+      headers: {  
         Authorization: `Bearer ${getToken()}`,
-        "Content-type": "multipart/form-data",
+        // "Content-type": "multipart/form-data",
       },
     });
     return response.data;

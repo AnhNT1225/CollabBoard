@@ -5,9 +5,10 @@ import "./styles.scss";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import { BoardContext } from "../../context/boardContext";
 import {SpaceContext} from '../../context/spaceContext';
+import {TeamContext} from '../../context/teamContext';
 import BoardService from "../../services/boardService";
 import SpaceService from "../../services/spaceService";
-import TeamService from "../../services/spaceService";
+import TeamService from "../../services/teamService";
 import { getUserId } from "../../lib/auth";
 import UserService from "../../services/userService";
 import BackgroundImage from '../../assets/images/cute_background.jpg'
@@ -18,6 +19,7 @@ const OwnerProfile = () => {
   const { state, dispatch } = useContext(UserContext);
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
+  const { teamState, teamDispatch } = useContext(TeamContext);
   useEffect(() => {
     UserService.getUserById(userId)
       .then((response) => {
@@ -33,7 +35,6 @@ const OwnerProfile = () => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
     BoardService.getOwnedBoard()
       .then(async (response) => {
-        console.log("response at board: ", response.data);
         await boardDispatch({
           type: "FETCH_BOARDS_SUCCESS",
           payload: response.data,
@@ -54,7 +55,6 @@ const OwnerProfile = () => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
     SpaceService.getOwnedSpaces()
       .then(async (response) => {
-        console.log("response at space: ", response.data);
         await spaceDispatch({
           type: "FETCH_SPACES_SUCCESS",
           payload: response.data,
@@ -70,6 +70,17 @@ const OwnerProfile = () => {
       spaceDispatch({ type: "FETCH_DATA_FAILURE" });
     };
   }, [spaceDispatch]);
+
+  useEffect(() => {
+    teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
+    TeamService.getJoinedTeam()
+      .then((result) => {
+        teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: result.data });
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+  }, []);
 
   const history = useHistory();
   const backToDashboard = () => {
@@ -160,7 +171,7 @@ const OwnerProfile = () => {
         <div className="user_all_stats">
           <p className="stats_title">Current Teams</p>
           <div className="stats_show">
-            <b className="stats_title">{state?.newUsers.length}</b>
+            <b className="stats_title">{teamState?.teams.length}</b>
           </div>
         </div>
       </div>

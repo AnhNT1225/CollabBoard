@@ -7,7 +7,7 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true, trim: true },
     avatar: { type: String, default: null },
-    boards: [{ type: Schema.Types.ObjectId, ref: "Board" }],
+    // boards: [{ type: Schema.Types.ObjectId, ref: "Board" }],
     DoB: { type: Date, default: null },
     gender: { type: String, enum: ["Male", "Female", "Undefined"], default: "Undefined" },
     position: {type: String, default: null},

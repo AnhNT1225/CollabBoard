@@ -111,6 +111,7 @@ const TeamManagement = (props) => {
         dataSource={dataSource}
         onChange={handleChange}
         rowKey='_id'
+        pagination={{ pageSize: 5 }}
       />
     </div>
   );

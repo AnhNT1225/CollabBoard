@@ -194,6 +194,7 @@ const AccountManagement = (props) => {
         };
 
         return (
+          
           <Space size="large">
             <Popconfirm
               title="Are you sure to delete this task?"
@@ -235,17 +236,18 @@ const AccountManagement = (props) => {
       </div>
       <h2>Total user: {state?.users.length} </h2>
       <Table
-        rowSelection={{
-          type: "checkbox",
-          onChange: (selectedRowKeys, selectedRows) => {
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-            setIsOpen(!isOpen)
-          },
-        }}
+        // rowSelection={{
+        //   type: "checkbox",
+        //   onChange: (selectedRowKeys, selectedRows) => {
+        //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        //     setIsOpen(!isOpen)
+        //   },
+        // }}
         rowKey="_id"
         columns={columns}
         dataSource={dataSource}
-        onChange={handleChange}
+        onChange={handleChange} 
+        pagination={{ pageSize: 5 }}
       />
     </>
   );

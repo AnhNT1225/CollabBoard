@@ -5,7 +5,7 @@ import { BoardContext } from "../../../context/boardContext";
 import {SpaceContext} from '../../../context/spaceContext';
 import BoardService from "../../../services/boardService";
 const OwnedBoardTab = (props) => {
-  const { searchInput, getOwnedItems, getSpaceLists, socket } = props;
+  const { searchInput, sortType, getSpaceLists, socket } = props;
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
   const [itemNumber, setItemNumber] = useState({ minValue: 0, maxValue: 4 });
@@ -24,6 +24,26 @@ const OwnedBoardTab = (props) => {
   //     });
     
   // }, [boardDispatch]);
+
+  if (sortType === "date_created") {
+    const increase = boardState?.boards
+      .filter((board) => {
+        return new Date(board.createdAt) && new Date(board.updatedAt);
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+     console.log("increase: ", increase);
+  } else if (sortType === "date_updated") {
+    const decrease = boardState?.boards
+      .filter((board) => {
+        return new Date(board.createdAt) && new Date(board.updatedAt);
+      })
+      .sort(function (a, b) {
+        return b - a;
+      });
+    console.log("decrease: ", decrease);
+  }
 
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });

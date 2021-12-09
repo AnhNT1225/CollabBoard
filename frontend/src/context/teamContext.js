@@ -1,4 +1,3 @@
-import { AccountBookTwoTone } from "@ant-design/icons";
 import { createContext, useReducer, useMemo } from "react";
 
 export const TeamContext = createContext();
@@ -8,6 +7,7 @@ const initialState = {
   hasError: false,
   team: {},
   newTeams: [],
+  topTeams: [],
 };
 
 const teamReducer = (state, action) => {
@@ -36,6 +36,12 @@ const teamReducer = (state, action) => {
         hasError: true,
         isFetch: false,
       };
+    case "SET_TOP_TEAM":
+      return {
+        ...state,
+        isFetch: false,
+        topTeams: action.payload,
+      };
     case "CREATE_TEAM":
       return {
         ...state,
@@ -61,8 +67,8 @@ const teamReducer = (state, action) => {
         team: teamClone,
       };
     case "UPDATE_REMOVE_TEAM_SPACES":
-      const teamClone1 = { ...state.team };
-      console.log('teamClone: ', teamClone1);
+      // const teamClone1 = { ...state.team };
+      // console.log('teamClone: ', teamClone1);
       return {
         ...state,
         team: (state.team.boards.find(

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Input, Button, Space, Select, Form } from "antd";
+import { Input, Button, Space, Select, message } from "antd";
 import TeamService from "../../../services/teamService";
 import SpaceService from "../../../services/spaceService";
 import { SpaceContext } from "../../../context/spaceContext";
@@ -23,7 +23,7 @@ const SpaceEdit = (props) => {
         teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: result.data });
       })
       .catch((err) => {
-        throw new Error(err);
+        console.log('err: ', err)
       });
   }, [teamDispatch]);
 
@@ -46,7 +46,7 @@ const SpaceEdit = (props) => {
         spaceDispatch({ type: "FETCH_SPACE_SUCCESS", payload: result.data });
       })
       .catch((err) => {
-        throw new Error(err);
+        console.log('err: ', err)
       });
     // };
     // getSpaceInfo();
@@ -69,6 +69,7 @@ const SpaceEdit = (props) => {
       await SpaceService.updateSpaceInfo(spaceId, form)
         .then((result) => {
           console.log("result of updated space name and TEAM spaces: ", result);
+          message.success('Your space information has been updated')
           spaceDispatch({ type: "UPDATE_SPACE", payload: result.data });
         })
         .catch((err) => {

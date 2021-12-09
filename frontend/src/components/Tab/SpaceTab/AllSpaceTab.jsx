@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import SpaceService from "../../../services/spaceService";
 import { message, Popconfirm, Space, Table, Tag } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -11,6 +11,7 @@ const AllSpaceTab = (props) => {
   const { searchInput, setDataSource, dataSource, sideComponent, sortType } =
     props;
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
+  // const [source, setSource] = useState('')
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
     SpaceService.getJoinedSpaces()
@@ -24,29 +25,29 @@ const AllSpaceTab = (props) => {
       });
   }, []);
 
-  if (searchInput === "" ) {
+  if (searchInput === "") {
     setDataSource(spaceState?.spaces);
   }
 
-  // if (sortType === "Date created") {
-  //   const increase = spaceState?.spaces
-  //     .filter((space) => {
-  //       return space.createdAt && space.updatedAt;
-  //     })
-  //     .sort(function (a, b) {
-  //       return new Date(a) - new Date(b);
-  //     });
-	//   console.log('increase: ', increase)
-  // } else if (sortType === "Date updated") {
-  //   const decrease = spaceState?.spaces
-  //     .filter((space) => {
-  //       return space.createdAt && space.updatedAt;
-  //     })
-  //     .sort(function (a, b) {
-  //       return new Date(b) - new Date(a);
-  //     });
-	//   console.log('decrease: ', decrease)
-  // }
+  if (sortType === "date_created") {
+    const increase = spaceState?.spaces
+      .filter((space) => {
+        return new Date(space.createdAt) && new Date(space.updatedAt);
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+     console.log("increase: ", increase);
+  } else if (sortType === "date_updated") {
+    const decrease = spaceState?.spaces
+      .filter((space) => {
+        return new Date(space.createdAt) && new Date(space.updatedAt);
+      })
+      .sort(function (a, b) {
+        return b - a;
+      });
+    console.log("decrease: ", decrease);
+  }
   const columns = [
     {
       title: "Name",
@@ -131,7 +132,7 @@ const AllSpaceTab = (props) => {
 
   return (
     <>
-      <Table
+      {dataSource && <Table
         // components={components}
         // rowClassName={() => "editable-row"}
         bordered
@@ -140,7 +141,7 @@ const AllSpaceTab = (props) => {
         pagination={{ pageSize: 8 }}
         scroll={{ y: 240 }}
         rowKey="_id"
-      />
+      />}
     </>
   );
 };

@@ -41,6 +41,7 @@ const BoardHeader = (props) => {
     boardState,
     boardDispatch,
     socket,
+    setIsChatOpen
   } = props;
   // const { boardDispatch } = useContext(BoardContext);
   const { elementDispatch } = useContext(ElementContext);
@@ -51,7 +52,7 @@ const BoardHeader = (props) => {
     {
       type: 1,
       memberName: "Tuan Anh",
-      message: `One people has name Tuan joined our board.`,
+      message: `You has joined the board.`,
     },
   ]);
   const [isOpenNotify, setIsOpenNotify] = useState(false);
@@ -146,6 +147,7 @@ const BoardHeader = (props) => {
         );
         break;
       case "2":
+        setIsChatOpen(true)
         break;
       case "3":
         await BoardService.leaveBoardById(boardId)
@@ -169,28 +171,41 @@ const BoardHeader = (props) => {
   //Menu component ant design for DropDown Menu
 
   const menu1 = (
-    <Menu style={{ borderRadius: 10}} onClick={handleSettingMenu}>
-      <Menu.Item key="1"><i className="fas fa-download"></i>Export to image</Menu.Item>
-      <Menu.Item key="2"><i className="far fa-comment-alt"></i>View comment</Menu.Item>
-      <Menu.Item key="3"><i className="fas fa-sign-out-alt"></i>Leave room</Menu.Item>
+    <Menu style={{ borderRadius: 10 }} onClick={handleSettingMenu}>
+      <Menu.Item key="1">
+        <i className="fas fa-download"></i>Export to image
+      </Menu.Item>
+      <Menu.Item key="2">
+        <i className="far fa-comment-alt"></i>View comment
+      </Menu.Item>
+      <Menu.Item key="3">
+        <i className="fas fa-sign-out-alt"></i>Leave room
+      </Menu.Item>
     </Menu>
   );
 
   const menu = (
     <div
       className="notification_box"
-      style={{ inlineSize: 200, wordWrap: "break-word", background: 'white', borderRadius: 10 }}
+      style={{
+        inlineSize: 200,
+        wordWrap: "break-word",
+        background: "white",
+        borderRadius: 10,
+      }}
     >
       {notifications.map((n, i) => (
-        <div key={i}>
-          <div>
+        <div key={i} className='notify_item'>
+          <div className="notify_mess">
             <p>{n.message}</p>
           </div>
         </div>
       ))}
+      <div className='clear_btn'>
       <button className="checkBtn" onClick={() => setNotifications([])}>
-        Mark as read
+        <span style={{ color: "white", fontWeight:'bold' }}>Mark as read</span>
       </button>
+      </div>
     </div>
   );
 
@@ -274,14 +289,13 @@ const BoardHeader = (props) => {
           >
             {/* using map for users arr to render the user.name and user.avatar */}
             {/* if the user into room is not signin as anymous user with the avatar ? and background color random style, render a div like modal must sign up with GG or email*/}
-            {
-               boardState.currentBoard.contributors?.map((user, index) => {
-                return (
-                  <Tooltip key={index} title={`${user?.name}`} placement="top">
-                    <Avatar>{user.name?.charAt(0)}</Avatar>
-                  </Tooltip>
-                );
-              })}
+            {boardState.currentBoard.contributors?.map((user, index) => {
+              return (
+                <Tooltip key={index} title={`${user?.name}`} placement="top">
+                  <Avatar>{user.name?.charAt(0)}</Avatar>
+                </Tooltip>
+              );
+            })}
           </Avatar.Group>
           <Tooltip className="setting_element" placement="bottom" title="Share">
             <Popover

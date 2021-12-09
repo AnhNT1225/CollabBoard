@@ -89,7 +89,7 @@ class BoardController {
     console.log("req: ", req.user);
     await Board.find({ contributors: req.user._id })
     .populate("createdBy", "_id firstName lastName")
-      .populate("createdBy")
+    .populate("spaceId")
       .then((result) => {
         if (!result)
           return res.status(404).json({

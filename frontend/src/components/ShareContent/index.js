@@ -22,10 +22,10 @@ const ShareContent = (props) => {
 		 message.success({
 			content: 'Copied the board code to clipboard',
 			className: 'custom-class',
-			style: {
-			  marginTop: '20vh',
-			  marginLeft: "50vw"
-			},
+			// style: {
+			//   marginTop: '20vh',
+			//   marginLeft: "50vw"
+			// },
 		  });
 	}
 

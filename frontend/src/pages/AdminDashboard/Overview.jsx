@@ -1,22 +1,46 @@
-import React, {useEffect, useContext} from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import UserService from "../../services/userService";
 import { UserContext } from "../../context/userContext";
 import TeamService from "../../services/teamService";
 import { TeamContext } from "../../context/teamContext";
 import BoardService from "../../services/boardService";
-import {BoardContext} from '../../context/boardContext'
+import { BoardContext } from "../../context/boardContext";
 import "./styles.scss";
 const Overview = () => {
   const { state, dispatch } = useContext(UserContext);
   const { teamState, teamDispatch } = useContext(TeamContext);
   const { boardState, boardDispatch } = useContext(BoardContext);
+  const [topTeam, setTopTeam] = useState([]);
+  useEffect(() => {
+    teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
+    TeamService.getAllTeams()
+      .then((response) => {
+        console.log("all team: ", response.data);
+        teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: response.data });
+        // console.log("user response data: ", response.data);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const filterTeam = teamState.teams.filter((team) => {
+      // console.log('team chick : ', team)
+      return team.boards.length > 0 && team.members.length>0})
+        .sort(function (a, b) {
+          return b - a;
+        }).slice(0, 5);
+    setTopTeam(filterTeam)
+    console.log("filterTeam: ", filterTeam);
+  }, [teamState.teams]);
   useEffect(() => {
     teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
     TeamService.getTopTeams()
       .then((response) => {
         console.log("top team: ", response.data);
-        teamDispatch({ type: "FETCH_TEAMS_SUCCESS", payload: response.data });
+        teamDispatch({ type: "SET_TOP_TEAM", payload: response.data });
         // console.log("user response data: ", response.data);
       })
       .catch((error) => {
@@ -60,7 +84,7 @@ const Overview = () => {
         console.log("error: ", error);
       });
   }, []);
-  
+
   useEffect(() => {
     TeamService.getNewTeams()
       .then((response) => {
@@ -118,14 +142,8 @@ const Overview = () => {
       {
         label: "New team percentage",
         data: [teamState?.newTeams.length, teamState?.teams.length],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-        ],
+        backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)"],
+        borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
         borderWidth: 1,
       },
     ],
@@ -179,13 +197,13 @@ const Overview = () => {
             New board today: <b>{boardState?.newBoards.length}</b>
           </p>
           <div>
-          <Doughnut
-            className="chart"
-            data={boardData}
-            // width={300}
-            // height={200}
-            options={{ maintainAspectRatio: false }}
-          />
+            <Doughnut
+              className="chart"
+              data={boardData}
+              // width={300}
+              // height={200}
+              options={{ maintainAspectRatio: false }}
+            />
           </div>
         </div>
         <div className="recently_stats">
@@ -193,40 +211,40 @@ const Overview = () => {
             New team today: <b>{teamState?.newTeams.length}</b>
           </p>
           <div>
-          <Doughnut
-            className="chart"
-            data={teamData}
-            options={{ maintainAspectRatio: false }}
-          />
+            <Doughnut
+              className="chart"
+              data={teamData}
+              options={{ maintainAspectRatio: false }}
+            />
           </div>
         </div>
       </div>
       <div className="recently_board_chart">
         <div>
-            <h5>Top 5 teams own the most boards</h5>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Members</th>
-                  <th scope="col">Boards</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teamState?.teams.map((team, index) => {
-                  return (
-                    <tr>
-                      <th scope="row">{index+ 1}</th>
-                      <td>{team.name}</td>
-                      <td>{team.members.length}</td>
-                      <td>{team.boards.length}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <h5>Top 5 teams own the most boards</h5>
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Members</th>
+                <th scope="col">Boards</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topTeam.map((team, index) => {
+                return (
+                  <tr>
+                    <th scope="row">{index + 1}</th>
+                    <td>{team.name}</td>
+                    <td>{team.members.length}</td>
+                    <td>{team.boards.length}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

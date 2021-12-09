@@ -10,7 +10,7 @@ const AllTeamTab = (props) => {
   const { teamState, teamDispatch } = useContext(TeamContext);
   const { searchInput, setDataSource, dataSource, sideComponent } = props;
   const { path, url } = useRouteMatch();
-  console.log("team all path: ", path);
+  // console.log("team all path: ", path);
   useEffect(() => {
     teamDispatch({ type: "FETCH_TEAMS_REQUEST" });
     TeamService.getJoinedTeam()
@@ -56,7 +56,7 @@ const AllTeamTab = (props) => {
       dataIndex: "_id",
       key: "_id",
       render: (id) => {
-        console.log("team id: ", id);
+        // console.log("team id: ", id);
         const confirmDelete = async (e) => {
           console.log(e);
           console.log("is that id: ", id);

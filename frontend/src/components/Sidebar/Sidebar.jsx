@@ -13,10 +13,10 @@ const SideBar = (props) => {
     dispatch({ type: ACTIONS.LOGOUT });
     history.replace("/");
   };
-  console.log('admin side: ', admin)
+  // console.log('admin side: ', admin)
   const menu = (
     <Menu className="dropdown_menu">
-      <Menu.Item key="0" className="dropdown_item">
+      {/* <Menu.Item key="0" className="dropdown_item">
         <Link to={`/user/profiles`}>
           <i className="fas fa-user-edit"></i>
           My profile
@@ -27,8 +27,8 @@ const SideBar = (props) => {
           <i className="fa fa-cog" aria-hidden="true"></i>
           Settings
         </Link>
-      </Menu.Item>
-      <Menu.Divider />
+      </Menu.Item> */}
+      {/* <Menu.Divider /> */}
       <Menu.Item key="2" className="dropdown_item" onClick={logout}>
         <i className="fas fa-sign-out-alt">Sign out</i>
       </Menu.Item>

@@ -24,7 +24,7 @@ const ItemCards = ({ board, index, spaces, socket, sideComponent }) => {
     spaceId.current = e.name;
     spaceVal.current = value;
   }
-
+  console.log('test board: ', board)
   const submitStorePositiion = async (e) => {
     try {
       e.preventDefault();
@@ -45,6 +45,7 @@ const ItemCards = ({ board, index, spaces, socket, sideComponent }) => {
         .then((result) => {
           console.log("result 2: ", result.data);
           message.success(`Add board successfully into space named ${result.data.name}!`);
+          window.location.reload()
           // teamDispatch({type: 'UPDATE_TEAM_BOARDS', payload: result.data})
         })
         .catch((error) => {
@@ -96,7 +97,7 @@ const ItemCards = ({ board, index, spaces, socket, sideComponent }) => {
           </div>
           <Row>
             <Col span={12}>
-              {board.spaceId?._id ? (
+              {board.spaceId?._id  ? (
                 <Link to={`/dashboard/spaces/${board.spaceId?._id}`}>
                   {board.spaceId?.name}
                 </Link>

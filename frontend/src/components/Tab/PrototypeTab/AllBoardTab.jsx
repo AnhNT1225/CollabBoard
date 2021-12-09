@@ -7,11 +7,11 @@ import BoardService from "../../../services/boardService";
 import "./styles.scss";
 // import BoardService from "../../../../services/boardService";
 const AllBoardTab = (props) => {
-  const { searchInput, getJoinedItems, getSpaceLists, socket } = props;
+  const { searchInput, getSpaceLists, socket, sortType} = props;
   const { boardState, boardDispatch } = useContext(BoardContext);
   const { spaceState, spaceDispatch } = useContext(SpaceContext);
 
-  const [itemNumber, setItemNumber] = useState({ minValue: 0, maxValue: 4 });
+  const [itemNumber, setItemNumber] = useState({ minValue: 0, maxValue: 12 });
   // useEffect(() => {
   //   boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
   //   BoardService.getJoinedBoard()
@@ -26,13 +26,34 @@ const AllBoardTab = (props) => {
   //       console.log("error: ", error);
   //     });
   // }, [boardDispatch]);
+  if (sortType === "date_created") {
+    const increase = boardState?.boards
+      .filter((board) => {
+        return new Date(board.createdAt);
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+      // boardDispatch({type: 'FETCH_BOARDS_SUCCESS', payload: increase})
+     console.log("increase: ", increase);
+  } else if (sortType === "date_updated") {
+    const decrease = boardState?.boards
+      .filter((board) => {
+        return new Date(board.updatedAt);
+      })
+      .sort(function (a, b) {
+        return a - b;
+      });
+      // boardDispatch({type: 'FETCH_BOARDS_SUCCESS', payload: decrease})
+    console.log("decrease: ", decrease);
+  }
 
   useEffect(() => {
     spaceDispatch({ type: "FETCH_SPACES_REQUEST" });
     getSpaceLists();
   }, []);
 
-  console.log("boards log: ", boardState.boards);
+  console.log("all boards log: ", boardState.boards);
   //   let foundBoards;
   //   if (searchInput) {
   //     // foundBoards = boardState.boards.filter((board) => {
@@ -50,7 +71,7 @@ const AllBoardTab = (props) => {
     if (pageNumber <= 1) {
       setItemNumber({
         minValue: 0,
-        maxValue: 4,
+        maxValue: 12,
       });
     } else {
       setItemNumber({
@@ -75,7 +96,7 @@ const AllBoardTab = (props) => {
       <div className="pagination_wrap">
         <Pagination
           total={boardState.boards.length}
-          defaultPageSize={4}
+          defaultPageSize={12}
           defaultCurrent={1}
           // showSizeChanger
           // showQuickJumper

@@ -104,6 +104,7 @@ const BoardManagement = (props) => {
         columns={columns}
         dataSource={dataSource}
         onChange={handleChange}
+        pagination={{ pageSize: 5 }}
       />
     </div>
   );

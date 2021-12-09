@@ -73,8 +73,8 @@ class UserController {
         createdAt: {
           $gte: startOfDay(new Date()),
           $lte: endOfDay(new Date()),
-          role: "user",
         },
+        role: "user",
       });
       if (!user) {
         return res
@@ -94,7 +94,7 @@ class UserController {
 
   async updateUserInfo(req, res) {
     const { name, email, DoB, gender, workingPlace, position } = req.body;
-    const avatar = req.file.filename;
+    // const avatar = req.file.filename;
     await User.findByIdAndUpdate(
       { _id: req.user._id },
       {
@@ -104,7 +104,7 @@ class UserController {
         gender: gender,
         workingPlace: workingPlace,
         position: position,
-        avatar: avatar,
+        // avatar: avatar,
       },
       { new: true }
     )

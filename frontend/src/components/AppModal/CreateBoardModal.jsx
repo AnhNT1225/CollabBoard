@@ -139,7 +139,7 @@ const CreateBoardModal = ({ socket }) => {
               </div>
               <span className="media_name">Blank canvas</span>
             </Button>
-            <Button className="option_items" onClick={showThemeModal}
+            <Button className="option_items" onClick={(showThemeModal)}
             // onClick={createInitialFileBoard}
             >
               {/* <Upload onChange={handleChange}> */}

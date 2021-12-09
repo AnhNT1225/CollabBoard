@@ -18,10 +18,10 @@ const SortTool = (props) => {
     console.log(`selected ${value}`);
     switch (value) {
       case "date_created":
-        setSortType("Date created");
+        setSortType("date_created");
         break;
       case "date_update":
-        setSortType("Date updated");
+        setSortType("date_updated");
         break;
       default:
         break;

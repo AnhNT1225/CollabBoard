@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { Avatar, DatePicker, Input, Button, Space } from "antd";
+import { Avatar,  Input, Space } from "antd";
 import "./styles.scss";
 import { UserContext, ACTIONS } from "../../context/userContext";
 import UserService from "../../services/userService";
-import moment from "moment";
+
 const UserProfile = (props) => {
   const userId = props.match.params.id;
   const history = useHistory();

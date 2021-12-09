@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext, memo } from "react";
 import ControlMenu from "../ControlMenu";
 import Conversation from "../Conversation/Conversation";
-import {message} from 'antd'
+import { message } from "antd";
 import { withRouter } from "react-router-dom";
 import OverlayMenu from "../OverlayMenu/OverlayMenu";
 import { Stage, Layer, Line, Rect, Transformer } from "react-konva";
@@ -16,7 +16,7 @@ import { ElementContext } from "../../context/elementContext";
 import BoardService from "../../services/boardService";
 import nextId from "react-id-generator";
 import Note from "../NodeModels/label";
-import PenCursor from '../../assets/editor_icon/pen_cursor.png'
+import PenCursor from "../../assets/editor_icon/pen_cursor.png";
 const Board = (props) => {
   const {
     menuComponent,
@@ -31,7 +31,9 @@ const Board = (props) => {
     boardState,
     boardDispatch,
     socket,
-    boardTheme
+    isChatOpen,
+    setIsChatOpen,
+    boardTheme,
   } = props;
   // console.log("user from YTF: ", user);
   //----------------USE FOR SET SHAPING COMBINATION -------------------
@@ -43,7 +45,7 @@ const Board = (props) => {
   //check the text element is edit or not
 
   const isDrawing = useRef(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+
   const [isButton, setIsButton] = useState(true);
   // console.log("state push by history: ", location.state);
   const dragUrl = useRef();
@@ -104,8 +106,6 @@ const Board = (props) => {
   //     });
   // }, []);
 
-
-
   // ---------------------------------CHANGE BACKGROUND--------------------------
   // useEffect(() => {
   //   //Method 1
@@ -122,7 +122,7 @@ const Board = (props) => {
   //     // remove background from hit graph for better performance
   //     // because we don't need any events on the background
   //     listening: false,
-      
+
   //   });
   //   background.add(colorBackground);
   //   stageRef.current.add(layerRef.current)
@@ -235,22 +235,22 @@ const Board = (props) => {
 
     const onDrawingRectEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
-      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData});
+      elementDispatch({ type: "SET_RECTANGLE", payload: shapeData });
     };
     socket?.on("receiveRect", onDrawingRectEvent);
     const onDrawingPolyEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
-      elementDispatch({ type: "SET_POLYGONS", payload: shapeData});
+      elementDispatch({ type: "SET_POLYGONS", payload: shapeData });
     };
     socket?.on("receivePoly", onDrawingPolyEvent);
     const onDrawingElipEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
-      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData});
+      elementDispatch({ type: "SET_ELLIPSE", payload: shapeData });
     };
     socket?.on("receiveElip", onDrawingElipEvent);
     const onDrawingStarEvent = (shapeData) => {
       console.log("Shape data response: ", shapeData);
-      elementDispatch({ type: "SET_STAR", payload: shapeData});
+      elementDispatch({ type: "SET_STAR", payload: shapeData });
     };
     socket?.on("receiveStar", onDrawingStarEvent);
 
@@ -318,8 +318,7 @@ const Board = (props) => {
     const container = e.currentTarget.getStage().container();
     switch (menuComponent) {
       case "drawing":
-        container.style.cursor =
-        `url(${PenCursor}) 0 100,auto`
+        container.style.cursor = `url(${PenCursor}) 0 100,auto`;
         break;
       case "useHand":
         container.style.cursor = "grab";
@@ -367,8 +366,7 @@ const Board = (props) => {
         break;
       case "drawing":
         //if choose "Pen" tool cannot draggable on board
-        container.style.cursor =
-        `url(${PenCursor}) 0 100, auto`
+        container.style.cursor = `url(${PenCursor}) 0 100, auto`;
         stageRef.current.draggable(false);
         isDrawing.current = true;
 
@@ -467,8 +465,7 @@ const Board = (props) => {
         if (!isDrawing.current) {
           return;
         }
-        container.style.cursor =
-        `url(${PenCursor}) 0 100,auto`
+        container.style.cursor = `url(${PenCursor}) 0 100,auto`;
         let lastLine = elementState.lines[elementState.lines.length - 1];
         // add point
         lastLine.points = lastLine.points.concat([pos.x, pos.y]);
@@ -505,8 +502,7 @@ const Board = (props) => {
           code: boardState.currentBoard.code,
           line: elementState.lines,
         });
-        container.style.cursor =
-        `url(${PenCursor}) 0 100, auto`
+        container.style.cursor = `url(${PenCursor}) 0 100, auto`;
         break;
       case "useHand":
         container.style.cursor = "grab";
@@ -536,7 +532,6 @@ const Board = (props) => {
     }
   };
 
-
   //Zooming pan by relative position (by MOUSE Wheel)
   //define scale rate of the stage on zooming
   const SCALE = 1.2;
@@ -564,11 +559,11 @@ const Board = (props) => {
       e.target.getStage().position(newPos);
     }
   };
-  const key = 'updatable';
+  const key = "updatable";
   const openMessage = () => {
-    message.loading({ content: 'Saving...', key });
+    message.loading({ content: "Saving...", key });
     setTimeout(() => {
-      message.success({ content: 'Saved board!', key, duration: 2 });
+      message.success({ content: "Saved board!", key, duration: 2 });
     }, 1000);
   };
 
@@ -601,7 +596,7 @@ const Board = (props) => {
             type: "SET_CURRENT_BOARD",
             payload: response.data,
           });
-          openMessage()
+          openMessage();
           elementDispatch({ type: "RESET_STATE" });
         })
         .catch((error) => {
@@ -825,7 +820,7 @@ const Board = (props) => {
             draggable={false}
             ref={stageRef}
           >
-            <Layer ref={layerRef} >
+            <Layer ref={layerRef}>
               {/* Line using for drawing */}
               {elementState?.lines.map((line, i) => {
                 return (
@@ -843,7 +838,7 @@ const Board = (props) => {
                         let temp = nodesArray;
                         if (!nodesArray.includes(e.current))
                           temp.push(e.current);
-                        setNodes(temp); 
+                        setNodes(temp);
                         trRef.current.nodes(nodesArray);
                         trRef.current.getLayer().batchDraw();
                       }

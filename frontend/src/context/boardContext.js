@@ -8,6 +8,7 @@ const initialState = {
   currentBoard: {},
   foundBoards: [],
   newBoards: [],
+  markNotiy: { joined: true, message: true }
 };
 
 const boardReducer = (state, action) => {
@@ -39,6 +40,11 @@ const boardReducer = (state, action) => {
         hasError: true,
         isFetch: false,
       };
+      // case "SET_BOARD_NOTIFY": 
+      // return {
+      //   ...state,
+      //   markNotiy: {...state.markNotiy, action.payload}
+      // }
     case "CREATE_BOARD":
       return {
         ...state,

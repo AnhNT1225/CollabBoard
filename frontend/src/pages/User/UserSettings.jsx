@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { Tabs, Form, Input, Button, message, Checkbox, Space } from "antd";
+import React, { useContext, useState } from "react";
+import { Tabs, Form, Input, Button, message, Checkbox } from "antd";
 import { useHistory } from "react-router-dom";
 import {
   SafetyOutlined,
@@ -10,11 +10,12 @@ import {
 } from "@ant-design/icons";
 import UserEdit from "./UserEdit";
 import UserService from "../../services/userService";
-import { UserContext } from "../../context/userContext";
+// import { UserContext } from "../../context/userContext";
 const { TabPane } = Tabs;
 const UserSettings = () => {
   const history = useHistory();
-  const { dispatch } = useContext(UserContext);
+  // const { dispatch } = useContext(UserContext);
+  const [markNotiy, setMarkNotiy] = useState({ joined: true, message: true });
 
   const callback = (key) => {
     console.log(key);
@@ -146,14 +147,18 @@ const UserSettings = () => {
                   }
                 />
               </Form.Item>
-              <Button
-                className="button_form"
-                type="primary"
-                htmlType="submit"
-                size="large"
-              >
-                Submit
-              </Button>
+              <div style={{ textAlign: "center", marginTop: 20 }}>
+                <Button
+                  // className="button_form"
+                  style={{ padding: "0 50px" }}
+                  shape="round"
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                >
+                  Submit
+                </Button>
+              </div>
             </Form>
           </TabPane>
           <TabPane
@@ -165,38 +170,87 @@ const UserSettings = () => {
             }
           >
             <div>
-              <p><b>Board activity and conversation</b></p>
-              <div>
-              <Space direction='horizontal'>
-              <p style={{marginBottom: 0}}>When a board is shared with me</p>
-              <Checkbox style={{textAlign:'right'}} onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
-              </Space>
+              <b>Board activity and conversation</b>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <p style={{ marginBottom: 0 }}>
+                  When a board is shared with me
+                </p>
+                <Checkbox
+                  style={{ textAlign: "right" }}
+                  onChange={(checkedValues) =>
+                    console.log("checked = ", checkedValues)
+                  }
+                />
               </div>
-              <div>
-              <Space direction='horizontal'>
-              <p style={{marginBottom: 0}}>When someone requests access to my board</p>
-              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
-              </Space>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                {/* <p style={{ marginBottom: 0 }}>
+                  When someone requests access to my board
+                </p> */}
+                <p style={{ marginBottom: 0 }}>
+                  When someone joined to my board
+                </p>
+                <Checkbox
+                  checked={markNotiy.joined}
+                  onChange={(e) => {
+                    setMarkNotiy(e.target.checked);
+                    console.log("checked = ", e.target.checked);
+                  }}
+                />
               </div>
-              <p><b>Project activity</b></p>
-              <div>
-              <Space direction='horizontal'>
-              <p style={{marginBottom: 0}}>When someone adds me to a project</p>
-              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
-              </Space>
+              <b>Project activity</b>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                {/* <p style={{ marginBottom: 0 }}>
+                  When someone add me to a project
+                </p> */}
+                <p style={{ marginBottom: 0 }}>
+                  When someone chat to me on board
+                </p>
+                <Checkbox
+                  checked={markNotiy.message}
+                  onChange={(e) => {
+                    setMarkNotiy(e.target.checked);
+                    console.log("checked = ", e.target.checked);
+                  }}
+                />
               </div>
-              <p><b>Team activity</b></p>
-              <div>
-              <Space direction='horizontal'>
-              <p style={{marginBottom: 0}}>When someone invites me to a team</p>
-              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
-              </Space>
+              <b>Team activity</b>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <p style={{ marginBottom: 0 }}>
+                  When someone invites me to a team
+                </p>
+                <Checkbox
+                  onChange={(checkedValues) =>
+                    console.log("checked = ", checkedValues)
+                  }
+                />
               </div>
-              <div>
-              <Space direction='horizontal'>
-              <p style={{marginBottom: 0}}>When someone requests access to my team</p>
-              <Checkbox onChange={(checkedValues) =>console.log('checked = ', checkedValues) }/>
-              </Space>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <p style={{ marginBottom: 0 }}>
+                  When someone requests access to my team
+                </p>
+                <Checkbox
+                  onChange={(checkedValues) =>
+                    console.log("checked = ", checkedValues)
+                  }
+                />
               </div>
             </div>
           </TabPane>

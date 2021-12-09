@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CreateBoardModal from "../../components/AppModal/CreateBoardModal";
 import { Tabs } from "antd";
 import AllBoardTab from "../../components/Tab/PrototypeTab/AllBoardTab";
@@ -15,7 +15,7 @@ const Prototypes = (props) => {
   // const [deletedId, setDeletedId] = useState(null)
   const { boardDispatch } = useContext(BoardContext);
   const { spaceDispatch } = useContext(SpaceContext);
-  
+  const [sortType, setSortType] = useState('date_created')
     useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
     getJoinedItems()
@@ -85,12 +85,12 @@ const Prototypes = (props) => {
       <div className="category_card">
         <Tabs defaultActiveKey="1" onChange={changeTab}>
           <TabPane tab="All" key="1">
-            <SortTool />
-            <AllBoardTab searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
+            <SortTool setSortType={setSortType}/>
+            <AllBoardTab sortType={sortType} searchInput={searchInput} getJoinedItems={getJoinedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
           </TabPane>
           <TabPane tab="Created by me" key="2">
-            <SortTool />
-            <OwnedBoardTab searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
+            <SortTool setSortType={setSortType}/>
+            <OwnedBoardTab sortType={sortType} searchInput={searchInput} getOwnedItems={getOwnedItems} getSpaceLists={getSpaceLists} socket={socket} sideComponent={sideComponent}/>
           </TabPane>
         </Tabs>
       </div>

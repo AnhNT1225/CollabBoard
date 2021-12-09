@@ -11,7 +11,7 @@ const Spaces = (props) => {
   const {searchInput, setDataSource, dataSource, sideComponent} = props
   const [createSpaceModal, setCreateSpaceModal] = useState(false);
   const { spaceDispatch } = useContext(SpaceContext);
-  const [sortType, setSortType] = useState('')
+  const [sortType, setSortType] = useState('date_created')
 
   const createNewSpace = async (form) => {
     // e.preventDefault();

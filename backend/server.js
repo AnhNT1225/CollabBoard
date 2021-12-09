@@ -87,7 +87,7 @@ io.on("connection", function (socket) {
   console.log("New client connected " + socket.userId);
   socket.on("newUser", (userId) => {
     addNewUser(userId, socket.id);
-    console.log('online user: ', onlineUsers);
+    console.log("online user: ", onlineUsers);
   });
   // console.log("socket room: ", socket.rooms);
   // console.log("al room: ", io.sockets.adapter.rooms);
@@ -103,14 +103,11 @@ io.on("connection", function (socket) {
       console.log("user joined room: ", boardCode);
       console.log("all room in Join: ", io.of("/").adapter.rooms);
       socket.emit("notification", `You have joined the room: ${boardCode}`);
-      io.to(boardCode).emit(
-        "getRoomNotification",
-        {
-          memberName: memberInfo.memberName,
-          message: `One people has name ${memberInfo.memberName} joined our board.`,
-          type: memberInfo.type
-        }
-      );
+      socket.to(boardCode).emit("getRoomNotification", {
+        memberName: memberInfo.memberName,
+        message: `One people has name ${memberInfo.memberName} joined our board.`,
+        type: memberInfo.type,
+      });
     } else {
       console.log("There is no room like this key word search");
     }
@@ -119,9 +116,9 @@ io.on("connection", function (socket) {
   const createRoom = (boardCode) => {
     console.log("THIS IS ROOM CODE: ", boardCode);
     if (boardCode !== null) {
-    socket.join(boardCode);
-    console.log("all room in create: ", io.sockets.adapter.rooms);
-    // socket.emit("notification", `You have joined the room: ${boardCode}`);
+      socket.join(boardCode);
+      console.log("all room in create: ", io.sockets.adapter.rooms);
+      // socket.emit("notification", `You have joined the room: ${boardCode}`);
     }
   };
 
@@ -196,6 +193,11 @@ io.on("connection", function (socket) {
     socket
       .in(data.code)
       .emit("receiveMessageServer", { message: data.message });
+    socket.to(data.code).emit("getRoomNotification", {
+      memberName: data.message.senderId.name,
+      message: `${data.message.senderId.name} has sent a new message.`,
+      type: 2,
+    });
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected!: " + socket.userId);
@@ -205,6 +207,7 @@ io.on("connection", function (socket) {
 
 //DB connection
 const db = require("./models");
+const { da } = require("date-fns/locale");
 
 db.mongoose
   .connect(

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { Input, Button, Space, Tag, Checkbox } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { Input, Button, Space, Tag, Checkbox, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import TeamService from "../../../services/teamService";
 import { TeamContext } from "../../../context/teamContext";
@@ -21,7 +21,7 @@ const TeamEdit = (props) => {
           teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
         })
         .catch((err) => {
-          throw new Error(err);
+          console.log('err: ', err)
         });
     };
     getTeamInfo();
@@ -32,6 +32,7 @@ const TeamEdit = (props) => {
     await TeamService.editTeamName(teamId, updateName)
       .then((result) => {
         console.log("result edit team name: ", result);
+        message.success('Update team successfully!')
         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((err) => {
@@ -51,6 +52,7 @@ const TeamEdit = (props) => {
     await TeamService.removeMemberFromTeam(teamId, selectedMemberId)
       .then((result) => {
         console.log("result: ", result);
+        message.success('Remomve member from team successfully!')
         teamDispatch({ type: "FETCH_TEAM_SUCCESS", payload: result.data });
       })
       .catch((err) => {
@@ -62,6 +64,7 @@ const TeamEdit = (props) => {
     await TeamService.addMemberToTeam(teamId, email)
       .then((result) => {
         console.log("add member to team result: ", result);
+        message.success('Member is added successfully into team')
         teamDispatch({type: "FETCH_TEAM_SUCCESS", payload: result.data});
       })
       .catch((error) => {

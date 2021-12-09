@@ -64,10 +64,10 @@ function App() {
     setupSocket();
   }, []);
 
-  // useEffect(() => {
-  //   const userId= getUserId()
-  //   socket?.emit("newUser", userId)
-  // }, [socket])
+  useEffect(() => {
+    const userId= getUserId()
+    socket?.emit("newUser", userId)
+  }, [socket])
   return (
     <Suspense fallback={<Spinner />}>
       <Router>

@@ -12,6 +12,7 @@ const Editor = ({ match, socket }) => {
   const { state, dispatch } = useContext(UserContext);
   const location = useLocation();
   const { boardState, boardDispatch } = useContext(BoardContext);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const boardId = match.params.id;
   console.log("boardId: ", boardId);
   console.log("state props history: ", location.state);
@@ -28,7 +29,7 @@ const Editor = ({ match, socket }) => {
       socket?.off("notification", onNotification);
     };
   }, [socket]);
-  
+
   useEffect(() => {
     boardDispatch({ type: "FETCH_BOARDS_REQUEST" });
     BoardService.getBoard(boardId)
@@ -45,9 +46,9 @@ const Editor = ({ match, socket }) => {
       });
   }, [boardDispatch, boardId]);
 
-//   if(boardTheme){
-// 	boardDispatch({type: })
-// }
+  //   if(boardTheme){
+  // 	boardDispatch({type: })
+  // }
 
   useEffect(() => {
     UserService.getCurrentUser()
@@ -81,6 +82,8 @@ const Editor = ({ match, socket }) => {
   return (
     <div className="editor">
       <BoardHeader
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
         boardId={boardId}
         menuComponent={menuComponent}
         drawingProperty={drawingProperty}
@@ -95,6 +98,8 @@ const Editor = ({ match, socket }) => {
         socket={socket}
       />
       <Board
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
         boardTheme={boardTheme}
         menuComponent={menuComponent}
         drawingProperty={drawingProperty}
